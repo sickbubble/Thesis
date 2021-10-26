@@ -92,11 +92,11 @@ namespace Solver
             {
                 var frmMember = listOfFrameMembers[i];
                 var K = frmMember.GetGlobalStiffnessMatrix();
-                var ıNode = frmMember.IEndNode;
+                var iNode = frmMember.IEndNode;
                 var jNode = frmMember.JEndNode;
 
                 var g = new List<int>();
-                g.AddRange(nodeEquationData[ıNode.ID]);
+                g.AddRange(nodeEquationData[iNode.ID]);
                 g.AddRange(nodeEquationData[jNode.ID]);
 
                 var matrixLength = K.NRows;//should be 12 for frame
