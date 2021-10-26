@@ -1,0 +1,2 @@
+C:\Users\Burak T\source\repos\ThesisProject\ThesisProject\obj\Debug\Model Info.csprojAssemblyReference.cache
+C:\Users\Burak T\source\repos\ThesisProject\ThesisProject\obj\Debug\Model Info.csproj.CoreCompileInputs.cache
