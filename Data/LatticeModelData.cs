@@ -69,7 +69,7 @@ namespace Data
             {
                 for (int j = 1; j < _ListOfNodes.Count; j++)
                 {
-                    var lengthOfMember = Math.Sqrt(Math.Pow(_ListOfNodes[j].X - _ListOfNodes[i].X, 2) + Math.Pow(_ListOfNodes[j].Y - _ListOfNodes[i].Y, 2) + Math.Pow(_ListOfNodes[j].Z - _ListOfNodes[i].Z, 2));
+                    var lengthOfMember = Math.Sqrt(Math.Pow(_ListOfNodes[j].Point.X - _ListOfNodes[i].Point.X, 2) + Math.Pow(_ListOfNodes[j].Point.Y - _ListOfNodes[i].Point.Y, 2) + Math.Pow(_ListOfNodes[j].Point.Z - _ListOfNodes[i].Point.Z, 2));
                     if (lengthOfMember < 1.42 * _MeshSize)
                     {
                         _ListOfMembers.Add(new FrameMember() { IEndNode = _ListOfNodes[i], JEndNode = _ListOfNodes[j], ID = labelCounter });
@@ -91,10 +91,10 @@ namespace Data
                 for (int j = 0; j < ny; j++)
                 {
                     var node = new Node();
-                    node.Z = 0; // Level of system, not necessary at the moment. 
+                    node.Point.Z = 0; // Level of system, not necessary at the moment. 
 
-                    node.Y = j * this.MeshSize;
-                    node.X = i * this.MeshSize;
+                    node.Point.Y = j * this.MeshSize;
+                    node.Point.X = i * this.MeshSize;
 
                     node.SupportCondition = new Support(eSupportType.Free);
                     node.ID = nodeIDCounter;
@@ -116,10 +116,10 @@ namespace Data
             var ret = new List<Node>();
             if (this.ListOfNodes !=null)
             {
-                ret = this.ListOfNodes.Where(x => x.X == 0 ||
-                                            x.X == _Width ||
-                                             x.Y == 0 ||
-                                             x.Y == _Height).ToList();
+                ret = this.ListOfNodes.Where(x => x.Point.X == 0 ||
+                                            x.Point.X == _Width ||
+                                             x.Point.Y == 0 ||
+                                             x.Point.Y == _Height).ToList();
 
             }
             return ret;

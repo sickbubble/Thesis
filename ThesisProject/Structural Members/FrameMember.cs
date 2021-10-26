@@ -58,21 +58,21 @@ namespace ThesisProject.Structural_Members
 
             rotationMatrix = this.GetRotationMatrix();
             localStiffnessMatrix = this.GetLocalStiffnessMatrix();
-            transposedRotMatrix.Matrix = rotationMatrix.Transpose();
+            transposedRotMatrix = rotationMatrix.Transpose();
 
-            var secondPartOfMultiplication = localStiffnessMatrix.Multiply(rotationMatrix.Matrix);
-            globalStiffnessMatrix.Matrix = transposedRotMatrix.Multiply(secondPartOfMultiplication);
+            var secondPartOfMultiplication = localStiffnessMatrix.Multiply(rotationMatrix);
+            globalStiffnessMatrix = transposedRotMatrix.Multiply(secondPartOfMultiplication);
 
             return globalStiffnessMatrix;
         }
 
         public MatrixCS GetRotationMatrix()
         {
-            var L = Math.Sqrt(Math.Pow(this.JEndNode.X - this.IEndNode.X, 2) + Math.Pow(this.JEndNode.Y - this.IEndNode.Y, 2) + Math.Pow(this.JEndNode.Z - this.IEndNode.Z, 2));
+            var L = Math.Sqrt(Math.Pow(this.JEndNode.Point.X - this.IEndNode.Point.X, 2) + Math.Pow(this.JEndNode.Point.Y - this.IEndNode.Point.Y, 2) + Math.Pow(this.JEndNode.Point.Z - this.IEndNode.Point.Z, 2));
 
-            var Cx = (this.JEndNode.X - this.IEndNode.X) / L;
-            var Cy = (this.JEndNode.Y - this.IEndNode.Y) / L;
-            var Cz = (this.JEndNode.Z - this.IEndNode.Z) / L;
+            var Cx = (this.JEndNode.Point.X - this.IEndNode.Point.X) / L;
+            var Cy = (this.JEndNode.Point.Y - this.IEndNode.Point.Y) / L;
+            var Cz = (this.JEndNode.Point.Z - this.IEndNode.Point.Z) / L;
             var Cxz = Math.Sqrt(Cx * Cx + Cz * Cz);
             var alpha = 0;
 
@@ -90,10 +90,10 @@ namespace ThesisProject.Structural_Members
 
 
             var rotElm = new MatrixCS(12, 12); // 3 columns will be added by using InsertRange
-            rotElm.InsertMatrix(Ri.Matrix, 0, 0);
-            rotElm.InsertMatrix(Ri.Matrix, 3, 3);
-            rotElm.InsertMatrix(Ri.Matrix, 6, 6);
-            rotElm.InsertMatrix(Ri.Matrix, 9, 9);
+            rotElm.InsertMatrix(Ri, 0, 0);
+            rotElm.InsertMatrix(Ri, 3, 3);
+            rotElm.InsertMatrix(Ri, 6, 6);
+            rotElm.InsertMatrix(Ri, 9, 9);
 
 
             return rotElm;
@@ -103,7 +103,7 @@ namespace ThesisProject.Structural_Members
         {
             var section = (FrameSection)_Section;
             var kElm = new MatrixCS(12, 12);
-            var L = Math.Sqrt(Math.Pow(this.JEndNode.X - this.IEndNode.X, 2) + Math.Pow(this.JEndNode.Y - this.IEndNode.Y, 2)+ Math.Pow(this.JEndNode.Z - this.IEndNode.Z, 2));
+            var L = Math.Sqrt(Math.Pow(this.JEndNode.Point.X - this.IEndNode.Point.X, 2) + Math.Pow(this.JEndNode.Point.Y - this.IEndNode.Point.Y, 2)+ Math.Pow(this.JEndNode.Point.Z - this.IEndNode.Point.Z, 2));
             var L2 = L * L;
             var L3 = Math.Pow(L, 3);
             var E = section.Material.E;

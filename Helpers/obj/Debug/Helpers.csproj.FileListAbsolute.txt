@@ -1,0 +1,14 @@
+C:\Users\Burak T\Desktop\Tez\Helpers\obj\Debug\Helpers.csprojAssemblyReference.cache
+C:\Users\Burak T\Desktop\Tez\Helpers\obj\Debug\Helpers.csproj.CoreCompileInputs.cache
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\Helpers.dll.config
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\Helpers.dll
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\Helpers.pdb
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\Data.dll
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\ThesisProject.dll
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\Data.pdb
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\Data.dll.config
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\ThesisProject.pdb
+C:\Users\Burak T\Desktop\Tez\Helpers\bin\Debug\ThesisProject.dll.config
+C:\Users\Burak T\Desktop\Tez\Helpers\obj\Debug\Helpers.csproj.CopyComplete
+C:\Users\Burak T\Desktop\Tez\Helpers\obj\Debug\Helpers.dll
+C:\Users\Burak T\Desktop\Tez\Helpers\obj\Debug\Helpers.pdb

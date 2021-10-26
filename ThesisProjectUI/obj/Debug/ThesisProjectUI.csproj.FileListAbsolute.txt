@@ -1,0 +1,10 @@
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\bin\Debug\ThesisProjectUI.exe.config
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\bin\Debug\ThesisProjectUI.exe
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\bin\Debug\ThesisProjectUI.pdb
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.MainForm.resources
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.Properties.Resources.resources
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.csproj.GenerateResource.cache
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.csproj.CoreCompileInputs.cache
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.exe
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.pdb
+C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.csprojAssemblyReference.cache

@@ -10,20 +10,30 @@ namespace ThesisProject
     {
         public MatrixCS(int numOfRows, int numOfCols)
         {
-            _Matrix = new double[numOfRows, numOfCols];    
+            _Matrix = new double[numOfRows, numOfCols];
+            _nRows = numOfRows;
+            _nColumns = numOfCols;
         }
         private double[,] _Matrix;
+        private int _nRows;
+        private int _nColumns;
+
 
         public double[,] Matrix { get => _Matrix; set => _Matrix = value; }
+        public int NRows { get => _nRows; set => _nRows = value; }
+        public int NColumns { get => _nColumns; set => _nColumns = value; }
+
+
+
 
 
 
         #region Public Methods
 
-        public void InsertMatrix(double[,] matrix, int startingRow, int startingColumn)
+        public void InsertMatrix(MatrixCS matrix, int startingRow, int startingColumn)
         {
-            var lastColumn = startingColumn + matrix.Length;
-            var lastRow = startingRow+ matrix.Length;
+            var lastColumn = startingColumn + matrix.NColumns;
+            var lastRow = startingRow+ matrix.NRows;
 
             int rowCounter = 0;
             int columnCounter = 0;
@@ -32,7 +42,7 @@ namespace ThesisProject
             { 
                 for (int j = startingColumn; j < lastColumn; j++)
                 {
-                    this.Matrix[i, j] = matrix[rowCounter, columnCounter];
+                    this.Matrix[i, j] = matrix.Matrix[rowCounter, columnCounter];
                         columnCounter++;
                 }
 
@@ -43,11 +53,29 @@ namespace ThesisProject
 
 
         }
-
-        public double[,] Multiply(double[,] matrix2)
+        public MatrixCS Multiply(double multiplyWith)
         {
+            MatrixCS product = new MatrixCS(this.NRows, this.NColumns);
+            for (int i = 0; i < _nRows; i++)
+            {
+                for (int j = 0; j < _nColumns; j++)
+                {
+                    product.Matrix[i, j] = this.Matrix[i, j] * multiplyWith;
 
+                }
+
+            }
+
+            return product;
+        }
+
+        public MatrixCS Multiply(MatrixCS multiplyWith)
+        {
+            MatrixCS product = new MatrixCS(this.NRows,multiplyWith.NColumns);
             double[,] matrix1 = this.Matrix;
+
+            double[,] matrix2 = multiplyWith.Matrix;
+
 
             // cahing matrix lengths for better performance  
             var matrix1Rows = matrix1.GetLength(0);
@@ -61,7 +89,6 @@ namespace ThesisProject
                   ("Product is undefined. n columns of first matrix must equal to n rows of second matrix");
 
             // creating the final product matrix  
-            double[,] product = new double[matrix1Rows, matrix2Cols];
 
             // looping through matrix 1 rows  
             for (int matrix1_row = 0; matrix1_row < matrix1Rows; matrix1_row++)
@@ -72,7 +99,7 @@ namespace ThesisProject
                     // loop through matrix 1 columns to calculate the dot product  
                     for (int matrix1_col = 0; matrix1_col < matrix1Cols; matrix1_col++)
                     {
-                        product[matrix1_row, matrix2_col] +=
+                        product.Matrix[matrix1_row, matrix2_col] +=
                           matrix1[matrix1_row, matrix1_col] *
                           matrix2[matrix1_col, matrix2_col];
                     }
@@ -82,10 +109,11 @@ namespace ThesisProject
             return product;
         }
 
-        public double [,] Transpose()
+        public MatrixCS Transpose()
         {
-            var m =  this.Matrix.GetLength(0);
-            var n = this.Matrix.GetLength(0);
+            var m =  this.NRows;
+            var n = this.NColumns;
+            var product = new MatrixCS(n, m);
 
             var arr1 = this.Matrix;
 
@@ -98,8 +126,8 @@ namespace ThesisProject
                     transpose[j, i] = arr1[i, j];
                 }
             }
-
-            return transpose;
+            product.Matrix = transpose;
+            return product ;
 
         }
 

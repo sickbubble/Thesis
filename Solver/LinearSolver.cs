@@ -55,7 +55,7 @@ namespace Solver
             var RHS = GetRightHandSide();
 
 
-            var size = KG.Matrix.Length;
+            var size = KG.NRows;
 
 
             double GetK(int i, int j) => KG.Matrix[i, j];
@@ -99,7 +99,7 @@ namespace Solver
                 g.AddRange(nodeEquationData[ıNode.ID]);
                 g.AddRange(nodeEquationData[jNode.ID]);
 
-                var matrixLength = K.Matrix.Length;//should be 12 for frame
+                var matrixLength = K.NRows;//should be 12 for frame
 
                 for (int k = 0; k < matrixLength; k++)
                 {

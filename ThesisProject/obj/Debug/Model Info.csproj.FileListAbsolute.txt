@@ -1,2 +1,9 @@
 C:\Users\Burak T\source\repos\ThesisProject\ThesisProject\obj\Debug\Model Info.csprojAssemblyReference.cache
 C:\Users\Burak T\source\repos\ThesisProject\ThesisProject\obj\Debug\Model Info.csproj.CoreCompileInputs.cache
+C:\Users\Burak T\Desktop\Tez\ThesisProject\obj\Debug\Model Info.csproj.CoreCompileInputs.cache
+C:\Users\Burak T\Desktop\Tez\ThesisProject\bin\Debug\ThesisProject.pdb
+C:\Users\Burak T\Desktop\Tez\ThesisProject\obj\Debug\ThesisProject.pdb
+C:\Users\Burak T\Desktop\Tez\ThesisProject\bin\Debug\ThesisProject.dll.config
+C:\Users\Burak T\Desktop\Tez\ThesisProject\bin\Debug\ThesisProject.dll
+C:\Users\Burak T\Desktop\Tez\ThesisProject\obj\Debug\ThesisProject.dll
+C:\Users\Burak T\Desktop\Tez\ThesisProject\obj\Debug\Model Info.csprojAssemblyReference.cache
