@@ -24,11 +24,13 @@ namespace Data
         #region Private Fields
 
         private Dictionary<int, List<double>> _NodeResults; 
-        private Dictionary<int, FrameMemberResults> _FrameResults ; 
-        
+        private Dictionary<int, FrameMemberResults> _LocalFrameResults ;
+        private Dictionary<int, FrameMemberResults> _GlobalFrameResults;
 
 
-        #endregion 
+
+
+        #endregion
 
 
 
@@ -42,7 +44,8 @@ namespace Data
         /// <summary>
         /// Frame ID and FrameMemberResults
         /// </summary>
-        public Dictionary<int, FrameMemberResults> FrameResults { get => _FrameResults; set => _FrameResults = value; }
+        public Dictionary<int, FrameMemberResults> LocalFrameResults { get => _LocalFrameResults; set => _LocalFrameResults = value; }
+        public Dictionary<int, FrameMemberResults> GlobalFrameResults { get => _GlobalFrameResults; set => _GlobalFrameResults = value; }
 
         #endregion
     }
@@ -57,10 +60,15 @@ namespace Data
         }
 
 
-        private Dictionary<int, List<double>> _INodeResults;
-        private Dictionary<int, List<double>> _JNodeResults;
+        private List<double> _INodeDisplacements;
+        private List<double> _JNodeDisplacements;
+        private List<double> _INodeForces;
+        private List<double> _JNodeForces;
 
-        public Dictionary<int, List<double>> INodeResults { get => _INodeResults; set => _INodeResults = value; }
-        public Dictionary<int, List<double>> JNodeResults { get => _JNodeResults; set => _JNodeResults = value; }
+
+        public  List<double> INodeDisplacements { get => _INodeDisplacements; set => _INodeDisplacements = value; }
+        public  List<double> JNodeDisplacements { get => _JNodeDisplacements; set => _JNodeDisplacements = value; }
+        public  List<double> INodeForces { get => _INodeForces; set => _INodeForces = value; }
+        public  List<double> JNodeForces { get => _JNodeForces; set => _JNodeForces = value; }
     }
 }
