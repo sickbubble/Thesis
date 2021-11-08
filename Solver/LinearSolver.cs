@@ -154,7 +154,16 @@ namespace Solver
             return assemblyData;
         }
 
+        private void FillNodeResults(Matrix<double> nodeDisps)
+        {
+            
 
+        }
+
+        private void FillFrameMemberResults()
+        {
+
+        }
         #endregion
     }
 }
