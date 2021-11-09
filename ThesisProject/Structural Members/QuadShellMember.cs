@@ -193,6 +193,81 @@ namespace ThesisProject.Structural_Members
                     }
                 }
             }
+            else if (MembraneType == eMembraneType.Incompatible )
+            {
+                var gp = 1 / Math.Sqrt(3);
+                double[,] gaussPoints = { { -gp, -gp }, { gp, -gp }, { gp, gp }, { -gp, gp } };
+
+                var rowCounter = 0;
+                for (int i = 0; i < 2; i++)
+                {
+                    for (int j = 0; j < 2; j++)
+                    {
+                        // Get Gauss point
+                        var ksi = gaussPoints[rowCounter, 0]; var eta = gaussPoints[rowCounter, 1];
+
+                        // Calculate jacobi
+                        MatrixCS j1 = new MatrixCS(2, 4);
+
+                        j1.Matrix[0, 0] = eta - 1; j1.Matrix[0, 1] = 1 - eta; j1.Matrix[0, 2] = eta + 1; j1.Matrix[0, 3] = -eta - 1;
+                        j1.Matrix[1, 0] = ksi - 1; j1.Matrix[1, 1] = -ksi - 1; j1.Matrix[1, 2] = ksi + 1; j1.Matrix[1, 3] = 1 - ksi;
+                        var j2 = j1.Multiply(mappedCoords);
+
+                        var jacobi = j2.Multiply(0.25);
+
+                        MatrixCS inversejacobi = new MatrixCS(2, 2);
+
+
+                        var detjacobi = (jacobi.Matrix[0, 0] * jacobi.Matrix[1, 1]) - (jacobi.Matrix[0, 1] * jacobi.Matrix[1, 0]);
+                        inversejacobi.Matrix[0, 0] = jacobi.Matrix[1, 1] / detjacobi; inversejacobi.Matrix[0, 1] = -1 * jacobi.Matrix[0, 1] / detjacobi;
+                        inversejacobi.Matrix[1, 0] = -1 * jacobi.Matrix[1, 0] / detjacobi; inversejacobi.Matrix[1, 1] = jacobi.Matrix[0, 0] / detjacobi;
+
+                        // Calculate strain-displacement matrix (B]
+                        MatrixCS mat1 = new MatrixCS(3, 4);
+                        mat1.Matrix[0, 0] = 1; mat1.Matrix[1, 3] = 1; mat1.Matrix[2, 1] = 1; mat1.Matrix[2, 2] = 1;
+
+                        MatrixCS mat2 = new MatrixCS(4, 4);
+                        mat2.Matrix[0, 0] = inversejacobi.Matrix[0, 0]; mat2.Matrix[0, 1] = inversejacobi.Matrix[0, 1]; mat2.Matrix[1, 0] = inversejacobi.Matrix[1, 0]; mat2.Matrix[1, 1] = inversejacobi.Matrix[1, 1];
+                        mat2.Matrix[2, 2] = inversejacobi.Matrix[0, 0]; mat2.Matrix[2, 3] = inversejacobi.Matrix[0, 1]; mat2.Matrix[3, 2] = inversejacobi.Matrix[1, 0]; mat2.Matrix[3, 3] = inversejacobi.Matrix[1, 1];
+
+                        MatrixCS mat3 = new MatrixCS(4, 8);
+                        mat3.Matrix[0, 0] = eta - 1; mat3.Matrix[0, 2] = 1 - eta; mat3.Matrix[0, 4] = eta + 1; mat3.Matrix[0, 6] = -eta - 1;
+                        mat3.Matrix[1, 0] = ksi - 1; mat3.Matrix[1, 2] = -ksi - 1; mat3.Matrix[1, 4] = ksi + 1; mat3.Matrix[1, 6] = 1 - ksi;
+                        mat3.Matrix[2, 1] = eta - 1; mat3.Matrix[2, 3] = 1 - eta; mat3.Matrix[2, 5] = eta + 1; mat3.Matrix[2, 7] = -eta - 1;
+                        mat3.Matrix[3, 1] = ksi - 1; mat3.Matrix[3, 3] = -ksi - 1; mat3.Matrix[3, 5] = ksi + 1; mat3.Matrix[3, 7] = 1 - ksi;
+                        mat3.Multiply(0.25);
+
+
+                        var b = (mat1.Multiply(mat2)).Multiply(mat3);
+
+                        b.Matrix[0, 8] = inversejacobi.Matrix[0, 0] * -2 * ksi;
+                        b.Matrix[0, 9] = inversejacobi.Matrix[0, 1] * -2 * eta;
+                        b.Matrix[1, 10] = inversejacobi.Matrix[1, 0] * -2 * ksi;
+                        b.Matrix[1, 11] = inversejacobi.Matrix[1, 1] * -2 * eta;
+                        b.Matrix[2, 8] = inversejacobi.Matrix[1, 0] * -2 * ksi;
+                        b.Matrix[2, 9] = inversejacobi.Matrix[1, 1] * -2 * eta;
+                        b.Matrix[2, 10] = inversejacobi.Matrix[0, 0] * -2 * ksi;
+                        b.Matrix[2, 11] = inversejacobi.Matrix[0, 1] * -2 * eta;
+
+
+                        var bT = b.Transpose();
+
+
+                        // Stiffness calculated at given Gauss point
+                        var firstPart = bT.Multiply(eMat);
+                        var secondPart = b.Multiply(thickness * detjacobi);
+                        var kPt = firstPart.Multiply(secondPart);
+
+                        // Update stifness
+                        for (int row = 0; row < 12; row++)
+                            for (int col = 0; col < 12; col++)
+                                kMembrane.Matrix[row, col] += kPt.Matrix[row, col];
+
+                        rowCounter++;
+                    }
+                }
+
+            }
         }
 
         MatrixCS IStructuralMember.GetLocalStiffnessMatrix()
