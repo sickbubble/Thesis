@@ -109,6 +109,25 @@ namespace ThesisProject
             return product;
         }
 
+        public MatrixCS Sum(MatrixCS sumWith)
+        {
+            MatrixCS product = new MatrixCS(this.NRows, this.NColumns);
+
+
+
+            for (int i = 0; i < sumWith.NRows; i++)
+            {
+                for (int j = 0; j < sumWith.NColumns; j++)
+                {
+                    this.Matrix[i, j] += this.Matrix[i, j] + sumWith.Matrix[i, j];
+
+                }
+
+            }
+
+            return product;
+        }
+
         public MatrixCS Transpose()
         {
             var m =  this.NRows;
