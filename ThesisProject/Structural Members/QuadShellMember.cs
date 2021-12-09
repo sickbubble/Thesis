@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThesisProject;
+using ThesisProject.LocalDataHolders;
 using ThesisProject.Sections;
 
 namespace ThesisProject.Structural_Members
@@ -64,11 +65,7 @@ namespace ThesisProject.Structural_Members
         public eMembraneType MembraneType1 { get => _MembraneType; set => _MembraneType = value; }
         public ePlateType PlateType { get => _PlateType; set => _PlateType = value; }
 
-        public void GetGlobalStiffnessMatrix()
-        {
-        }
-
-        public MatrixCS GetLocalStiffnessMatrix()
+       public MatrixCS GetLocalStiffnessMatrix()
         {
             // Stiffness matrix is calculated at four Gauss points using Gauss Quadrature
             // It is assumed that nodes are oriented in counter-clock wise direction
@@ -193,7 +190,7 @@ namespace ThesisProject.Structural_Members
                     }
                 }
             }
-            else if (MembraneType == eMembraneType.Incompatible )
+            else if (MembraneType == eMembraneType.Incompatible)
             {
                 var gp = 1 / Math.Sqrt(3);
                 double[,] gaussPoints = { { -gp, -gp }, { gp, -gp }, { gp, gp }, { -gp, gp } };
@@ -277,20 +274,20 @@ namespace ThesisProject.Structural_Members
 
 
                 double[,] gauss2x2PointsWeights = new double[4, 3] { { -gpCoeff, -gpCoeff, 1 }, { gpCoeff, -gpCoeff, 1 }, { gpCoeff, gpCoeff, 1 }, { -gpCoeff, gpCoeff, 1 } };
-                int[,] jk=new int [4,2]  { { 0, 1} , { 1, 2} , { 2, 3} , { 3, 0} };
-                int[,] ms=new int [4,2]  { { 7, 4} , { 4, 5} , { 5, 6} , { 6, 7} };
-                int[] ml=new int [4] { 3, 0, 1, 2 };
-                double[,] nL = new double[4,2];
+                int[,] jk = new int[4, 2] { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 } };
+                int[,] ms = new int[4, 2] { { 7, 4 }, { 4, 5 }, { 5, 6 }, { 6, 7 } };
+                int[] ml = new int[4] { 3, 0, 1, 2 };
+                double[,] nL = new double[4, 2];
 
                 for (int i = 0; i < 4; i++)
                 {
-                    var edgeStartNodeCoordX = mappedCoords.Matrix[jk[i,0], 0];
-                    var edgeStartNodeCoordY = mappedCoords.Matrix[jk[i,0], 1];
-                    var edgeEndNodeCoordX = mappedCoords.Matrix[jk[i,1], 0];
-                    var edgeEndNodeCoordY = mappedCoords.Matrix[jk[i,1], 1];
+                    var edgeStartNodeCoordX = mappedCoords.Matrix[jk[i, 0], 0];
+                    var edgeStartNodeCoordY = mappedCoords.Matrix[jk[i, 0], 1];
+                    var edgeEndNodeCoordX = mappedCoords.Matrix[jk[i, 1], 0];
+                    var edgeEndNodeCoordY = mappedCoords.Matrix[jk[i, 1], 1];
 
-                    nL[i,0] = edgeEndNodeCoordY - edgeStartNodeCoordY;
-                    nL[i,1] = edgeStartNodeCoordX - edgeEndNodeCoordX;
+                    nL[i, 0] = edgeEndNodeCoordY - edgeStartNodeCoordY;
+                    nL[i, 1] = edgeStartNodeCoordX - edgeEndNodeCoordX;
                 }
 
 
@@ -323,10 +320,10 @@ namespace ThesisProject.Structural_Members
                     dN4Eta[3] = 0.25 * (1 - ksi);
 
                     // Calculate jacobi
-                    MatrixCS j1 =  new MatrixCS(2, 4);
-                j1.Matrix[0, 0] = dN4Ksi[0]; j1.Matrix[0, 1] = dN4Ksi[1]; j1.Matrix[0, 2] = dN4Ksi[2]; j1.Matrix[0, 3] = dN4Ksi[3];
-                j1.Matrix[1, 0] = dN4Eta[0]; j1.Matrix[1, 1] = dN4Eta[1]; j1.Matrix[1, 2] = dN4Eta[2]; j1.Matrix[1, 3] = dN4Eta[3];
-                var jacobi = j1.Multiply(mappedCoords);
+                    MatrixCS j1 = new MatrixCS(2, 4);
+                    j1.Matrix[0, 0] = dN4Ksi[0]; j1.Matrix[0, 1] = dN4Ksi[1]; j1.Matrix[0, 2] = dN4Ksi[2]; j1.Matrix[0, 3] = dN4Ksi[3];
+                    j1.Matrix[1, 0] = dN4Eta[0]; j1.Matrix[1, 1] = dN4Eta[1]; j1.Matrix[1, 2] = dN4Eta[2]; j1.Matrix[1, 3] = dN4Eta[3];
+                    var jacobi = j1.Multiply(mappedCoords);
 
                     var inverseJacobi = new MatrixCS(2, 2);
 
@@ -344,7 +341,7 @@ namespace ThesisProject.Structural_Members
 
 
                     // Derivative of bilinear shape functions with respect to y
-                                     double[] dN4Y = new double[4];
+                    double[] dN4Y = new double[4];
 
                     dN4Y[0] = (inverseJacobi.Matrix[1, 0] * dN4Ksi[0]) + (inverseJacobi.Matrix[1, 1] * dN4Eta[0]);
                     dN4Y[1] = (inverseJacobi.Matrix[1, 0] * dN4Ksi[1]) + (inverseJacobi.Matrix[1, 1] * dN4Eta[1]);
@@ -352,7 +349,7 @@ namespace ThesisProject.Structural_Members
                     dN4Y[3] = (inverseJacobi.Matrix[1, 0] * dN4Ksi[3]) + (inverseJacobi.Matrix[1, 1] * dN4Eta[3]);
 
                     // Quadratic shape functions
-                    double[] N8 =   new double [8] {
+                    double[] N8 = new double[8] {
                 -0.25 * (-1 + ksi) * (-1 + eta) * (ksi + eta + 1),
                 0.25 * (1 + ksi) * (-1 + eta) * (-ksi + eta + 1),
                 0.25 * (1 + ksi) * (1 + eta) * (ksi + eta - 1),
@@ -412,33 +409,33 @@ namespace ThesisProject.Structural_Members
                     // Create strain-displacement relationship
                     var B = new MatrixCS(3, 12);
 
-                for (int i = 0; i < 4; i++)
-                {
-                    int j = (i * 3);
-                    int k = j + 1;
-                    int m = j + 2;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        int j = (i * 3);
+                        int k = j + 1;
+                        int m = j + 2;
 
-                    B.Matrix[0, j] = dN4X[i];
-                    B.Matrix[1, k] = dN4Y[i];
-                    B.Matrix[2, j] = dN4Y[i];
-                    B.Matrix[2, k] = dN4X[i];
+                        B.Matrix[0, j] = dN4X[i];
+                        B.Matrix[1, k] = dN4Y[i];
+                        B.Matrix[2, j] = dN4Y[i];
+                        B.Matrix[2, k] = dN4X[i];
 
-                    B.Matrix[0, m] = ((dN8X[ms[i,0]] * nL[ml[i],0]) - (dN8X[ms[i,1]] * nL[i,0])) / 8.0;
-                    B.Matrix[1, m] = ((dN8Y[ms[i,0]] * nL[ml[i],1]) - (dN8Y[ms[i,1]] * nL[i,1])) / 8.0;
-                    B.Matrix[2, m] = ((dN8Y[ms[i,0]] * nL[ml[i],0]) - (dN8Y[ms[i,1]] * nL[i,0])) / 8.0;
-                    B.Matrix[2, m] += ((dN8X[ms[i,0]] * nL[ml[i],1]) - (dN8X[ms[i,1]] * nL[i,1])) / 8.0;
+                        B.Matrix[0, m] = ((dN8X[ms[i, 0]] * nL[ml[i], 0]) - (dN8X[ms[i, 1]] * nL[i, 0])) / 8.0;
+                        B.Matrix[1, m] = ((dN8Y[ms[i, 0]] * nL[ml[i], 1]) - (dN8Y[ms[i, 1]] * nL[i, 1])) / 8.0;
+                        B.Matrix[2, m] = ((dN8Y[ms[i, 0]] * nL[ml[i], 0]) - (dN8Y[ms[i, 1]] * nL[i, 0])) / 8.0;
+                        B.Matrix[2, m] += ((dN8X[ms[i, 0]] * nL[ml[i], 1]) - (dN8X[ms[i, 1]] * nL[i, 1])) / 8.0;
+                    }
+
+                    var vi = thickness * detJacobi * weight;
+                    var littleK = ((B.Transpose().Multiply(eMat)).Multiply(B)).Multiply(vi);
+                    kDrilling = kDrilling.Sum(littleK);
+                    V += vi;
+
                 }
-
-                var vi = thickness * detJacobi * weight;
-                var littleK = ((B.Transpose().Multiply(eMat)).Multiply(B)).Multiply(vi);
-                kDrilling = kDrilling.Sum(littleK);
-                V += vi;
-
-            }
 
 
                 // Create stabilizator for zero-energy modes
-                var  kD =  new MatrixCS(12, 12);
+                var kD = new MatrixCS(12, 12);
                 var em = this.Material.E;
                 var alpha = (1.0 / 150000.0);
                 var kDia = alpha * em * V;
@@ -462,7 +459,7 @@ namespace ThesisProject.Structural_Members
 
 
                 // Map membrane stifness to element stiffness(For a plate at XY - plane, it resists translation - X, translation - Y and rotation - Z)
-        int mapper1 = 0; // Row updader
+                int mapper1 = 0; // Row updader
                 for (int i = 0; i < 12; i++)
                 {
                     int mapper2 = 0; // Column updater
@@ -494,7 +491,7 @@ namespace ThesisProject.Structural_Members
 
                     var kBending = new MatrixCS(12, 12);
                     var gpCoeff2 = 1 / Math.Sqrt(3);
-                    double[,] gaussPoints2= new double[4,2] { { -gpCoeff2, -gpCoeff2}, { gpCoeff2, -gpCoeff2}, { gpCoeff2, gpCoeff2}, { -gpCoeff2, gpCoeff2} };
+                    double[,] gaussPoints2 = new double[4, 2] { { -gpCoeff2, -gpCoeff2 }, { gpCoeff2, -gpCoeff2 }, { gpCoeff2, gpCoeff2 }, { -gpCoeff2, gpCoeff2 } };
                     var rowCounter = 0;
 
                     var flexuralRigidity = new MatrixCS(3, 3);
@@ -510,68 +507,68 @@ namespace ThesisProject.Structural_Members
                     {
                         for (int j = 0; j < 2; j++)
                         {
-                            var ksi = gaussPoints2[rowCounter,0]; var eta = gaussPoints2[rowCounter,1];
+                            var ksi = gaussPoints2[rowCounter, 0]; var eta = gaussPoints2[rowCounter, 1];
 
                             // Calculate jacobi
-                           var j1 = new MatrixCS(2, 4);
-                    j1.Matrix[0, 0] = eta - 1; j1.Matrix[0, 1] = 1 - eta; j1.Matrix[0, 2] = eta + 1; j1.Matrix[0, 3] = -eta - 1;
-                    j1.Matrix[1, 0] = ksi - 1; j1.Matrix[1, 1] = -ksi - 1; j1.Matrix[1, 2] = ksi + 1; j1.Matrix[1, 3] = 1 - ksi;
-                    var j2 = j1.Multiply(mappedCoords);
-                    var jacobi = j2.Multiply( 0.25);
+                            var j1 = new MatrixCS(2, 4);
+                            j1.Matrix[0, 0] = eta - 1; j1.Matrix[0, 1] = 1 - eta; j1.Matrix[0, 2] = eta + 1; j1.Matrix[0, 3] = -eta - 1;
+                            j1.Matrix[1, 0] = ksi - 1; j1.Matrix[1, 1] = -ksi - 1; j1.Matrix[1, 2] = ksi + 1; j1.Matrix[1, 3] = 1 - ksi;
+                            var j2 = j1.Multiply(mappedCoords);
+                            var jacobi = j2.Multiply(0.25);
 
-                    var inverseJacobi = new MatrixCS(2, 2);
-                    var detjacobi = (jacobi.Matrix[0, 0] * jacobi.Matrix[1, 1]) - (jacobi.Matrix[0, 1] * jacobi.Matrix[1, 0]);
-                    inverseJacobi.Matrix[0, 0] = jacobi.Matrix[1, 1] / detjacobi; inverseJacobi.Matrix[0, 1] = -1 * jacobi.Matrix[0, 1] / detjacobi;
-                    inverseJacobi.Matrix[1, 0] = -1 * jacobi.Matrix[1, 0] / detjacobi; inverseJacobi.Matrix[1, 1] = jacobi.Matrix[0, 0] / detjacobi;
+                            var inverseJacobi = new MatrixCS(2, 2);
+                            var detjacobi = (jacobi.Matrix[0, 0] * jacobi.Matrix[1, 1]) - (jacobi.Matrix[0, 1] * jacobi.Matrix[1, 0]);
+                            inverseJacobi.Matrix[0, 0] = jacobi.Matrix[1, 1] / detjacobi; inverseJacobi.Matrix[0, 1] = -1 * jacobi.Matrix[0, 1] / detjacobi;
+                            inverseJacobi.Matrix[1, 0] = -1 * jacobi.Matrix[1, 0] / detjacobi; inverseJacobi.Matrix[1, 1] = jacobi.Matrix[0, 0] / detjacobi;
 
-                    // Bilinear shape functions
-                    var n1 = 0.25 * (1 - ksi) * (1 - eta);
-                    var n2 = 0.25 * (1 + ksi) * (1 - eta);
-                    var n3 = 0.25 * (1 + ksi) * (1 + eta);
-                    var n4 = 0.25 * (1 - ksi) * (1 + eta);
+                            // Bilinear shape functions
+                            var n1 = 0.25 * (1 - ksi) * (1 - eta);
+                            var n2 = 0.25 * (1 + ksi) * (1 - eta);
+                            var n3 = 0.25 * (1 + ksi) * (1 + eta);
+                            var n4 = 0.25 * (1 - ksi) * (1 + eta);
 
-                    // Derivative of shape functions with respect to ksi
-                    var dN1Ksi = -0.25 * (1 - eta);
-                    var dN2Ksi = 0.25 * (1 - eta);
-                    var dN3Ksi = 0.25 * (1 + eta);
-                    var dN4Ksi = -0.25 * (1 + eta);
+                            // Derivative of shape functions with respect to ksi
+                            var dN1Ksi = -0.25 * (1 - eta);
+                            var dN2Ksi = 0.25 * (1 - eta);
+                            var dN3Ksi = 0.25 * (1 + eta);
+                            var dN4Ksi = -0.25 * (1 + eta);
 
-                    // Derivative of shape functions with respect to eta
-                    var dN1Eta = -0.25 * (1 - ksi);
-                    var dN2Eta = -0.25 * (1 + ksi);
-                    var dN3Eta = 0.25 * (1 + ksi);
-                    var dN4Eta = 0.25 * (1 - ksi);
+                            // Derivative of shape functions with respect to eta
+                            var dN1Eta = -0.25 * (1 - ksi);
+                            var dN2Eta = -0.25 * (1 + ksi);
+                            var dN3Eta = 0.25 * (1 + ksi);
+                            var dN4Eta = 0.25 * (1 - ksi);
 
-                    // Derivative of shape functions with respect to x
-                    var dN1X = (inverseJacobi.Matrix[0, 0] * dN1Ksi) + (inverseJacobi.Matrix[0, 1] * dN1Eta);
-                    var dN2X = (inverseJacobi.Matrix[0, 0] * dN2Ksi) + (inverseJacobi.Matrix[0, 1] * dN2Eta);
-                    var dN3X = (inverseJacobi.Matrix[0, 0] * dN3Ksi) + (inverseJacobi.Matrix[0, 1] * dN3Eta);
-                    var dN4X = (inverseJacobi.Matrix[0, 0] * dN4Ksi) + (inverseJacobi.Matrix[0, 1] * dN4Eta);
+                            // Derivative of shape functions with respect to x
+                            var dN1X = (inverseJacobi.Matrix[0, 0] * dN1Ksi) + (inverseJacobi.Matrix[0, 1] * dN1Eta);
+                            var dN2X = (inverseJacobi.Matrix[0, 0] * dN2Ksi) + (inverseJacobi.Matrix[0, 1] * dN2Eta);
+                            var dN3X = (inverseJacobi.Matrix[0, 0] * dN3Ksi) + (inverseJacobi.Matrix[0, 1] * dN3Eta);
+                            var dN4X = (inverseJacobi.Matrix[0, 0] * dN4Ksi) + (inverseJacobi.Matrix[0, 1] * dN4Eta);
 
-                    // Derivative of shape functions with respect to y
-                    var dN1Y = (inverseJacobi.Matrix[1, 0] * dN1Ksi) + (inverseJacobi.Matrix[1, 1] * dN1Eta);
-                    var dN2Y = (inverseJacobi.Matrix[1, 0] * dN2Ksi) + (inverseJacobi.Matrix[1, 1] * dN2Eta);
-                    var dN3Y = (inverseJacobi.Matrix[1, 0] * dN3Ksi) + (inverseJacobi.Matrix[1, 1] * dN3Eta);
-                    var dN4Y = (inverseJacobi.Matrix[1, 0] * dN4Ksi) + (inverseJacobi.Matrix[1, 1] * dN4Eta);
+                            // Derivative of shape functions with respect to y
+                            var dN1Y = (inverseJacobi.Matrix[1, 0] * dN1Ksi) + (inverseJacobi.Matrix[1, 1] * dN1Eta);
+                            var dN2Y = (inverseJacobi.Matrix[1, 0] * dN2Ksi) + (inverseJacobi.Matrix[1, 1] * dN2Eta);
+                            var dN3Y = (inverseJacobi.Matrix[1, 0] * dN3Ksi) + (inverseJacobi.Matrix[1, 1] * dN3Eta);
+                            var dN4Y = (inverseJacobi.Matrix[1, 0] * dN4Ksi) + (inverseJacobi.Matrix[1, 1] * dN4Eta);
 
-                    var bB = new MatrixCS(3, 12);
-                    bB.Matrix[0, 2] = dN1X; bB.Matrix[0, 5] = dN2X; bB.Matrix[0, 8] = dN3X; bB.Matrix[0, 11] = dN4X;
-                    bB.Matrix[1, 1] = -dN1Y; bB.Matrix[1, 4] = -dN2Y; bB.Matrix[1, 7] = -dN3Y; bB.Matrix[1, 10] = -dN4Y;
-                    bB.Matrix[2, 1] = -dN1X; bB.Matrix[2, 4] = -dN2X; bB.Matrix[2, 7] = -dN3X; bB.Matrix[2, 10] = -dN4X;
-                    bB.Matrix[2, 2] = dN1Y; bB.Matrix[2, 5] = dN2Y; bB.Matrix[2, 8] = dN3Y; bB.Matrix[2, 11] = dN4Y;
+                            var bB = new MatrixCS(3, 12);
+                            bB.Matrix[0, 2] = dN1X; bB.Matrix[0, 5] = dN2X; bB.Matrix[0, 8] = dN3X; bB.Matrix[0, 11] = dN4X;
+                            bB.Matrix[1, 1] = -dN1Y; bB.Matrix[1, 4] = -dN2Y; bB.Matrix[1, 7] = -dN3Y; bB.Matrix[1, 10] = -dN4Y;
+                            bB.Matrix[2, 1] = -dN1X; bB.Matrix[2, 4] = -dN2X; bB.Matrix[2, 7] = -dN3X; bB.Matrix[2, 10] = -dN4X;
+                            bB.Matrix[2, 2] = dN1Y; bB.Matrix[2, 5] = dN2Y; bB.Matrix[2, 8] = dN3Y; bB.Matrix[2, 11] = dN4Y;
                             bB = bB.Multiply(-1);
 
-                    var pointBendingStiffness = ((bB.Transpose().Multiply( flexuralRigidity)).Multiply ( bB)).Multiply(detjacobi);
-                    kBending  = kBending.Sum(pointBendingStiffness);
+                            var pointBendingStiffness = ((bB.Transpose().Multiply(flexuralRigidity)).Multiply(bB)).Multiply(detjacobi);
+                            kBending = kBending.Sum(pointBendingStiffness);
 
-                    rowCounter++;
-                }
-            }
+                            rowCounter++;
+                        }
+                    }
 
                     // Again, use bilinear shape functions for shear stiffness part but use midpoint integration
                     // (Multiply stiffness value calculated for ksi = 0 and eta = 0 by 2)
                     // Use bilinear shape functions for bending part
-                    var kShear  = new MatrixCS(12, 12);
+                    var kShear = new MatrixCS(12, 12);
                     var shearRigidity = new MatrixCS(2, 2);
                     double sR = (5.0 / 6.0) * this.Material.G * this.Thickness;
                     // Shear rigidity is multiplied by two since shear stifness is calculated at only midpoint
@@ -585,60 +582,60 @@ namespace ThesisProject.Structural_Members
 
                         // Calculate jacobi
                         var j1 = new MatrixCS(2, 4);
-                    j1.Matrix[0, 0] = eta - 1; j1.Matrix[0, 1] = 1 - eta; j1.Matrix[0, 2] = eta + 1; j1.Matrix[0, 3] = -eta - 1;
-                    j1.Matrix[1, 0] = ksi - 1; j1.Matrix[1, 1] = -ksi - 1; j1.Matrix[1, 2] = ksi + 1; j1.Matrix[1, 3] = 1 - ksi;
-                    var j2 = j1.Multiply(mappedCoords);
-                    var jacobi = j2.Multiply( 0.25);
+                        j1.Matrix[0, 0] = eta - 1; j1.Matrix[0, 1] = 1 - eta; j1.Matrix[0, 2] = eta + 1; j1.Matrix[0, 3] = -eta - 1;
+                        j1.Matrix[1, 0] = ksi - 1; j1.Matrix[1, 1] = -ksi - 1; j1.Matrix[1, 2] = ksi + 1; j1.Matrix[1, 3] = 1 - ksi;
+                        var j2 = j1.Multiply(mappedCoords);
+                        var jacobi = j2.Multiply(0.25);
 
-                    var inversejacobi = new MatrixCS(2, 2);
-                    var detjacobi = (jacobi.Matrix[0, 0] * jacobi.Matrix[1, 1]) - (jacobi.Matrix[0, 1] * jacobi.Matrix[1, 0]);
-                    inversejacobi.Matrix[0, 0] = jacobi.Matrix[1, 1] / detjacobi; inversejacobi.Matrix[0, 1] = -1 * jacobi.Matrix[0, 1] / detjacobi;
-                    inversejacobi.Matrix[1, 0] = -1 * jacobi.Matrix[1, 0] / detjacobi; inversejacobi.Matrix[1, 1] = jacobi.Matrix[0, 0] / detjacobi;
+                        var inversejacobi = new MatrixCS(2, 2);
+                        var detjacobi = (jacobi.Matrix[0, 0] * jacobi.Matrix[1, 1]) - (jacobi.Matrix[0, 1] * jacobi.Matrix[1, 0]);
+                        inversejacobi.Matrix[0, 0] = jacobi.Matrix[1, 1] / detjacobi; inversejacobi.Matrix[0, 1] = -1 * jacobi.Matrix[0, 1] / detjacobi;
+                        inversejacobi.Matrix[1, 0] = -1 * jacobi.Matrix[1, 0] / detjacobi; inversejacobi.Matrix[1, 1] = jacobi.Matrix[0, 0] / detjacobi;
 
-                    // Bilinear shape functions
-                    var n1 = 0.25 * (1 - ksi) * (1 - eta);
-                    var n2 = 0.25 * (1 + ksi) * (1 - eta);
-                    var n3 = 0.25 * (1 + ksi) * (1 + eta);
-                    var n4 = 0.25 * (1 - ksi) * (1 + eta);
+                        // Bilinear shape functions
+                        var n1 = 0.25 * (1 - ksi) * (1 - eta);
+                        var n2 = 0.25 * (1 + ksi) * (1 - eta);
+                        var n3 = 0.25 * (1 + ksi) * (1 + eta);
+                        var n4 = 0.25 * (1 - ksi) * (1 + eta);
 
-                    // Derivative of shape functions with respect to ksi
-                    var dN1Ksi = -0.25 * (1 - eta);
-                    var dN2Ksi = 0.25 * (1 - eta);
-                    var dN3Ksi = 0.25 * (1 + eta);
-                    var dN4Ksi = -0.25 * (1 + eta);
+                        // Derivative of shape functions with respect to ksi
+                        var dN1Ksi = -0.25 * (1 - eta);
+                        var dN2Ksi = 0.25 * (1 - eta);
+                        var dN3Ksi = 0.25 * (1 + eta);
+                        var dN4Ksi = -0.25 * (1 + eta);
 
-                    // Derivative of shape functions with respect to eta
-                    var dN1Eta = -0.25 * (1 - ksi);
-                    var dN2Eta = -0.25 * (1 + ksi);
-                    var dN3Eta = 0.25 * (1 + ksi);
-                    var dN4Eta = 0.25 * (1 - ksi);
+                        // Derivative of shape functions with respect to eta
+                        var dN1Eta = -0.25 * (1 - ksi);
+                        var dN2Eta = -0.25 * (1 + ksi);
+                        var dN3Eta = 0.25 * (1 + ksi);
+                        var dN4Eta = 0.25 * (1 - ksi);
 
-                    // Derivative of shape functions with respect to x
-                    var dN1X = (inversejacobi.Matrix[0, 0] * dN1Ksi) + (inversejacobi.Matrix[0, 1] * dN1Eta);
-                    var dN2X = (inversejacobi.Matrix[0, 0] * dN2Ksi) + (inversejacobi.Matrix[0, 1] * dN2Eta);
-                    var dN3X = (inversejacobi.Matrix[0, 0] * dN3Ksi) + (inversejacobi.Matrix[0, 1] * dN3Eta);
-                    var dN4X = (inversejacobi.Matrix[0, 0] * dN4Ksi) + (inversejacobi.Matrix[0, 1] * dN4Eta);
-                                                                                                 
-                    // Derivative of shape functions with respect to y                           
-                    var dN1Y = (inversejacobi.Matrix[1, 0] * dN1Ksi) + (inversejacobi.Matrix[1, 1] * dN1Eta);
-                    var dN2Y = (inversejacobi.Matrix[1, 0] * dN2Ksi) + (inversejacobi.Matrix[1, 1] * dN2Eta);
-                    var dN3Y = (inversejacobi.Matrix[1, 0] * dN3Ksi) + (inversejacobi.Matrix[1, 1] * dN3Eta);
-                    var dN4Y = (inversejacobi.Matrix[1, 0] * dN4Ksi) + (inversejacobi.Matrix[1, 1] * dN4Eta);
+                        // Derivative of shape functions with respect to x
+                        var dN1X = (inversejacobi.Matrix[0, 0] * dN1Ksi) + (inversejacobi.Matrix[0, 1] * dN1Eta);
+                        var dN2X = (inversejacobi.Matrix[0, 0] * dN2Ksi) + (inversejacobi.Matrix[0, 1] * dN2Eta);
+                        var dN3X = (inversejacobi.Matrix[0, 0] * dN3Ksi) + (inversejacobi.Matrix[0, 1] * dN3Eta);
+                        var dN4X = (inversejacobi.Matrix[0, 0] * dN4Ksi) + (inversejacobi.Matrix[0, 1] * dN4Eta);
 
-                    var bS = new MatrixCS(2, 12);
-                    bS.Matrix[0, 0] = dN1X; bS.Matrix[0, 2] = n1;
-                    bS.Matrix[0, 3] = dN2X; bS.Matrix[0, 5] = n2;
-                    bS.Matrix[0, 6] = dN3X; bS.Matrix[0, 8] = n3;
-                    bS.Matrix[0, 9] = dN4X; bS.Matrix[0, 11] = n4;
-                                  
-                    bS.Matrix[1, 0] = -dN1Y; bS.Matrix[1, 1] = n1;
-                    bS.Matrix[1, 3] = -dN2Y; bS.Matrix[1, 4] = n2;
-                    bS.Matrix[1, 6] = -dN3Y; bS.Matrix[1, 7] = n3;
-                    bS.Matrix[1, 9] = -dN4Y; bS.Matrix[1, 10] = n4;
+                        // Derivative of shape functions with respect to y                           
+                        var dN1Y = (inversejacobi.Matrix[1, 0] * dN1Ksi) + (inversejacobi.Matrix[1, 1] * dN1Eta);
+                        var dN2Y = (inversejacobi.Matrix[1, 0] * dN2Ksi) + (inversejacobi.Matrix[1, 1] * dN2Eta);
+                        var dN3Y = (inversejacobi.Matrix[1, 0] * dN3Ksi) + (inversejacobi.Matrix[1, 1] * dN3Eta);
+                        var dN4Y = (inversejacobi.Matrix[1, 0] * dN4Ksi) + (inversejacobi.Matrix[1, 1] * dN4Eta);
 
-                    var pointShearStiffness = ((bS.Transpose().Multiply(shearRigidity)).Multiply(bS)).Multiply( detjacobi);
-                    
-                        
+                        var bS = new MatrixCS(2, 12);
+                        bS.Matrix[0, 0] = dN1X; bS.Matrix[0, 2] = n1;
+                        bS.Matrix[0, 3] = dN2X; bS.Matrix[0, 5] = n2;
+                        bS.Matrix[0, 6] = dN3X; bS.Matrix[0, 8] = n3;
+                        bS.Matrix[0, 9] = dN4X; bS.Matrix[0, 11] = n4;
+
+                        bS.Matrix[1, 0] = -dN1Y; bS.Matrix[1, 1] = n1;
+                        bS.Matrix[1, 3] = -dN2Y; bS.Matrix[1, 4] = n2;
+                        bS.Matrix[1, 6] = -dN3Y; bS.Matrix[1, 7] = n3;
+                        bS.Matrix[1, 9] = -dN4Y; bS.Matrix[1, 10] = n4;
+
+                        var pointShearStiffness = ((bS.Transpose().Multiply(shearRigidity)).Multiply(bS)).Multiply(detjacobi);
+
+
                         kShear = kShear.Sum(pointShearStiffness);
 
                         var kPlate = kBending.Sum(kShear);
@@ -664,19 +661,164 @@ namespace ThesisProject.Structural_Members
             return elmK;
         }
 
-        MatrixCS IStructuralMember.GetLocalStiffnessMatrix()
+        public MatrixCS GetGlobalStiffnessMatrix()
         {
-            throw new NotImplementedException();
-        }
+            //var globalStiffnesMatrix = new MatrixCS()
 
-        MatrixCS IStructuralMember.GetGlobalStiffnessMatrix()
-        {
-            throw new NotImplementedException();
+            var rotMatrix = this.GetRotationMatrix();
+            var localStiffness = this.GetLocalStiffnessMatrix();
+
+            var rotTrans = rotMatrix.Transpose();
+
+            var globalStiffnesMatrix = (rotTrans.Multiply(localStiffness)).Multiply(rotMatrix);
+
+            return globalStiffnesMatrix;
         }
 
         public MatrixCS GetRotationMatrix()
         {
-            throw new NotImplementedException();
+            var rotationMatrix = new MatrixCS(24, 24);
+
+            Vector xVector = new Vector(this.IEndNode.Point, this.JEndNode.Point);
+
+            Vector secondPlaneVector = new Vector(this.JEndNode.Point, this.KEndNode.Point);
+
+            var normalVector = xVector.CrossProduct(secondPlaneVector);
+
+            Vector globalZ = new Vector(0.0, 0.0, 1.0);
+            double skewAngle = globalZ.AngleTo(normalVector);
+
+            var minorRot = GetTranslationalRotationMatrix(xVector, skewAngle);
+
+            for ( int i = 3; i < 6; i++)
+                for ( int j = 3; j < 6; j++)
+                    rotationMatrix.Matrix[i, j] = minorRot.Matrix[i - 3, j - 3];
+
+            for ( int i = 6; i < 9; i++)
+                for ( int j = 6; j < 9; j++)
+                    rotationMatrix.Matrix[i, j] = minorRot.Matrix[i - 6, j - 6];
+
+            for ( int i = 9; i < 12; i++)
+                for ( int j = 9; j < 12; j++)
+                    rotationMatrix.Matrix[i, j] = minorRot.Matrix[i - 9, j - 9];
+
+            for ( int i = 12; i < 15; i++)
+                for ( int j = 12; j < 15; j++)
+                    rotationMatrix.Matrix[i, j] = minorRot.Matrix[i - 12, j - 12];
+
+            for ( int i = 15; i < 18; i++)
+                for ( int j = 15; j < 18; j++)
+                    rotationMatrix.Matrix[i, j] = minorRot.Matrix[i - 15, j - 15];
+
+            for ( int i = 18; i < 21; i++)
+                for ( int j = 18; j < 21; j++)
+                    rotationMatrix.Matrix[i, j] = minorRot.Matrix[i - 18, j - 18];
+
+            for ( int i = 21; i < 24; i++)
+                for ( int j = 21; j < 24; j++)
+                    rotationMatrix.Matrix[i, j] = minorRot.Matrix[i - 21, j - 21];
+
+
+            return rotationMatrix;
+        }
+
+        private MatrixCS GetTranslationalRotationMatrix(Vector elmVector, double rotationAngle)
+{
+            // For vertical members (i.e., both cX and cY are zero, different approach should be followed)
+            var cX = elmVector.X / elmVector.Length;
+            var cY = elmVector.Y / elmVector.Length;
+            var cZ = elmVector.Z / elmVector.Length;
+            var cXZ = Math.Sqrt((cX * cX) + (cZ * cZ));
+
+            double compareVal = 0.0;
+            double alpha = rotationAngle;
+            double tol = 1e-8;
+
+            MatrixCS retVal = new MatrixCS(3,3);
+
+            var areEqual = Math.Abs(Math.Abs(cXZ) - Math.Abs(compareVal)) <= tol;
+
+            if (areEqual) // Vertical members
+            {
+                retVal.Matrix[0, 0] = 0.0;
+                retVal.Matrix[0, 1] = cY;
+                retVal.Matrix[0, 2] = 0.0;
+
+                retVal.Matrix[1, 0] = -1 * cY * Math.Cos(alpha);
+                retVal.Matrix[1, 1] = 0;
+                retVal.Matrix[1, 2] = Math.Sin(alpha);
+
+                retVal.Matrix[2, 0] = cY * Math.Sin(alpha);
+                retVal.Matrix[2, 1] = 0.0;
+                retVal.Matrix[2, 2] = Math.Cos(alpha);
+            }
+            else // General case
+            {
+                retVal.Matrix[0, 0] = cX;
+                retVal.Matrix[0, 1] = cY;
+                retVal.Matrix[0, 2] = cZ;
+
+                retVal.Matrix[1, 0] = -1 * ((cX * cY * Math.Cos(alpha)) + (cZ * Math.Sin(alpha))) / cXZ;
+                retVal.Matrix[1, 1] = cXZ * Math.Cos(alpha);
+                retVal.Matrix[1, 2] = ((-cY * cZ * Math.Cos(alpha)) + (cX * Math.Sin(alpha))) / cXZ;
+
+                retVal.Matrix[2, 0] = ((cX * cY * Math.Sin(alpha)) - (cZ * Math.Cos(alpha))) / cXZ;
+                retVal.Matrix[2, 1] = -1 * cXZ * Math.Sin(alpha);
+                retVal.Matrix[2, 2] = ((cY * cZ * Math.Sin(alpha)) + (cX * Math.Cos(alpha))) / cXZ;
+            }
+
+            return retVal;
+        }
+
+        public MatrixCS InvertMatrix(MatrixCS matrix)
+        {
+
+            double A2323 = matrix.Matrix[2, 2] * matrix.Matrix[3, 3] - matrix.Matrix[2, 3] * matrix.Matrix[3, 2];
+            double A1323 = matrix.Matrix[2, 1] * matrix.Matrix[3, 3] - matrix.Matrix[2, 3] * matrix.Matrix[3, 1];
+            double A1223 = matrix.Matrix[2, 1] * matrix.Matrix[3, 2] - matrix.Matrix[2, 2] * matrix.Matrix[3, 1];
+            double A0323 = matrix.Matrix[2, 0] * matrix.Matrix[3, 3] - matrix.Matrix[2, 3] * matrix.Matrix[3, 0];
+            double A0223 = matrix.Matrix[2, 0] * matrix.Matrix[3, 2] - matrix.Matrix[2, 2] * matrix.Matrix[3, 0];
+            double A0123 = matrix.Matrix[2, 0] * matrix.Matrix[3, 1] - matrix.Matrix[2, 1] * matrix.Matrix[3, 0];
+            double A2313 = matrix.Matrix[1, 2] * matrix.Matrix[3, 3] - matrix.Matrix[1, 3] * matrix.Matrix[3, 2];
+            double A1313 = matrix.Matrix[1, 1] * matrix.Matrix[3, 3] - matrix.Matrix[1, 3] * matrix.Matrix[3, 1];
+            double A1213 = matrix.Matrix[1, 1] * matrix.Matrix[3, 2] - matrix.Matrix[1, 2] * matrix.Matrix[3, 1];
+            double A2312 = matrix.Matrix[1, 2] * matrix.Matrix[2, 3] - matrix.Matrix[1, 3] * matrix.Matrix[2, 2];
+            double A1312 = matrix.Matrix[1, 1] * matrix.Matrix[2, 3] - matrix.Matrix[1, 3] * matrix.Matrix[2, 1];
+            double A1212 = matrix.Matrix[1, 1] * matrix.Matrix[2, 2] - matrix.Matrix[1, 2] * matrix.Matrix[2, 1];
+            double A0313 = matrix.Matrix[1, 0] * matrix.Matrix[3, 3] - matrix.Matrix[1, 3] * matrix.Matrix[3, 0];
+            double A0213 = matrix.Matrix[1, 0] * matrix.Matrix[3, 2] - matrix.Matrix[1, 2] * matrix.Matrix[3, 0];
+            double A0312 = matrix.Matrix[1, 0] * matrix.Matrix[2, 3] - matrix.Matrix[1, 3] * matrix.Matrix[2, 0];
+            double A0212 = matrix.Matrix[1, 0] * matrix.Matrix[2, 2] - matrix.Matrix[1, 2] * matrix.Matrix[2, 0];
+            double A0113 = matrix.Matrix[1, 0] * matrix.Matrix[3, 1] - matrix.Matrix[1, 1] * matrix.Matrix[3, 0];
+            double A0112 = matrix.Matrix[1, 0] * matrix.Matrix[2, 1] - matrix.Matrix[1, 1] * matrix.Matrix[2, 0];
+
+            var det = matrix.Matrix[0, 0] * (matrix.Matrix[1, 1] * A2323 - matrix.Matrix[1, 2] * A1323 + matrix.Matrix[1, 3] * A1223)
+                - matrix.Matrix[0, 1] * (matrix.Matrix[1, 0] * A2323 - matrix.Matrix[1, 2] * A0323 + matrix.Matrix[1, 3] * A0223)
+                + matrix.Matrix[0, 2] * (matrix.Matrix[1, 0] * A1323 - matrix.Matrix[1, 1] * A0323 + matrix.Matrix[1, 3] * A0123)
+                - matrix.Matrix[0, 3] * (matrix.Matrix[1, 0] * A1223 - matrix.Matrix[1, 1] * A0223 + matrix.Matrix[1, 2] * A0123);
+            det = 1 / det;
+
+            MatrixCS im = new MatrixCS(4, 4);
+
+            im.Matrix[0, 0] = det * (matrix.Matrix[1, 1] * A2323 - matrix.Matrix[1, 2] * A1323 + matrix.Matrix[1, 3] * A1223);
+            im.Matrix[0, 1] = det * -(matrix.Matrix[0, 1] * A2323 - matrix.Matrix[0, 2] * A1323 + matrix.Matrix[0, 3] * A1223);
+            im.Matrix[0, 2] = det * (matrix.Matrix[0, 1] * A2313 - matrix.Matrix[0, 2] * A1313 + matrix.Matrix[0, 3] * A1213);
+            im.Matrix[0, 3] = det * -(matrix.Matrix[0, 1] * A2312 - matrix.Matrix[0, 2] * A1312 + matrix.Matrix[0, 3] * A1212);
+            im.Matrix[1, 0] = det * -(matrix.Matrix[1, 0] * A2323 - matrix.Matrix[1, 2] * A0323 + matrix.Matrix[1, 3] * A0223);
+            im.Matrix[1, 1] = det * (matrix.Matrix[0, 0] * A2323 - matrix.Matrix[0, 2] * A0323 + matrix.Matrix[0, 3] * A0223);
+            im.Matrix[1, 2] = det * -(matrix.Matrix[0, 0] * A2313 - matrix.Matrix[0, 2] * A0313 + matrix.Matrix[0, 3] * A0213);
+            im.Matrix[1, 3] = det * (matrix.Matrix[0, 0] * A2312 - matrix.Matrix[0, 2] * A0312 + matrix.Matrix[0, 3] * A0212);
+            im.Matrix[2, 0] = det * (matrix.Matrix[1, 0] * A1323 - matrix.Matrix[1, 1] * A0323 + matrix.Matrix[1, 3] * A0123);
+            im.Matrix[2, 1] = det * -(matrix.Matrix[0, 0] * A1323 - matrix.Matrix[0, 1] * A0323 + matrix.Matrix[0, 3] * A0123);
+            im.Matrix[2, 2] = det * (matrix.Matrix[0, 0] * A1313 - matrix.Matrix[0, 1] * A0313 + matrix.Matrix[0, 3] * A0113);
+            im.Matrix[2, 3] = det * -(matrix.Matrix[0, 0] * A1312 - matrix.Matrix[0, 1] * A0312 + matrix.Matrix[0, 3] * A0112);
+            im.Matrix[3, 0] = det * -(matrix.Matrix[1, 0] * A1223 - matrix.Matrix[1, 1] * A0223 + matrix.Matrix[1, 2] * A0123);
+            im.Matrix[3, 1] = det * (matrix.Matrix[0, 0] * A1223 - matrix.Matrix[0, 1] * A0223 + matrix.Matrix[0, 2] * A0123);
+            im.Matrix[3, 2] = det * -(matrix.Matrix[0, 0] * A1213 - matrix.Matrix[0, 1] * A0213 + matrix.Matrix[0, 2] * A0113);
+            im.Matrix[3, 3] = det * (matrix.Matrix[0, 0] * A1212 - matrix.Matrix[0, 1] * A0212 + matrix.Matrix[0, 2] * A0112);
+
+            return im;
+
         }
     }
 }

@@ -78,7 +78,7 @@ namespace Data
             }
         }
 
-        private void FillNodeInfo()
+        public void FillNodeInfo()
         {
             var listOfNodes = new List<Node>();
             var nx = (this.Width / this.MeshSize + 1);
@@ -90,6 +90,7 @@ namespace Data
                 for (int j = 0; j < ny; j++)
                 {
                     var node = new Node();
+                    node.Point = new ModelInfo.Point();
                     node.Point.Z = 0; // Level of system, not necessary at the moment. 
 
                     node.Point.Y = j * this.MeshSize;

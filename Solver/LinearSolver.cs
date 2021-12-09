@@ -35,7 +35,7 @@ namespace Solver
         {
             _LatticeModelData = latticemodeldata;
             
-            var _AssemblyData = GetNodeAssemblyData();
+             _AssemblyData = GetNodeAssemblyData();
 
         }
         #endregion

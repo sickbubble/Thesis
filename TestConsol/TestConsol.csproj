@@ -49,5 +49,19 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Data\Data.csproj">
+      <Project>{C07CEA18-19C3-4B10-9E0E-53DA5A84A668}</Project>
+      <Name>Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Solver\Solver.csproj">
+      <Project>{F30B2CAA-603C-4B1F-BD56-F364FD5AAF1B}</Project>
+      <Name>Solver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ThesisProject\Model Info.csproj">
+      <Project>{89E85E82-9F1A-40C7-8E41-90F4320F82D5}</Project>
+      <Name>Model Info</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

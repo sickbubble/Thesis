@@ -84,9 +84,9 @@ namespace ThesisProject.Structural_Members
             Ri.Matrix[1, 0] = (-Cy * Cx * Math.Cos(alpha)) - Cz * Math.Sin(alpha) / Cxz;
             Ri.Matrix[1, 1] = Cxz * Math.Cos(alpha);
             Ri.Matrix[1, 2] = (-Cy * Cz * Math.Cos(alpha)) + Cx * Math.Sin(alpha) / Cxz;
-            Ri.Matrix[3, 1] = ((Cy * Cx * Math.Sin(alpha)) - Cz * Math.Cos(alpha)) / Cxz;
-            Ri.Matrix[3, 2] = -Cxz * Math.Sin(alpha);
-            Ri.Matrix[3, 3] = ((Cy * Cz * Math.Sin(alpha)) + Cx * Math.Cos(alpha)) / Cxz;
+            Ri.Matrix[2, 0] = ((Cy * Cx * Math.Sin(alpha)) - Cz * Math.Cos(alpha)) / Cxz;
+            Ri.Matrix[2, 1] = -Cxz * Math.Sin(alpha);
+            Ri.Matrix[2, 2] = ((Cy * Cz * Math.Sin(alpha)) + Cx * Math.Cos(alpha)) / Cxz;
 
 
             var rotElm = new MatrixCS(12, 12); // 3 columns will be added by using InsertRange
