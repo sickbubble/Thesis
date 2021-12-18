@@ -22,6 +22,7 @@ namespace ThesisProject.Loads
         private eLoadType _LoadType;
         private Node _Node;
         private double _Magnitude;
+        private int _DofID; //TODO: Find better solution. 
 
         #endregion
 
@@ -36,7 +37,8 @@ namespace ThesisProject.Loads
 
         #region Interface Implementations
         public eLoadType LoadType { get => _LoadType; set => _LoadType = value; }
-        
+        public int DofID { get => _DofID; set => _DofID = value; }
+
 
         #endregion
 

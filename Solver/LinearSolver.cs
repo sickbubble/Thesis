@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ThesisProject;
 using ThesisProject.Structural_Members;
 using MathNet.Numerics.LinearAlgebra;
+using ThesisProject.Loads;
 
 namespace Solver
 {
@@ -78,6 +79,36 @@ namespace Solver
         {
             var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
             MatrixCS rightHandSide = new MatrixCS(numOfUnknowns, 1);
+            var listOfLoads = _LatticeModelData.ListOfLoads;
+
+            for (int i = 0; i < listOfLoads.Count; i++)
+            {
+                var load = listOfLoads[i];
+
+                switch (load.LoadType)
+                {
+                    case ThesisProject.Loads.eLoadType.Point:
+                        var pLoad = (PointLoad)load;
+                        var eqnNumber = _AssemblyData.NodeEquationData[pLoad.Node.ID][pLoad.DofID];
+                        if (eqnNumber != -1 )
+                        {
+                            rightHandSide.Matrix[eqnNumber,0] = pLoad.Magnitude;
+                        } 
+
+                        break;
+                    case ThesisProject.Loads.eLoadType.Distributed:
+                        //load = (PointLoad)load;
+                        break;
+                    case ThesisProject.Loads.eLoadType.Area:
+                        //load = (PointLoad)load;
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+
+
 
             return rightHandSide;
         }
@@ -109,6 +140,8 @@ namespace Solver
                 {
                     for (int l = 0; l < matrixLength; l++)
                     {
+                        var gk = g[k];
+                        var gl = g[l];
                         if (g[k] != -1 && g[l] != -1) // -1 means free a.k.a unknown
                         {
                             KG.Matrix[g[k], g[l]] = KG.Matrix[g[k], g[l]] + K.Matrix[k, l];
@@ -140,8 +173,8 @@ namespace Solver
                     var restraint = supportCondition.Restraints.Values.ElementAt(j);
                     if (restraint == eRestrainedCondition.NotRestrained)
                     {
-                        numberOfUnknowns++;
                         listOfEquationNumbers.Add(numberOfUnknowns);
+                        numberOfUnknowns++;
                     }
                     else
                     {

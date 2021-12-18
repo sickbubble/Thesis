@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ThesisProject.Loads;
+using ThesisProject.Sections;
 using ThesisProject.Structural_Members;
 
 namespace Data
@@ -21,6 +23,7 @@ namespace Data
 
         private List<Node> _ListOfNodes;
         private List<Support> _ListOfSupports;
+        private List<ILoad> _ListOfLoads = new List<ILoad>();
         private List<FrameMember> _ListOfMembers = new List<FrameMember>();
 
         private double _Width;
@@ -41,12 +44,30 @@ namespace Data
         public double Height { get => _Height; set => _Height = value; }
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
         public double LatticeMeshRatio { get => _LatticeMeshRatio; set => _LatticeMeshRatio = value; }
+        public List<ILoad> ListOfLoads { get => _ListOfLoads; set => _ListOfLoads = value; }
 
         #endregion
 
 
 
         #region Public Methods
+        public void AssignLoadToMiddle()
+        {
+            if (ListOfNodes != null )
+            {
+            for (int i = 0; i < ListOfNodes.Count; i++)
+            {
+                    var node = ListOfNodes[i];
+                    if (node.Point.X == Width/2 &&
+                        node.Point.Y == Height/ 2)
+                    {
+                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node,DofID = 2 });
+                    }
+            }
+            }
+
+
+        }
 
         public void SetBorderNodesSupportCondition(eSupportType supportType)
         {
@@ -71,7 +92,9 @@ namespace Data
                     var lengthOfMember = Math.Sqrt(Math.Pow(_ListOfNodes[j].Point.X - _ListOfNodes[i].Point.X, 2) + Math.Pow(_ListOfNodes[j].Point.Y - _ListOfNodes[i].Point.Y, 2) + Math.Pow(_ListOfNodes[j].Point.Z - _ListOfNodes[i].Point.Z, 2));
                     if (lengthOfMember < 1.42 * _MeshSize)
                     {
-                        _ListOfMembers.Add(new FrameMember() { IEndNode = _ListOfNodes[i], JEndNode = _ListOfNodes[j], ID = labelCounter });
+                        var frameMember = new FrameMember() { IEndNode = _ListOfNodes[i], JEndNode = _ListOfNodes[j], ID = labelCounter };
+                        frameMember.Section = new FrameSection();
+                        _ListOfMembers.Add(frameMember);
                         labelCounter = labelCounter ++;
                     }
                 }
@@ -85,16 +108,16 @@ namespace Data
             var ny = (this.Height / this.MeshSize + 1);
 
             var nodeIDCounter = 1;
-            for (int i = 0; i < nx; i++)
+            for (int i = 0; i < ny; i++)
             {
-                for (int j = 0; j < ny; j++)
+                for (int j = 0; j < nx; j++)
                 {
                     var node = new Node();
                     node.Point = new ModelInfo.Point();
                     node.Point.Z = 0; // Level of system, not necessary at the moment. 
 
-                    node.Point.Y = j * this.MeshSize;
-                    node.Point.X = i * this.MeshSize;
+                    node.Point.Y = i * this.MeshSize;
+                    node.Point.X = j * this.MeshSize;
 
                     node.SupportCondition = new Support(eSupportType.Free);
                     node.ID = nodeIDCounter;

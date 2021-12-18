@@ -14,12 +14,13 @@ namespace TestConsol
         static void Main(string[] args)
         {
             var latticeModelData = new LatticeModelData();
-            latticeModelData.Width = 5;
-            latticeModelData.Height = 5;
-            latticeModelData.MeshSize = 0.1;
+            latticeModelData.Width = 4;
+            latticeModelData.Height = 4;
+            latticeModelData.MeshSize = 1;
             latticeModelData.FillNodeInfo();
             latticeModelData.FillMemberInfoList();
             latticeModelData.SetBorderNodesSupportCondition(eSupportType.Pinned);
+latticeModelData.AssignLoadToMiddle();
 
 
             var solver = new LinearSolver(latticeModelData);

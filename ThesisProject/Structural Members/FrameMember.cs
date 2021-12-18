@@ -13,7 +13,7 @@ namespace ThesisProject.Structural_Members
         #region Ctor
         public FrameMember()
         {
-
+            GetDefaultEndConditions();
         }
         #endregion
 
@@ -73,20 +73,20 @@ namespace ThesisProject.Structural_Members
             var Cx = (this.JEndNode.Point.X - this.IEndNode.Point.X) / L;
             var Cy = (this.JEndNode.Point.Y - this.IEndNode.Point.Y) / L;
             var Cz = (this.JEndNode.Point.Z - this.IEndNode.Point.Z) / L;
-            var Cxz = Math.Sqrt(Cx * Cx + Cz * Cz);
+            var Cxz = Math.Sqrt(Cx * Cx + Cy * Cy);
             var alpha = 0;
 
             var Ri = new MatrixCS(3, 3);
 
             Ri.Matrix[0, 0] = Cx;
-            Ri.Matrix[0, 1] = Cy;
-            Ri.Matrix[0, 2] = Cz;
-            Ri.Matrix[1, 0] = (-Cy * Cx * Math.Cos(alpha)) - Cz * Math.Sin(alpha) / Cxz;
+            Ri.Matrix[0, 1] = Cz;
+            Ri.Matrix[0, 2] = Cy;
+            Ri.Matrix[1, 0] = (-Cz * Cx * Math.Cos(alpha)) - Cy * Math.Sin(alpha) / Cxz;
             Ri.Matrix[1, 1] = Cxz * Math.Cos(alpha);
-            Ri.Matrix[1, 2] = (-Cy * Cz * Math.Cos(alpha)) + Cx * Math.Sin(alpha) / Cxz;
-            Ri.Matrix[2, 0] = ((Cy * Cx * Math.Sin(alpha)) - Cz * Math.Cos(alpha)) / Cxz;
+            Ri.Matrix[1, 2] = (-Cz * Cy * Math.Cos(alpha)) + Cx * Math.Sin(alpha) / Cxz;
+            Ri.Matrix[2, 0] = ((Cz * Cx * Math.Sin(alpha)) - Cy * Math.Cos(alpha)) / Cxz;
             Ri.Matrix[2, 1] = -Cxz * Math.Sin(alpha);
-            Ri.Matrix[2, 2] = ((Cy * Cz * Math.Sin(alpha)) + Cx * Math.Cos(alpha)) / Cxz;
+            Ri.Matrix[2, 2] = ((Cz * Cy * Math.Sin(alpha)) + Cx * Math.Cos(alpha)) / Cxz;
 
 
             var rotElm = new MatrixCS(12, 12); // 3 columns will be added by using InsertRange
@@ -278,8 +278,21 @@ namespace ThesisProject.Structural_Members
             return kElm;
         }
 
-     
+
         #endregion
+
+
+        #region Private Methods
+
+        private void GetDefaultEndConditions()
+        {
+            this.IEndCondition= new EndCondition();
+            this.JEndCondition = new EndCondition();
+            //this.IEndCondition
+        }
+
+
+        #endregion 
 
     }
 
@@ -287,7 +300,7 @@ namespace ThesisProject.Structural_Members
     {
         public EndCondition()
         {
-
+            SetDefaultEndCond();
         }
         private bool _IsReleaseFx;
         private bool _IsReleaseFy;
@@ -302,5 +315,18 @@ namespace ThesisProject.Structural_Members
         public bool IsReleaseMx { get => _IsReleaseMx; set => _IsReleaseMx = value; }
         public bool IsReleaseMy { get => _IsReleaseMy; set => _IsReleaseMy = value; }
         public bool IsReleaseMz { get => _IsReleaseMz; set => _IsReleaseMz = value; }
+
+        /// <summary>
+        /// All not released for deafault
+        /// </summary>
+        private void SetDefaultEndCond()
+        {
+            _IsReleaseFx=false;
+            _IsReleaseFy=false;
+            _IsReleaseFz=false;
+            _IsReleaseMx=false;
+            _IsReleaseMy=false;
+            _IsReleaseMz = false;
+        }
     }
 }
