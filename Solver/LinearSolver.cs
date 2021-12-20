@@ -68,6 +68,84 @@ namespace Solver
             double GetRHS(int i, int j) => RHS.Matrix[i, j];
             var externalRHS = Matrix<double>.Build.Sparse(size, 1, GetRHS);
             var dispRes = externalKG.Solve(externalRHS);
+
+
+
+
+            _LatticeModelResultData = new LatticeModelResultData();
+
+            
+            // Get node results
+            var listOfNodes = _LatticeModelData.ListOfNodes;
+            int counter = 0;
+
+            for (int i = 0; i < listOfNodes.Count; i++)
+            {
+                var node = listOfNodes[i];
+                var nodeEqnData = _AssemblyData.NodeEquationData[node.ID];
+                var nodeResults = new List<double>();
+
+                for (int j = 0; j < nodeEqnData.Count; j++)
+                {
+                    double dofResult = 0;
+
+                    if (nodeEqnData[j] != -1) // unknown
+                    {
+
+                        dofResult = dispRes[counter,1];
+                        counter ++;
+
+                    }
+
+                    nodeResults.Add(dofResult);
+                }
+
+                _LatticeModelResultData.NodeResults.Add(node.ID, nodeResults);
+
+            }
+
+            //Get frame results.
+            var listOFFrames = _LatticeModelData.ListOfMembers;
+            counter = 0;
+            for (int i = 0; i < listOFFrames.Count; i++)
+            {
+                var frame = listOFFrames[i];
+                var frameRes = new FrameMemberResults();
+
+                var InodeEqnData = _AssemblyData.NodeEquationData[frame.IEndNode.ID];
+                for (int j = 0; j < InodeEqnData.Count; j++)
+                {
+                    double dofResult = 0;
+
+                    if (InodeEqnData[j] != -1) // unknown
+                    {
+                        dofResult = dispRes[counter, 1];
+                        counter++;
+                    }
+
+                    frameRes.INodeDisplacements.Add(dofResult);
+                    
+                }
+
+                var JnodeEqnData = _AssemblyData.NodeEquationData[frame.IEndNode.ID];
+
+                for (int k   = 0; k < JnodeEqnData.Count; k++)
+                {
+                    double dofResult = 0;
+
+                    if (JnodeEqnData[k] != -1) // unknown
+                    {
+                        dofResult = dispRes[counter, 1];
+                        counter++;
+                    }
+
+                    frameRes.JNodeDisplacements.Add(dofResult);
+                }
+
+                //TODO add local results also. 
+                _LatticeModelResultData.GlobalFrameResults.Add(frame.ID, frameRes);
+            }
+
         }
 
         #endregion
