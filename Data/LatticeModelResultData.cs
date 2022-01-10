@@ -24,8 +24,7 @@ namespace Data
         #region Private Fields
 
         private Dictionary<int, List<double>> _NodeResults; 
-        private Dictionary<int, FrameMemberResults> _LocalFrameResults ;
-        private Dictionary<int, FrameMemberResults> _GlobalFrameResults;
+        private Dictionary<int, FrameMemberResults> _FrameResults;
 
 
 
@@ -45,8 +44,7 @@ namespace Data
         /// <summary>
         /// Frame ID and FrameMemberResults
         /// </summary>
-        public Dictionary<int, FrameMemberResults> LocalFrameResults { get => _LocalFrameResults; set => _LocalFrameResults = value; }
-        public Dictionary<int, FrameMemberResults> GlobalFrameResults { get => _GlobalFrameResults; set => _GlobalFrameResults = value; }
+        public Dictionary<int, FrameMemberResults> FrameResults { get => _FrameResults; set => _FrameResults = value; }
 
         #endregion
     }
@@ -61,15 +59,23 @@ namespace Data
         }
 
 
-        private List<double> _INodeDisplacements;
-        private List<double> _JNodeDisplacements;
-        private List<double> _INodeForces;
-        private List<double> _JNodeForces;
+        private List<double> _INodeDisplacements_Global;
+        private List<double> _JNodeDisplacements_Global;
+        private List<double> _INodeForces_Global;
+        private List<double> _JNodeForces_Global;
 
+        private List<double> _INodeDisplacements_Local;
+        private List<double> _JNodeDisplacements_Local;
+        private List<double> _INodeForces_Local;
+        private List<double> _JNodeForces_Local;
 
-        public  List<double> INodeDisplacements { get => _INodeDisplacements; set => _INodeDisplacements = value; }
-        public  List<double> JNodeDisplacements { get => _JNodeDisplacements; set => _JNodeDisplacements = value; }
-        public  List<double> INodeForces { get => _INodeForces; set => _INodeForces = value; }
-        public  List<double> JNodeForces { get => _JNodeForces; set => _JNodeForces = value; }
+        public List<double> INodeDisplacements_Global { get => _INodeDisplacements_Global; set => _INodeDisplacements_Global = value; }
+        public List<double> JNodeDisplacements_Global { get => _JNodeDisplacements_Global; set => _JNodeDisplacements_Global = value; }
+        public List<double> INodeForces_Global { get => _INodeForces_Global; set => _INodeForces_Global = value; }
+        public List<double> JNodeForces_Global { get => _JNodeForces_Global; set => _JNodeForces_Global = value; }
+        public List<double> INodeDisplacements_Local { get => _INodeDisplacements_Local; set => _INodeDisplacements_Local = value; }
+        public List<double> JNodeDisplacements_Local { get => _JNodeDisplacements_Local; set => _JNodeDisplacements_Local = value; }
+        public List<double> INodeForces_Local { get => _INodeForces_Local; set => _INodeForces_Local = value; }
+        public List<double> JNodeForces_Local { get => _JNodeForces_Local; set => _JNodeForces_Local = value; }
     }
 }

@@ -23,6 +23,7 @@ namespace Data
 
         private List<Node> _ListOfNodes;
         private List<Support> _ListOfSupports;
+        
         private List<ILoad> _ListOfLoads = new List<ILoad>();
         private List<FrameMember> _ListOfMembers = new List<FrameMember>();
 
@@ -87,15 +88,16 @@ namespace Data
             var labelCounter = 1;
             for (int i = 0; i < _ListOfNodes.Count; i++)
             {
-                for (int j = 1; j < _ListOfNodes.Count; j++)
+                for (int j = i+1; j < _ListOfNodes.Count; j++)
                 {
                     var lengthOfMember = Math.Sqrt(Math.Pow(_ListOfNodes[j].Point.X - _ListOfNodes[i].Point.X, 2) + Math.Pow(_ListOfNodes[j].Point.Y - _ListOfNodes[i].Point.Y, 2) + Math.Pow(_ListOfNodes[j].Point.Z - _ListOfNodes[i].Point.Z, 2));
+
                     if (lengthOfMember < 1.42 * _MeshSize)
                     {
                         var frameMember = new FrameMember() { IEndNode = _ListOfNodes[i], JEndNode = _ListOfNodes[j], ID = labelCounter };
                         frameMember.Section = new FrameSection();
                         _ListOfMembers.Add(frameMember);
-                        labelCounter = labelCounter ++;
+                        labelCounter ++;
                     }
                 }
             }

@@ -14,8 +14,8 @@ namespace TestConsol
         static void Main(string[] args)
         {
             var latticeModelData = new LatticeModelData();
-            latticeModelData.Width = 4;
-            latticeModelData.Height = 4;
+            latticeModelData.Width = 2;
+            latticeModelData.Height = 2;
             latticeModelData.MeshSize = 1;
             latticeModelData.FillNodeInfo();
             latticeModelData.FillMemberInfoList();

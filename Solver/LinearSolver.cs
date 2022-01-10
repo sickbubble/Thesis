@@ -63,88 +63,116 @@ namespace Solver
             var size = KG.NRows;
 
 
-            double GetK(int i, int j) => KG.Matrix[i, j];
-            var externalKG = Matrix<double>.Build.Sparse(size, size, GetK);
-            double GetRHS(int i, int j) => RHS.Matrix[i, j];
-            var externalRHS = Matrix<double>.Build.Sparse(size, 1, GetRHS);
+            var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
+            var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
+
+
+            //for (int i = 0; i < KG.NRows; i++)
+            //{
+            //    for (int j = 0; j < KG.NColumns; j++)
+            //    {
+            //        externalKG[i, j] = KG.Matrix[i, j];
+            //    }
+
+            //}
+
+            //var externalRHS = Matrix<double>.Build.Random(RHS.NRows, RHS.NColumns);
+
+            //for (int i = 0; i < RHS.NRows; i++)
+            //{
+            //    for (int j = 0; j < RHS.NColumns; j++)
+            //    {
+            //        externalRHS[i, j] = RHS.Matrix[i, j];
+            //    }
+
+            //}
+
+            //double GetK(int i, int j) => KG.Matrix[i, j];
+
+            //var externalKG = Matrix<double>.Build.Sparse(size, size, GetK);
+            //double GetRHS(int i, int j) => RHS.Matrix[i, j];
             var dispRes = externalKG.Solve(externalRHS);
 
-
-
-
+            var dispResAsArray = dispRes.ToArray();
             _LatticeModelResultData = new LatticeModelResultData();
+            _LatticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
+            _LatticeModelResultData.FrameResults = new Dictionary<int, FrameMemberResults>();
 
-            
-            // Get node results
-            var listOfNodes = _LatticeModelData.ListOfNodes;
-            int counter = 0;
+            FillNodeResults(dispResAsArray);
+            FillFrameMemberResults();
 
-            for (int i = 0; i < listOfNodes.Count; i++)
-            {
-                var node = listOfNodes[i];
-                var nodeEqnData = _AssemblyData.NodeEquationData[node.ID];
-                var nodeResults = new List<double>();
 
-                for (int j = 0; j < nodeEqnData.Count; j++)
-                {
-                    double dofResult = 0;
 
-                    if (nodeEqnData[j] != -1) // unknown
-                    {
+            //// Get node results
+            //var listOfNodes = _LatticeModelData.ListOfNodes;
+            //int counter = 0;
 
-                        dofResult = dispRes[counter,1];
-                        counter ++;
+            //for (int i = 0; i < listOfNodes.Count; i++)
+            //{
+            //    var node = listOfNodes[i];
+            //    var nodeEqnData = _AssemblyData.NodeEquationData[node.ID];
+            //    var nodeResults = new List<double>();
 
-                    }
+            //    for (int j = 0; j < nodeEqnData.Count; j++)
+            //    {
+            //        double dofResult = 0;
 
-                    nodeResults.Add(dofResult);
-                }
+            //        if (nodeEqnData[j] != -1) // unknown
+            //        {
 
-                _LatticeModelResultData.NodeResults.Add(node.ID, nodeResults);
+            //            dofResult = dispResAsArray[counter,0];
+            //            counter ++;
 
-            }
+            //        }
 
-            //Get frame results.
-            var listOFFrames = _LatticeModelData.ListOfMembers;
-            counter = 0;
-            for (int i = 0; i < listOFFrames.Count; i++)
-            {
-                var frame = listOFFrames[i];
-                var frameRes = new FrameMemberResults();
+            //        nodeResults.Add(dofResult);
+            //    }
+            //    _LatticeModelResultData.NodeResults.Add(node.ID, nodeResults);
 
-                var InodeEqnData = _AssemblyData.NodeEquationData[frame.IEndNode.ID];
-                for (int j = 0; j < InodeEqnData.Count; j++)
-                {
-                    double dofResult = 0;
+            //}
 
-                    if (InodeEqnData[j] != -1) // unknown
-                    {
-                        dofResult = dispRes[counter, 1];
-                        counter++;
-                    }
+            ////Get frame results.
+            //var listOFFrames = _LatticeModelData.ListOfMembers;
+            //counter = 0;
+            //for (int i = 0; i < listOFFrames.Count; i++)
+            //{
+            //    var frame = listOFFrames[i];
+            //    var frameRes = new FrameMemberResults();
+            //    frameRes.INodeDisplacements_Global = new List<double>();
+            //    var InodeEqnData = _AssemblyData.NodeEquationData[frame.IEndNode.ID];
+            //    for (int j = 0; j < InodeEqnData.Count; j++)
+            //    {
+            //        double dofResult = 0;
 
-                    frameRes.INodeDisplacements.Add(dofResult);
-                    
-                }
+            //        if (InodeEqnData[j] != -1) // unknown
+            //        {
+            //            dofResult = dispRes[counter, 0];
+            //            counter++;
+            //        }
 
-                var JnodeEqnData = _AssemblyData.NodeEquationData[frame.IEndNode.ID];
+            //        frameRes.INodeDisplacements_Global.Add(dofResult);
 
-                for (int k   = 0; k < JnodeEqnData.Count; k++)
-                {
-                    double dofResult = 0;
+            //    }
 
-                    if (JnodeEqnData[k] != -1) // unknown
-                    {
-                        dofResult = dispRes[counter, 1];
-                        counter++;
-                    }
+            //    var JnodeEqnData = _AssemblyData.NodeEquationData[frame.IEndNode.ID];
+            //    frameRes.JNodeDisplacements_Global = new List<double>();
 
-                    frameRes.JNodeDisplacements.Add(dofResult);
-                }
+            //    for (int k   = 0; k < JnodeEqnData.Count; k++)
+            //    {
+            //        double dofResult = 0;
 
-                //TODO add local results also. 
-                _LatticeModelResultData.GlobalFrameResults.Add(frame.ID, frameRes);
-            }
+            //        if (JnodeEqnData[k] != -1) // unknown
+            //        {
+            //            dofResult = dispRes[counter, 0];
+            //            counter++;
+            //        }
+
+            //        frameRes.JNodeDisplacements_Global.Add(dofResult);
+            //    }
+
+            //    //TODO add local results also. 
+            //    _LatticeModelResultData.FrameResults.Add(frame.ID, frameRes);
+            //}
 
         }
 
@@ -170,7 +198,8 @@ namespace Solver
                         var eqnNumber = _AssemblyData.NodeEquationData[pLoad.Node.ID][pLoad.DofID];
                         if (eqnNumber != -1 )
                         {
-                            rightHandSide.Matrix[eqnNumber,0] = pLoad.Magnitude;
+                            // eqnNumber is one based. 
+                            rightHandSide.Matrix[eqnNumber -1 ,0] = pLoad.Magnitude;
                         } 
 
                         break;
@@ -269,36 +298,36 @@ namespace Solver
             return assemblyData;
         }
 
-        private void FillNodeResults(Matrix<double> nodeDisps)
+        private void FillNodeResults(double [,] nodeDisps)
         {
-            _LatticeModelResultData = new LatticeModelResultData();
-            var nodeEquationData = _AssemblyData.NodeEquationData;
-
+            // Get node results
             var listOfNodes = _LatticeModelData.ListOfNodes;
+            int counter = 0;
+
             for (int i = 0; i < listOfNodes.Count; i++)
             {
                 var node = listOfNodes[i];
-                var nodeData = nodeEquationData[node.ID];
-
+                var nodeEqnData = _AssemblyData.NodeEquationData[node.ID];
                 var nodeResults = new List<double>();
 
-                for (int j   = 0; j < nodeData.Count; j++)
+                for (int j = 0; j < nodeEqnData.Count; j++)
                 {
-                    if (nodeData[j] == -1)
+                    double dofResult = 0;
+
+                    if (nodeEqnData[j] != -1) // unknown
                     {
-                        nodeResults.Add(0);
-                    }
-                    else
-                    {
-                        nodeResults.Add(nodeDisps[nodeData[j], 0]);
-                        //TODO: Check with debug.  matrix index i ile equation number arasında fark olabilir. 
+
+                        dofResult = nodeDisps[counter, 0];
+                        counter++;
+
                     }
 
+                    nodeResults.Add(dofResult);
                 }
-
                 _LatticeModelResultData.NodeResults.Add(node.ID, nodeResults);
 
             }
+
 
         }
 
@@ -311,9 +340,9 @@ namespace Solver
             for (int i = 0; i < listOfFrames.Count; i++)
             {
                 var frm = listOfFrames[i];
-                var frameGlobalResults = new FrameMemberResults();
-                frameGlobalResults.INodeDisplacements = nodeResults[frm.IEndNode.ID];
-                frameGlobalResults.JNodeDisplacements = nodeResults[frm.JEndNode.ID];
+                var frameResults = new FrameMemberResults();
+                frameResults.INodeDisplacements_Global = nodeResults[frm.IEndNode.ID];
+                frameResults.JNodeDisplacements_Global = nodeResults[frm.JEndNode.ID];
 
 
 
@@ -321,8 +350,8 @@ namespace Solver
                 var globalResultsMatrix = new MatrixCS(12, 1);
                 for (int k= 0; k < 6; k++)
                 {
-                    globalResultsMatrix.Matrix[k, 1] = frameGlobalResults.INodeDisplacements[k];
-                    globalResultsMatrix.Matrix[k+6, 1] = frameGlobalResults.JNodeDisplacements[k];
+                    globalResultsMatrix.Matrix[k, 0] = frameResults.INodeDisplacements_Global[k];
+                    globalResultsMatrix.Matrix[k+6, 0] = frameResults.JNodeDisplacements_Global[k];
                 }
 
                 var R = frm.GetRotationMatrix();
@@ -333,41 +362,37 @@ namespace Solver
                 var fGlobal = RPrime.Multiply(fLocal);
 
 
-                var frameLocalResults = new FrameMemberResults();
-                frameLocalResults.INodeDisplacements = new List<double>();
-                frameLocalResults.JNodeDisplacements = new List<double>();
+                frameResults.INodeDisplacements_Local = new List<double>();
+                frameResults.INodeForces_Global = new List<double>();
+                frameResults.INodeForces_Local = new List<double>();
+                frameResults.JNodeDisplacements_Local = new List<double>();
+                frameResults.JNodeForces_Global = new List<double>();
+                frameResults.JNodeForces_Local = new List<double>();
 
 
                 for (int k = 0; k < 12; k++)
                 {
                     if (k>=6)
                     {
-                        frameLocalResults.JNodeDisplacements.Add(uLocal.Matrix[k, 1]);
-                        frameLocalResults.JNodeForces.Add(fLocal.Matrix[k, 1]);
+                        frameResults.JNodeDisplacements_Local.Add(uLocal.Matrix[k, 0]);
+                        frameResults.JNodeForces_Local.Add(fLocal.Matrix[k, 0]);
 
-                        frameGlobalResults.JNodeDisplacements.Add(fGlobal.Matrix[k, 1]);
+                        frameResults.JNodeForces_Global.Add(fGlobal.Matrix[k, 0]);
                     }
                     else
                     {
-                        frameLocalResults.INodeDisplacements.Add(uLocal.Matrix[k, 1]);
-                        frameLocalResults.INodeForces.Add(fLocal.Matrix[k, 1]);
-
-                        frameGlobalResults.INodeDisplacements.Add(fGlobal.Matrix[k, 1]);
+                        frameResults.INodeDisplacements_Local.Add(uLocal.Matrix[k, 0]);
+                        frameResults.INodeForces_Local.Add(fLocal.Matrix[k, 0]);
+                         
+                        frameResults.INodeForces_Global.Add(fGlobal.Matrix[k, 0]);
 
                     }
 
                 }
 
-                _LatticeModelResultData.GlobalFrameResults.Add(frm.ID, frameGlobalResults);
-                _LatticeModelResultData.LocalFrameResults.Add(frm.ID, frameLocalResults);
+
+                _LatticeModelResultData.FrameResults.Add(frm.ID, frameResults);
             }
-
-
-            // Get Local Displacements
-
-
-
-
         }
         #endregion
     }
