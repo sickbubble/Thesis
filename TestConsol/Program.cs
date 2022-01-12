@@ -23,7 +23,7 @@ namespace TestConsol
             latticeModelData.AssignLoadToMiddle();
 
 
-            var shellModelData =new ShellModelData();
+            var shellModelData = new ShellModelData();
             shellModelData.Width = 2;
             shellModelData.Height = 2;
             shellModelData.MeshSize = 1;
@@ -35,7 +35,7 @@ namespace TestConsol
 
 
             var solverLattice = new LinearSolver(latticeModelData);
-var solverShell = new LinearSolver( shellModelData);
+            var solverShell = new LinearSolver(shellModelData);
             solverLattice.RunAnalysis_Lattice();
 
             solverShell.RunAnalysis_Shell();
