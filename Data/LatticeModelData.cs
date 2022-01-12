@@ -66,8 +66,6 @@ namespace Data
                     }
             }
             }
-
-
         }
 
         public void SetBorderNodesSupportCondition(eSupportType supportType)

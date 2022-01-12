@@ -11,7 +11,11 @@ namespace ThesisProject.Sections
         #region Ctor
         public ShellSection()
         {
+            _SectionType = eSectionType.Frame;
 
+            SetDefaultParameters();
+
+            SetDefaultMaterial();
         }
 
         #endregion
@@ -40,5 +44,18 @@ namespace ThesisProject.Sections
         #endregion
 
 
+        #region Public Methods
+        public void SetDefaultParameters()
+        {
+            this.Thickness = 0.1;
+        }
+
+
+        public void SetDefaultMaterial()
+        {
+            this.Material = new Material(1, 0.3);
+
+        }
+        #endregion
     }
 }

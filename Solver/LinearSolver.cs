@@ -35,8 +35,16 @@ namespace Solver
         public LinearSolver(LatticeModelData latticemodeldata)
         {
             _LatticeModelData = latticemodeldata;
-            
-             _AssemblyData = GetNodeAssemblyData();
+
+             _AssemblyData = GetNodeAssemblyData(latticemodeldata.ListOfNodes);
+
+        }
+
+        public LinearSolver(ShellModelData shellModelData)
+        {
+            _ShellModelData = shellModelData;
+
+            _AssemblyData = GetNodeAssemblyData(shellModelData.ListOfNodes);
 
         }
         #endregion
@@ -46,6 +54,7 @@ namespace Solver
         private LatticeModelData _LatticeModelData;
         private LatticeModelResultData _LatticeModelResultData ;
         private AssemblyDataContainer _AssemblyData;
+        private ShellModelData _ShellModelData;
 
         public LatticeModelResultData LatticeModelResultData { get => _LatticeModelResultData; set => _LatticeModelResultData = value; }
 
@@ -54,43 +63,14 @@ namespace Solver
 
         #region Public Methods
 
-        public void RunAnalysis()
+        public void RunAnalysis_Lattice()
         {
-            var KG = GetGlobalStiffness();
+            var KG = GetGlobalStiffness_Latttice();
             var RHS = GetRightHandSide();
-
-
-            var size = KG.NRows;
-
 
             var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
             var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
 
-
-            //for (int i = 0; i < KG.NRows; i++)
-            //{
-            //    for (int j = 0; j < KG.NColumns; j++)
-            //    {
-            //        externalKG[i, j] = KG.Matrix[i, j];
-            //    }
-
-            //}
-
-            //var externalRHS = Matrix<double>.Build.Random(RHS.NRows, RHS.NColumns);
-
-            //for (int i = 0; i < RHS.NRows; i++)
-            //{
-            //    for (int j = 0; j < RHS.NColumns; j++)
-            //    {
-            //        externalRHS[i, j] = RHS.Matrix[i, j];
-            //    }
-
-            //}
-
-            //double GetK(int i, int j) => KG.Matrix[i, j];
-
-            //var externalKG = Matrix<double>.Build.Sparse(size, size, GetK);
-            //double GetRHS(int i, int j) => RHS.Matrix[i, j];
             var dispRes = externalKG.Solve(externalRHS);
 
             var dispResAsArray = dispRes.ToArray();
@@ -100,81 +80,46 @@ namespace Solver
 
             FillNodeResults(dispResAsArray);
             FillFrameMemberResults();
+        }
+
+        public void RunAnalysis_Shell()
+        {
+            var KG = GetGlobalStiffness_Shell();
+            var RHS = GetRightHandSide();
+
+            var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
+            var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
+
+            var dispRes = externalKG.Solve(externalRHS);
+
+            var dispResAsArray = dispRes.ToArray();
+            var dispResMatrix = new MatrixCS(dispResAsArray.Length, 1);
+
+            dispResMatrix.Matrix = dispResAsArray;
+
+            var internalEnergy = GetShellModelInternalEnergy(dispResMatrix);
 
 
 
-            //// Get node results
-            //var listOfNodes = _LatticeModelData.ListOfNodes;
-            //int counter = 0;
+            _LatticeModelResultData = new LatticeModelResultData();
+            _LatticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
 
-            //for (int i = 0; i < listOfNodes.Count; i++)
-            //{
-            //    var node = listOfNodes[i];
-            //    var nodeEqnData = _AssemblyData.NodeEquationData[node.ID];
-            //    var nodeResults = new List<double>();
-
-            //    for (int j = 0; j < nodeEqnData.Count; j++)
-            //    {
-            //        double dofResult = 0;
-
-            //        if (nodeEqnData[j] != -1) // unknown
-            //        {
-
-            //            dofResult = dispResAsArray[counter,0];
-            //            counter ++;
-
-            //        }
-
-            //        nodeResults.Add(dofResult);
-            //    }
-            //    _LatticeModelResultData.NodeResults.Add(node.ID, nodeResults);
-
-            //}
-
-            ////Get frame results.
-            //var listOFFrames = _LatticeModelData.ListOfMembers;
-            //counter = 0;
-            //for (int i = 0; i < listOFFrames.Count; i++)
-            //{
-            //    var frame = listOFFrames[i];
-            //    var frameRes = new FrameMemberResults();
-            //    frameRes.INodeDisplacements_Global = new List<double>();
-            //    var InodeEqnData = _AssemblyData.NodeEquationData[frame.IEndNode.ID];
-            //    for (int j = 0; j < InodeEqnData.Count; j++)
-            //    {
-            //        double dofResult = 0;
-
-            //        if (InodeEqnData[j] != -1) // unknown
-            //        {
-            //            dofResult = dispRes[counter, 0];
-            //            counter++;
-            //        }
-
-            //        frameRes.INodeDisplacements_Global.Add(dofResult);
-
-            //    }
-
-            //    var JnodeEqnData = _AssemblyData.NodeEquationData[frame.IEndNode.ID];
-            //    frameRes.JNodeDisplacements_Global = new List<double>();
-
-            //    for (int k   = 0; k < JnodeEqnData.Count; k++)
-            //    {
-            //        double dofResult = 0;
-
-            //        if (JnodeEqnData[k] != -1) // unknown
-            //        {
-            //            dofResult = dispRes[counter, 0];
-            //            counter++;
-            //        }
-
-            //        frameRes.JNodeDisplacements_Global.Add(dofResult);
-            //    }
-
-            //    //TODO add local results also. 
-            //    _LatticeModelResultData.FrameResults.Add(frame.ID, frameRes);
-            //}
+            FillNodeResults(dispResAsArray);
 
         }
+
+        public double GetShellModelInternalEnergy(MatrixCS dispMatrix)
+        {
+            double ret;
+            var KG = GetGlobalStiffness_Shell();
+
+            var firstPart = dispMatrix.Transpose().Multiply(KG);
+            ret = firstPart.Multiply(dispMatrix).Matrix[0,0];
+
+
+            return ret;
+        }
+
 
         #endregion
 
@@ -185,7 +130,9 @@ namespace Solver
         {
             var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
             MatrixCS rightHandSide = new MatrixCS(numOfUnknowns, 1);
-            var listOfLoads = _LatticeModelData.ListOfLoads;
+
+            var listOfLoads  = _LatticeModelData!= null ? _LatticeModelData.ListOfLoads : _ShellModelData.ListOfLoads;
+
 
             for (int i = 0; i < listOfLoads.Count; i++)
             {
@@ -220,7 +167,7 @@ namespace Solver
             return rightHandSide;
         }
 
-        private MatrixCS GetGlobalStiffness()
+        private MatrixCS GetGlobalStiffness_Latttice()
         {
 
             var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
@@ -261,11 +208,54 @@ namespace Solver
 
         }
 
-        private AssemblyDataContainer GetNodeAssemblyData()
+        private MatrixCS GetGlobalStiffness_Shell()
+        {
+
+            var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
+            var nodeEquationData = _AssemblyData.NodeEquationData;
+
+            MatrixCS KG = new MatrixCS(numOfUnknowns, numOfUnknowns);
+
+            var listOfShellMembers = _ShellModelData.ListOfMembers;
+
+            for (int i = 0; i < listOfShellMembers.Count; i++)
+            {
+                var shellMember = listOfShellMembers[i];
+                var K = shellMember.GetGlobalStiffnessMatrix();
+                var iNode = shellMember.IEndNode;
+                var jNode = shellMember.JEndNode;
+                var kNode = shellMember.KEndNode;
+                var lNode = shellMember.LEndNode;
+
+                var g = new List<int>();
+
+                g.AddRange(nodeEquationData[iNode.ID]);
+                g.AddRange(nodeEquationData[jNode.ID]);
+                g.AddRange(nodeEquationData[kNode.ID]);
+                g.AddRange(nodeEquationData[lNode.ID]);
+
+                var matrixLength = K.NRows;//should be 12 for frame
+
+                for (int k = 0; k < matrixLength; k++)
+                {
+                    for (int l = 0; l < matrixLength; l++)
+                    {
+                        if (g[k] != -1 && g[l] != -1) // -1 means free a.k.a unknown
+                        {
+                            KG.Matrix[g[k], g[l]] = KG.Matrix[g[k], g[l]] + K.Matrix[k, l];
+                        }
+                    }
+                }
+            }
+
+            return KG;
+
+        }
+
+        private AssemblyDataContainer GetNodeAssemblyData(List<Node> listOfNodes )
         {
 
             int numberOfUnknowns = 0;
-            var listOfNodes = _LatticeModelData.ListOfNodes;
 
             var nodeEquationData = new Dictionary<int, List<int>>();
 
@@ -301,7 +291,7 @@ namespace Solver
         private void FillNodeResults(double [,] nodeDisps)
         {
             // Get node results
-            var listOfNodes = _LatticeModelData.ListOfNodes;
+            var listOfNodes = _LatticeModelData != null ? _LatticeModelData.ListOfNodes : _ShellModelData.ListOfNodes;
             int counter = 0;
 
             for (int i = 0; i < listOfNodes.Count; i++)

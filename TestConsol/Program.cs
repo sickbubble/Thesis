@@ -20,11 +20,28 @@ namespace TestConsol
             latticeModelData.FillNodeInfo();
             latticeModelData.FillMemberInfoList();
             latticeModelData.SetBorderNodesSupportCondition(eSupportType.Pinned);
-latticeModelData.AssignLoadToMiddle();
+            latticeModelData.AssignLoadToMiddle();
 
 
-            var solver = new LinearSolver(latticeModelData);
-            solver.RunAnalysis();
+            var shellModelData =new ShellModelData();
+            shellModelData.Width = 2;
+            shellModelData.Height = 2;
+            shellModelData.MeshSize = 1;
+            shellModelData.FillNodeInfo();
+            shellModelData.FillMemberInfoList();
+            shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
+            shellModelData.AssignLoadToMiddle();
+
+
+
+            var solverLattice = new LinearSolver(latticeModelData);
+var solverShell = new LinearSolver( shellModelData);
+            solverLattice.RunAnalysis_Lattice();
+
+            solverShell.RunAnalysis_Shell();
+
+
+            Console.ReadLine();
 
 
 

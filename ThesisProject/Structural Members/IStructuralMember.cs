@@ -14,7 +14,7 @@ namespace ThesisProject
     }
     public interface IStructuralMember
     {
-
+        int ID { get; set; }
         eMemberType MemberType { get; set; }
         ISection Section { get; set; }
 

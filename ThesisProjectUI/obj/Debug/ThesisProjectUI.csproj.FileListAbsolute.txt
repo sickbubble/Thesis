@@ -7,4 +7,3 @@ C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.csproj.Ge
 C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.csproj.CoreCompileInputs.cache
 C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.exe
 C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.pdb
-C:\Users\Burak T\Desktop\Tez\ThesisProjectUI\obj\Debug\ThesisProjectUI.csprojAssemblyReference.cache

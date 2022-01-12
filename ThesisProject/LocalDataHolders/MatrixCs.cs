@@ -30,6 +30,19 @@ namespace ThesisProject
 
         #region Public Methods
 
+        public void Print()
+        {
+            Console.WriteLine("This Matrix");
+            for (int i = 0; i < this.NRows; i++)
+            {
+                for (int j = 0; j < this.NColumns; j++)
+                {
+                    Console.Write(this.Matrix[i, j].ToString() + " ");
+                }
+                Console.WriteLine();
+            }
+        }
+
         public void InsertMatrix(MatrixCS matrix, int startingRow, int startingColumn)
         {
             var lastColumn = startingColumn + matrix.NColumns;
@@ -113,13 +126,11 @@ namespace ThesisProject
         {
             MatrixCS product = new MatrixCS(this.NRows, this.NColumns);
 
-
-
             for (int i = 0; i < sumWith.NRows; i++)
             {
                 for (int j = 0; j < sumWith.NColumns; j++)
                 {
-                    this.Matrix[i, j] += this.Matrix[i, j] + sumWith.Matrix[i, j];
+                    product.Matrix[i, j] += this.Matrix[i, j] + sumWith.Matrix[i, j];
 
                 }
 
