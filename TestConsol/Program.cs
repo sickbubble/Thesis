@@ -14,9 +14,9 @@ namespace TestConsol
         static void Main(string[] args)
         {
             var latticeModelData = new LatticeModelData();
-            latticeModelData.Width = 2;
-            latticeModelData.Height = 2;
-            latticeModelData.MeshSize = 1;
+            latticeModelData.Width = 16;
+            latticeModelData.Height = 16;
+            latticeModelData.MeshSize = 0.5;
             latticeModelData.FillNodeInfo();
             latticeModelData.FillMemberInfoList();
             latticeModelData.SetBorderNodesSupportCondition(eSupportType.Pinned);
@@ -24,9 +24,9 @@ namespace TestConsol
 
 
             var shellModelData = new ShellModelData();
-            shellModelData.Width = 2;
-            shellModelData.Height = 2;
-            shellModelData.MeshSize = 1;
+            shellModelData.Width = 16;
+            shellModelData.Height = 16;
+            shellModelData.MeshSize = 0.5;
             shellModelData.FillNodeInfo();
             shellModelData.FillMemberInfoList();
             shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
@@ -34,11 +34,9 @@ namespace TestConsol
 
 
 
-            var solverLattice = new LinearSolver(latticeModelData);
-            var solverShell = new LinearSolver(shellModelData);
-            solverLattice.RunAnalysis_Lattice();
-
-            solverShell.RunAnalysis_Shell();
+            var linearSolver = new LinearSolver();
+            var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
+            var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
 
 
             Console.ReadLine();

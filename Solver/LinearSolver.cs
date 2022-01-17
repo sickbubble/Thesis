@@ -32,39 +32,31 @@ namespace Solver
 
         #region Ctor
 
-        public LinearSolver(LatticeModelData latticemodeldata)
+        public LinearSolver()
         {
-            _LatticeModelData = latticemodeldata;
-
-             _AssemblyData = GetNodeAssemblyData(latticemodeldata.ListOfNodes);
+            
 
         }
 
-        public LinearSolver(ShellModelData shellModelData)
-        {
-            _ShellModelData = shellModelData;
-
-            _AssemblyData = GetNodeAssemblyData(shellModelData.ListOfNodes);
-
-        }
+       
         #endregion
 
         #region Private Fields
 
         private LatticeModelData _LatticeModelData;
-        private LatticeModelResultData _LatticeModelResultData ;
         private AssemblyDataContainer _AssemblyData;
         private ShellModelData _ShellModelData;
-
-        public LatticeModelResultData LatticeModelResultData { get => _LatticeModelResultData; set => _LatticeModelResultData = value; }
 
 
         #endregion
 
         #region Public Methods
 
-        public void RunAnalysis_Lattice()
+        public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata)
         {
+            _LatticeModelData = latticemodeldata;
+            _AssemblyData = GetNodeAssemblyData(latticemodeldata.ListOfNodes);
+
             var KG = GetGlobalStiffness_Latttice();
             var RHS = GetRightHandSide();
 
@@ -74,16 +66,21 @@ namespace Solver
             var dispRes = externalKG.Solve(externalRHS);
 
             var dispResAsArray = dispRes.ToArray();
-            _LatticeModelResultData = new LatticeModelResultData();
-            _LatticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
-            _LatticeModelResultData.FrameResults = new Dictionary<int, FrameMemberResults>();
+            var latticeModelResultData = new LatticeModelResultData();
+            latticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
+            latticeModelResultData.FrameResults = new Dictionary<int, FrameMemberResults>();
 
-            FillNodeResults(dispResAsArray);
-            FillFrameMemberResults();
+            GetNodeResults(dispResAsArray,latticeModelResultData.NodeResults);
+            FillFrameMemberResults(latticeModelResultData);
+
+            return latticeModelResultData;
         }
 
-        public void RunAnalysis_Shell()
+        public ShellModelResultData RunAnalysis_Shell(ShellModelData shellModelData)
         {
+            _ShellModelData = shellModelData;
+            _AssemblyData = GetNodeAssemblyData(shellModelData.ListOfNodes);
+            
             var KG = GetGlobalStiffness_Shell();
             var RHS = GetRightHandSide();
 
@@ -100,12 +97,12 @@ namespace Solver
             var internalEnergy = GetShellModelInternalEnergy(dispResMatrix);
 
 
+            var shellModelResultData = new ShellModelResultData();
+            shellModelResultData.NodeResults = new Dictionary<int, List<double>>();
 
-            _LatticeModelResultData = new LatticeModelResultData();
-            _LatticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
+            GetNodeResults(dispResAsArray,shellModelResultData.NodeResults);
 
-            FillNodeResults(dispResAsArray);
-
+            return shellModelResultData;
         }
 
         public double GetShellModelInternalEnergy(MatrixCS dispMatrix)
@@ -146,7 +143,7 @@ namespace Solver
                         if (eqnNumber != -1 )
                         {
                             // eqnNumber is one based. 
-                            rightHandSide.Matrix[eqnNumber -1 ,0] = pLoad.Magnitude;
+                            rightHandSide.Matrix[eqnNumber  ,0] = pLoad.Magnitude;
                         } 
 
                         break;
@@ -288,7 +285,7 @@ namespace Solver
             return assemblyData;
         }
 
-        private void FillNodeResults(double [,] nodeDisps)
+        private void GetNodeResults(double [,] nodeDisps, Dictionary<int,List<double>> nodeResultsDict)
         {
             // Get node results
             var listOfNodes = _LatticeModelData != null ? _LatticeModelData.ListOfNodes : _ShellModelData.ListOfNodes;
@@ -314,16 +311,16 @@ namespace Solver
 
                     nodeResults.Add(dofResult);
                 }
-                _LatticeModelResultData.NodeResults.Add(node.ID, nodeResults);
+                nodeResultsDict.Add(node.ID, nodeResults);
 
             }
 
 
         }
 
-        private void FillFrameMemberResults()
+        private void FillFrameMemberResults(LatticeModelResultData resultData)
         {
-            var nodeResults = _LatticeModelResultData.NodeResults;
+            var nodeResults = resultData.NodeResults;
 
             var listOfFrames = _LatticeModelData.ListOfMembers;
 
@@ -381,7 +378,7 @@ namespace Solver
                 }
 
 
-                _LatticeModelResultData.FrameResults.Add(frm.ID, frameResults);
+                resultData.FrameResults.Add(frm.ID, frameResults);
             }
         }
         #endregion

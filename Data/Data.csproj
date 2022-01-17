@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ShellModelResultData.cs" />
     <Compile Include="ShellModelData.cs" />
     <Compile Include="LatticeModelResultData.cs" />
     <Compile Include="IAnlResultData.cs" />
