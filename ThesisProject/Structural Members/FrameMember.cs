@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ThesisProject.Structural_Members
 {
-   
+
 
     public class FrameMember : IStructuralMember
     {
@@ -27,7 +27,7 @@ namespace ThesisProject.Structural_Members
 
 
         private eMemberType _MemberType;
-        private ISection _Section;
+        private FrameSection _Section;
 
 
         #endregion
@@ -42,11 +42,10 @@ namespace ThesisProject.Structural_Members
 
         #region Interface Implementations
         public eMemberType MemberType { get => _MemberType; set => _MemberType = value; }
-        public ISection Section { get => _Section; set => _Section = value; }
+        public FrameSection Section { get => _Section; set => _Section = value; }
         internal EndCondition IEndCondition { get => _IEndCondition; set => _IEndCondition = value; }
         internal EndCondition JEndCondition { get => _JEndCondition; set => _JEndCondition = value; }
-
-
+      
 
         public MatrixCS GetGlobalStiffnessMatrix()
         {
@@ -64,6 +63,30 @@ namespace ThesisProject.Structural_Members
             globalStiffnessMatrix = transposedRotMatrix.Multiply(secondPartOfMultiplication);
 
             return globalStiffnessMatrix;
+        }
+
+        public double GetLength()
+        {
+            double length = 0;
+
+            var iNode = this.IEndNode;
+            var iX = iNode.Point.X;
+            var iY = iNode.Point.Y;
+            var iZ = iNode.Point.Z;
+
+
+            var jNode = this.JEndNode;
+            var jX = jNode.Point.X;
+            var jY = jNode.Point.Y;
+            var jZ = jNode.Point.Z;
+
+
+
+            var sqrr = (iX - jX) * (iX - jX) + (iY - jY) * (iY - jY) + (iZ - jZ) * (iZ - jZ);
+            length = Math.Sqrt(sqrr);
+
+
+            return length;
         }
 
         public MatrixCS GetRotationMatrix()
@@ -103,7 +126,7 @@ namespace ThesisProject.Structural_Members
         {
             var section = (FrameSection)_Section;
             var kElm = new MatrixCS(12, 12);
-            var L = Math.Sqrt(Math.Pow(this.JEndNode.Point.X - this.IEndNode.Point.X, 2) + Math.Pow(this.JEndNode.Point.Y - this.IEndNode.Point.Y, 2)+ Math.Pow(this.JEndNode.Point.Z - this.IEndNode.Point.Z, 2));
+            var L = Math.Sqrt(Math.Pow(this.JEndNode.Point.X - this.IEndNode.Point.X, 2) + Math.Pow(this.JEndNode.Point.Y - this.IEndNode.Point.Y, 2) + Math.Pow(this.JEndNode.Point.Z - this.IEndNode.Point.Z, 2));
             var L2 = L * L;
             var L3 = Math.Pow(L, 3);
             var E = section.Material.E;
@@ -114,57 +137,57 @@ namespace ThesisProject.Structural_Members
             var I22 = section.I22;
             var J = section.J;
 
-            kElm.Matrix[0,0] = E * A / L;
-            kElm.Matrix[0,6] = -1 * E * A / L;
+            kElm.Matrix[0, 0] = E * A / L;
+            kElm.Matrix[0, 6] = -1 * E * A / L;
 
-            kElm.Matrix[1,1] = 12 * E * I11 / L3;
-            kElm.Matrix[1,5] = 6 * E * I11 / L2;
-            kElm.Matrix[1,7] = -12 * E * I11 / L3;
-            kElm.Matrix[1,11] = 6 * E * I11 / L2;
+            kElm.Matrix[1, 1] = 12 * E * I11 / L3;
+            kElm.Matrix[1, 5] = 6 * E * I11 / L2;
+            kElm.Matrix[1, 7] = -12 * E * I11 / L3;
+            kElm.Matrix[1, 11] = 6 * E * I11 / L2;
 
-            kElm.Matrix[2,2] = 12 * E * I22 / L3;
-            kElm.Matrix[2,4] = -6 * E * I22 / L2;
-            kElm.Matrix[2,8] = -12 * E * I22 / L3;
-            kElm.Matrix[2,10] = -6 * E * I22 / L2;
+            kElm.Matrix[2, 2] = 12 * E * I22 / L3;
+            kElm.Matrix[2, 4] = -6 * E * I22 / L2;
+            kElm.Matrix[2, 8] = -12 * E * I22 / L3;
+            kElm.Matrix[2, 10] = -6 * E * I22 / L2;
 
-            kElm.Matrix[3,3] = G * J / L;
-            kElm.Matrix[3,9] = -1 * G * J / L;
+            kElm.Matrix[3, 3] = G * J / L;
+            kElm.Matrix[3, 9] = -1 * G * J / L;
 
-            kElm.Matrix[4,2] = kElm.Matrix[2,4];
-            kElm.Matrix[4,4] = 4 * E * I11 / L;
-            kElm.Matrix[4,8] = 6 * E * I11 / L2;
-            kElm.Matrix[4,10] = 2 * E * I11 / L;
+            kElm.Matrix[4, 2] = kElm.Matrix[2, 4];
+            kElm.Matrix[4, 4] = 4 * E * I11 / L;
+            kElm.Matrix[4, 8] = 6 * E * I11 / L2;
+            kElm.Matrix[4, 10] = 2 * E * I11 / L;
 
-            kElm.Matrix[5,1] = kElm.Matrix[1,5];
-            kElm.Matrix[5,5] = 4 * E * I22 / L;
-            kElm.Matrix[5,7] = -6 * E * I22 / L2;
-            kElm.Matrix[5,11] = 2 * E * I22 / L;
+            kElm.Matrix[5, 1] = kElm.Matrix[1, 5];
+            kElm.Matrix[5, 5] = 4 * E * I22 / L;
+            kElm.Matrix[5, 7] = -6 * E * I22 / L2;
+            kElm.Matrix[5, 11] = 2 * E * I22 / L;
 
-            kElm.Matrix[6,0] = kElm.Matrix[0,6];
-            kElm.Matrix[6,6] = E * A / L;
+            kElm.Matrix[6, 0] = kElm.Matrix[0, 6];
+            kElm.Matrix[6, 6] = E * A / L;
 
-            kElm.Matrix[7,1] = kElm.Matrix[1,7];
-            kElm.Matrix[7,5] = kElm.Matrix[5,7];
-            kElm.Matrix[7,7] = 12 * E * I11 / L3;
-            kElm.Matrix[7,11] = -6 * E * I11 / L2;
+            kElm.Matrix[7, 1] = kElm.Matrix[1, 7];
+            kElm.Matrix[7, 5] = kElm.Matrix[5, 7];
+            kElm.Matrix[7, 7] = 12 * E * I11 / L3;
+            kElm.Matrix[7, 11] = -6 * E * I11 / L2;
 
-            kElm.Matrix[8,2] = kElm.Matrix[2,8];
-            kElm.Matrix[8,4] = kElm.Matrix[4,8];
-            kElm.Matrix[8,8] = 12 * E * I22 / L3;
-            kElm.Matrix[8,10] = 6 * E * I22 / L2;
+            kElm.Matrix[8, 2] = kElm.Matrix[2, 8];
+            kElm.Matrix[8, 4] = kElm.Matrix[4, 8];
+            kElm.Matrix[8, 8] = 12 * E * I22 / L3;
+            kElm.Matrix[8, 10] = 6 * E * I22 / L2;
 
-            kElm.Matrix[9,3] = kElm.Matrix[3,9];
-            kElm.Matrix[9,9] = G * J / L;
+            kElm.Matrix[9, 3] = kElm.Matrix[3, 9];
+            kElm.Matrix[9, 9] = G * J / L;
 
-            kElm.Matrix[10,2] = kElm.Matrix[2,10];
-            kElm.Matrix[10,4] = kElm.Matrix[4,10];
-            kElm.Matrix[10,8] = kElm.Matrix[8,10];
-            kElm.Matrix[10,10] = 4 * E * I11 / L;
+            kElm.Matrix[10, 2] = kElm.Matrix[2, 10];
+            kElm.Matrix[10, 4] = kElm.Matrix[4, 10];
+            kElm.Matrix[10, 8] = kElm.Matrix[8, 10];
+            kElm.Matrix[10, 10] = 4 * E * I11 / L;
 
-            kElm.Matrix[11,1] = kElm.Matrix[1,11];
-            kElm.Matrix[11,5] = kElm.Matrix[5,11];
-            kElm.Matrix[11,7] = kElm.Matrix[7,11];
-            kElm.Matrix[11,11] = 4 * E * I22 / L;
+            kElm.Matrix[11, 1] = kElm.Matrix[1, 11];
+            kElm.Matrix[11, 5] = kElm.Matrix[5, 11];
+            kElm.Matrix[11, 7] = kElm.Matrix[7, 11];
+            kElm.Matrix[11, 11] = 4 * E * I22 / L;
 
 
             // Check I-End Releases
@@ -173,8 +196,8 @@ namespace ThesisProject.Structural_Members
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[0,i] = 0.0;
-                    kElm.Matrix[i,0] = 0.0;
+                    kElm.Matrix[0, i] = 0.0;
+                    kElm.Matrix[i, 0] = 0.0;
                 }
             }
 
@@ -182,16 +205,16 @@ namespace ThesisProject.Structural_Members
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[1,i] = 0.0;
-                    kElm.Matrix[i,1] = 0.0;
+                    kElm.Matrix[1, i] = 0.0;
+                    kElm.Matrix[i, 1] = 0.0;
                 }
             }
             if (this._IEndCondition.IsReleaseFz)
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[2,i] = 0.0;
-                    kElm.Matrix[i,2] = 0.0;
+                    kElm.Matrix[2, i] = 0.0;
+                    kElm.Matrix[i, 2] = 0.0;
                 }
             }
 
@@ -199,16 +222,16 @@ namespace ThesisProject.Structural_Members
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[3,i] = 0.0;
-                    kElm.Matrix[i,3] = 0.0;
+                    kElm.Matrix[3, i] = 0.0;
+                    kElm.Matrix[i, 3] = 0.0;
                 }
             }
             if (this._IEndCondition.IsReleaseMy)
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[4,i] = 0.0;
-                    kElm.Matrix[i,4] = 0.0;
+                    kElm.Matrix[4, i] = 0.0;
+                    kElm.Matrix[i, 4] = 0.0;
                 }
             }
 
@@ -216,8 +239,8 @@ namespace ThesisProject.Structural_Members
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[5,i] = 0.0;
-                    kElm.Matrix[i,5] = 0.0;
+                    kElm.Matrix[5, i] = 0.0;
+                    kElm.Matrix[i, 5] = 0.0;
                 }
             }
 
@@ -227,8 +250,8 @@ namespace ThesisProject.Structural_Members
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[6,i] = 0.0;
-                    kElm.Matrix[i,6] = 0.0;
+                    kElm.Matrix[6, i] = 0.0;
+                    kElm.Matrix[i, 6] = 0.0;
                 }
             }
 
@@ -236,16 +259,16 @@ namespace ThesisProject.Structural_Members
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[7,i] = 0.0;
-                    kElm.Matrix[i,7] = 0.0;
+                    kElm.Matrix[7, i] = 0.0;
+                    kElm.Matrix[i, 7] = 0.0;
                 }
             }
             if (this._JEndCondition.IsReleaseFz)
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[8,i] = 0.0;
-                    kElm.Matrix[i,8] = 0.0;
+                    kElm.Matrix[8, i] = 0.0;
+                    kElm.Matrix[i, 8] = 0.0;
                 }
             }
 
@@ -253,16 +276,16 @@ namespace ThesisProject.Structural_Members
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[9,i] = 0.0;
-                    kElm.Matrix[i,9] = 0.0;
+                    kElm.Matrix[9, i] = 0.0;
+                    kElm.Matrix[i, 9] = 0.0;
                 }
             }
             if (this._JEndCondition.IsReleaseMy)
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[10,i] = 0.0;
-                    kElm.Matrix[i,10] = 0.0;
+                    kElm.Matrix[10, i] = 0.0;
+                    kElm.Matrix[i, 10] = 0.0;
                 }
             }
 
@@ -270,14 +293,50 @@ namespace ThesisProject.Structural_Members
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    kElm.Matrix[11,i] = 0.0;
-                    kElm.Matrix[i,11] = 0.0;
+                    kElm.Matrix[11, i] = 0.0;
+                    kElm.Matrix[i, 11] = 0.0;
                 }
             }
 
             return kElm;
         }
 
+        public MatrixCS GetLocalMassMatrix()
+        {
+            var massMatrix = new MatrixCS(12, 12);
+
+            var A = this.Section.Area;
+            var rho = this.Section.Material.Uw * A;
+            rho = 0.1; //todo
+            double L = this.GetLength();
+
+
+            var m = 0.5 * rho * L;
+            massMatrix.Matrix[0, 0] = m;
+            massMatrix.Matrix[1, 1] = m;
+            massMatrix.Matrix[2, 2] = m;
+            massMatrix.Matrix[4, 4] = 1e-6 * m * L * L;
+            massMatrix.Matrix[5, 5] = 1e-6 * m * L * L;
+            massMatrix.Matrix[6, 6] = m;
+            massMatrix.Matrix[7, 7] = m;
+            massMatrix.Matrix[8, 8] = m;
+            massMatrix.Matrix[10, 10] = 1e-6 * m * L * L;
+            massMatrix.Matrix[11, 11] = 1e-6 * m * L * L;
+
+
+            return massMatrix;
+        }
+
+        public MatrixCS GetGlobalMassMatrix()
+        {
+            var rot = this.GetRotationMatrix();
+            var rotTrans = rot.Transpose();
+            var localMassMatrix = this.GetLocalMassMatrix();
+
+            return (rotTrans.Multiply(localMassMatrix)).Multiply(rot);
+
+
+        }
 
         #endregion
 
@@ -286,7 +345,7 @@ namespace ThesisProject.Structural_Members
 
         private void GetDefaultEndConditions()
         {
-            this.IEndCondition= new EndCondition();
+            this.IEndCondition = new EndCondition();
             this.JEndCondition = new EndCondition();
             //this.IEndCondition
         }
@@ -321,11 +380,11 @@ namespace ThesisProject.Structural_Members
         /// </summary>
         private void SetDefaultEndCond()
         {
-            _IsReleaseFx=false;
-            _IsReleaseFy=false;
-            _IsReleaseFz=false;
-            _IsReleaseMx=false;
-            _IsReleaseMy=false;
+            _IsReleaseFx = false;
+            _IsReleaseFy = false;
+            _IsReleaseFz = false;
+            _IsReleaseMx = false;
+            _IsReleaseMy = false;
             _IsReleaseMz = false;
         }
     }

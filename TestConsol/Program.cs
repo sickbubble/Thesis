@@ -16,7 +16,7 @@ namespace TestConsol
             var latticeModelData = new LatticeModelData();
             latticeModelData.Width = 16;
             latticeModelData.Height = 16;
-            latticeModelData.MeshSize = 0.5;
+            latticeModelData.MeshSize = 4;
             latticeModelData.FillNodeInfo();
             latticeModelData.FillMemberInfoList();
             latticeModelData.SetBorderNodesSupportCondition(eSupportType.Pinned);
@@ -26,7 +26,7 @@ namespace TestConsol
             var shellModelData = new ShellModelData();
             shellModelData.Width = 16;
             shellModelData.Height = 16;
-            shellModelData.MeshSize = 0.5;
+            shellModelData.MeshSize = 4;
             shellModelData.FillNodeInfo();
             shellModelData.FillMemberInfoList();
             shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
@@ -36,6 +36,8 @@ namespace TestConsol
 
             var linearSolver = new LinearSolver();
             var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
+            
+            
             var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
 
 

@@ -16,7 +16,6 @@ namespace ThesisProject
     {
         int ID { get; set; }
         eMemberType MemberType { get; set; }
-        ISection Section { get; set; }
 
         MatrixCS GetLocalStiffnessMatrix();
 

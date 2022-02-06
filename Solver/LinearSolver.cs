@@ -52,6 +52,34 @@ namespace Solver
 
         #region Public Methods
 
+        public List<double> GetPeriodsOfTheSystem(MatrixCS kG, MatrixCS mass)
+        {
+            var periods = new List<double>();
+
+            var externalKG = Matrix<double>.Build.DenseOfArray(kG.Matrix);
+            var externalMass = Matrix<double>.Build.DenseOfArray(mass.Matrix);
+
+            var res = externalMass.Solve(externalKG);
+
+            var w = new List<double>();
+            
+            for (int i = 0; i < res.RowCount -1 ; i++)
+            {
+                 w.Add( Math.Sqrt(Convert.ToDouble(res[i, 0])));
+            }
+            w.Sort();
+
+            for (int i = 0; i < w.Count; i++)
+            {
+                periods.Add(2 * Math.PI / w[i]);
+            }
+
+
+
+            return periods;
+
+        }
+
         public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata)
         {
             _LatticeModelData = latticemodeldata;
@@ -59,6 +87,13 @@ namespace Solver
 
             var KG = GetGlobalStiffness_Latttice();
             var RHS = GetRightHandSide();
+
+
+            var mass = GetMassMatrix_Latttice();
+            var res = GetPeriodsOfTheSystem(KG, mass);
+
+
+
 
             var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
             var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
@@ -204,6 +239,90 @@ namespace Solver
             return KG;
 
         }
+
+        public MatrixCS GetMassMatrix_Latttice()
+        {
+
+            var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
+            var nodeEquationData = _AssemblyData.NodeEquationData;
+
+            MatrixCS globalMass = new MatrixCS(numOfUnknowns, numOfUnknowns);
+
+            var listOfFrameMembers = _LatticeModelData.ListOfMembers;
+
+            for (int i = 0; i < listOfFrameMembers.Count; i++)
+            {
+                var frmMember = listOfFrameMembers[i];
+                var m = frmMember.GetGlobalMassMatrix();
+                var iNode = frmMember.IEndNode;
+                var jNode = frmMember.JEndNode;
+
+                var g = new List<int>();
+                g.AddRange(nodeEquationData[iNode.ID]);
+                g.AddRange(nodeEquationData[jNode.ID]);
+
+                var matrixLength = m.NRows;//should be 12 for frame
+
+                for (int k = 0; k < matrixLength; k++)
+                {
+                    for (int l = 0; l < matrixLength; l++)
+                    {
+                        var gk = g[k];
+                        var gl = g[l];
+                        if (g[k] != -1 && g[l] != -1) // -1 means free a.k.a unknown
+                        {
+                            globalMass.Matrix[g[k], g[l]] = globalMass.Matrix[g[k], g[l]] + m.Matrix[k, l];
+                        }
+                    }
+                }
+            }
+
+            return globalMass;
+        }
+
+        public MatrixCS GetMassMatrix_Shell()
+        {
+
+            var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
+            var nodeEquationData = _AssemblyData.NodeEquationData;
+
+            MatrixCS massMatrix = new MatrixCS(numOfUnknowns, numOfUnknowns);
+
+            var listOfShellMembers = _ShellModelData.ListOfMembers;
+
+            for (int i = 0; i < listOfShellMembers.Count; i++)
+            {
+                var shellMember = listOfShellMembers[i];
+                var m = shellMember.GetGlobalMassMatrix();
+                var iNode = shellMember.IEndNode;
+                var jNode = shellMember.JEndNode;
+                var kNode = shellMember.KEndNode;
+                var lNode = shellMember.LEndNode;
+
+                var g = new List<int>();
+
+                g.AddRange(nodeEquationData[iNode.ID]);
+                g.AddRange(nodeEquationData[jNode.ID]);
+                g.AddRange(nodeEquationData[kNode.ID]);
+                g.AddRange(nodeEquationData[lNode.ID]);
+
+                var matrixLength = m.NRows;//should be 12 for frame
+
+                for (int k = 0; k < matrixLength; k++)
+                {
+                    for (int l = 0; l < matrixLength; l++)
+                    {
+                        if (g[k] != -1 && g[l] != -1) // -1 means free a.k.a unknown
+                        {
+                            massMatrix.Matrix[g[k], g[l]] = massMatrix.Matrix[g[k], g[l]] + m.Matrix[k, l];
+                        }
+                    }
+                }
+            }
+
+            return massMatrix;
+        }
+
 
         private MatrixCS GetGlobalStiffness_Shell()
         {
@@ -376,8 +495,6 @@ namespace Solver
                     }
 
                 }
-
-
                 resultData.FrameResults.Add(frm.ID, frameResults);
             }
         }

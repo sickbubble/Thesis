@@ -38,7 +38,7 @@ namespace ThesisProject.Structural_Members
         private Node _KEndNode;
         private Node _LEndNode;
         private eMemberType _MemberType;
-        private ISection _Section;
+        private ShellSection _Section;
         private Material _Material;
         private int _ID;
         private double _Thickness;
@@ -53,12 +53,12 @@ namespace ThesisProject.Structural_Members
         public Node JEndNode { get => _JEndNode; set => _JEndNode = value; }
         public Node KEndNode { get => _KEndNode; set => _KEndNode = value; }
         public Node LEndNode { get => _LEndNode; set => _LEndNode = value; }
+        public ShellSection Section { get => _Section; set => _Section = value; }
 
         #endregion
 
         #region Interface Implementations
         public eMemberType MemberType { get => _MemberType; set => _MemberType = value; }
-        public ISection Section { get => _Section; set => _Section = value; }
         public Material Material { get => _Material; set => _Material = value; }
         public double Thickness { get => _Thickness; set => _Thickness = value; }
         public eMembraneType MembraneType { get => _MembraneType; set => _MembraneType = value; }
@@ -852,7 +852,75 @@ namespace ThesisProject.Structural_Members
         return globalStiffnesMatrix;
     }
 
-    public MatrixCS GetRotationMatrix()
+        public MatrixCS GetLocalMassMatrix()
+        {
+{
+                // Map coordinates of flat plane to 2-D surface
+                var d1 = this.IEndNode.Point.DistTo(this.JEndNode.Point);
+                var d2 = this.JEndNode.Point.DistTo(this.KEndNode.Point);
+                var d3 = this.KEndNode.Point.DistTo(this.LEndNode.Point);
+                var d4 = this.LEndNode.Point.DistTo(this.IEndNode.Point);
+
+                Vector p1V = new Vector(this.IEndNode.Point);
+                Vector p2V = new Vector( this.JEndNode.Point);
+                Vector p3V = new Vector( this.KEndNode.Point);
+                Vector p4V = new Vector(this.LEndNode.Point);
+
+                // Angle between first line and fourth line
+                var firstVector0 = p2V.Extract(p1V);
+                var secondVector0 = p4V.Extract(p1V);
+                var alpha0 = firstVector0.AngleTo(secondVector0);
+
+                // Angle between first line and second line
+                var firstVector1 = p1V.Extract(p2V);
+                var secondVector1 = p3V.Extract(p2V);
+                var alpha1 = firstVector1.AngleTo(secondVector1);
+
+                // Angle between second line and third line
+                var firstVector2 = p2V.Extract(p3V);
+                var secondVector2 = p4V.Extract(p3V);
+                var alpha2 = firstVector2.AngleTo(secondVector2);
+
+                // Map 3D coordinates to 2D plane using angles and length found above to be able to
+                // use natural coordinates
+                var x1 = 0.0; var y1 = 0.0;
+                var x2 = d1; var y2 = 0.0;
+                var x3 = x2 - (d2 * Math.Cos(alpha1)); var y3 = d2 * Math.Sin(alpha1);
+                var x4 = d4 * Math.Cos(alpha0); var y4 = d4 * Math.Sin(alpha0);
+
+                // Calculate area of the polygon
+                var area = Math.Abs(((x1 * y2) - (x2 * y1)) + ((x2 * y3) - (x3 * y2)) + ((x3 * y4) - (x4 * y3)) + ((x4 * y1) - (x1 * y4))) * 0.5;
+
+                // Get total mass
+                var totalMass = area * this.Section.Thickness * this.Material.Uw;
+
+                // Get nodal mass contribution
+                // TODO : Assumption is shell is rectangular. For non-rectangular shells (i.e. edges are not perpendicular), implement 
+                // mass matrix with shape functions and Gauss integration.
+                var lM = totalMass / 4.0;
+
+                // Fill mass matrix
+                MatrixCS m = new MatrixCS(24, 24);
+                m.Matrix[0, 0] = lM; m.Matrix[1, 1] = lM;
+                m.Matrix[6, 6] = lM; m.Matrix[7, 7] = lM;
+                m.Matrix[12, 12] = lM; m.Matrix[13, 13] = lM;
+                m.Matrix[18, 18] = lM; m.Matrix[19, 19] = lM;
+
+                return m;
+            }
+        }
+        public MatrixCS GetGlobalMassMatrix()
+        {
+            var rot = this.GetRotationMatrix();
+            var rotTrans = rot.Transpose();
+            var localMassMatrix = this.GetLocalMassMatrix();
+
+            return (rotTrans.Multiply(localMassMatrix)).Multiply(rot);
+
+
+        }
+
+        public MatrixCS GetRotationMatrix()
     {
         var rotationMatrix = new MatrixCS(24, 24);
 
