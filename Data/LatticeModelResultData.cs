@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ThesisProject;
 
 namespace Data
 {
@@ -25,7 +26,7 @@ namespace Data
 
         private Dictionary<int, List<double>> _NodeResults; 
         private Dictionary<int, FrameMemberResults> _FrameResults;
-
+        private MatrixCS _DispRes;
 
 
 
@@ -45,6 +46,7 @@ namespace Data
         /// Frame ID and FrameMemberResults
         /// </summary>
         public Dictionary<int, FrameMemberResults> FrameResults { get => _FrameResults; set => _FrameResults = value; }
+        public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
 
         #endregion
     }

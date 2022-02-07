@@ -36,9 +36,10 @@ namespace TestConsol
 
             var linearSolver = new LinearSolver();
             var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
-            
-            
             var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
+
+             linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData);
+
 
 
             Console.ReadLine();

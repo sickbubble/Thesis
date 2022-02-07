@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ThesisProject;
 
 namespace Data
 {
@@ -22,7 +23,7 @@ namespace Data
         #endregion
 
         #region Private Fields
-
+        private MatrixCS _DispRes;
 
         #endregion
 
@@ -35,6 +36,7 @@ namespace Data
         /// // Node ID and ListOfResults
         /// </summary>
         public Dictionary<int, List<double>> NodeResults { get  ; set ; }
+        public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
 
 
         #endregion

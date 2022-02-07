@@ -8,6 +8,8 @@ using ThesisProject;
 using ThesisProject.Structural_Members;
 using MathNet.Numerics.LinearAlgebra;
 using ThesisProject.Loads;
+using MathNet.Numerics.LinearAlgebra.Factorization;
+using Accord.Math.Decompositions;
 
 namespace Solver
 {
@@ -61,6 +63,25 @@ namespace Solver
 
             var res = externalMass.Solve(externalKG);
 
+
+            //var eigen1 = Matrix<double>.Build.Diagonal(kG.NRows, kG.NRows);
+
+            //    eigen
+            //Evd<double> eigen = eigen1.Evd();
+   
+            //generalizedeigensolver
+
+            //eigen.Solve(externalKG, externalMass);
+
+            ////Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges;
+            ////ges.compute(K, M);
+            ////auto eigs = ges.eigenvalues().real();
+
+            ////for (int i = eigs.size() - 1; -1 < i; i--)
+            ////    t.push_back(2 * pi / sqrt(eigs(i)));
+
+
+
             var w = new List<double>();
             
             for (int i = 0; i < res.RowCount -1 ; i++)
@@ -100,8 +121,14 @@ namespace Solver
 
             var dispRes = externalKG.Solve(externalRHS);
 
+
             var dispResAsArray = dispRes.ToArray();
+            var dispResMatrix = new MatrixCS(dispResAsArray.Length, 1);
+
+            dispResMatrix.Matrix = dispResAsArray;
+
             var latticeModelResultData = new LatticeModelResultData();
+            latticeModelResultData.DispRes = dispResMatrix;
             latticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
             latticeModelResultData.FrameResults = new Dictionary<int, FrameMemberResults>();
 
@@ -109,6 +136,31 @@ namespace Solver
             FillFrameMemberResults(latticeModelResultData);
 
             return latticeModelResultData;
+        }
+        public LatticeModelData EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel)
+        {
+            var shellInternalEnergy = GetShellModelInternalEnergy(shellModelRes.DispRes);
+            var latticeInternalEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
+
+            var oldArea = latticeModel.ListOfMembers.FirstOrDefault().Section.Area;
+
+            var newArea = oldArea * latticeInternalEnergy / shellInternalEnergy;
+
+
+            for (int i = 0; i < latticeModel.ListOfMembers.Count; i++)
+            {
+                latticeModel.ListOfMembers[i].Section.Area = newArea;
+            }
+
+
+            var newLatticeRes = RunAnalysis_Lattice(latticeModel);
+
+
+
+            var latticeInternalEnergyNew = GetLatticeModelInternalEnergy(newLatticeRes.DispRes, latticeModel);
+
+
+            return latticeModel;
         }
 
         public ShellModelResultData RunAnalysis_Shell(ShellModelData shellModelData)
@@ -129,10 +181,12 @@ namespace Solver
 
             dispResMatrix.Matrix = dispResAsArray;
 
+
             var internalEnergy = GetShellModelInternalEnergy(dispResMatrix);
 
 
             var shellModelResultData = new ShellModelResultData();
+            shellModelResultData.DispRes = dispResMatrix;
             shellModelResultData.NodeResults = new Dictionary<int, List<double>>();
 
             GetNodeResults(dispResAsArray,shellModelResultData.NodeResults);
@@ -151,6 +205,21 @@ namespace Solver
 
             return ret;
         }
+
+        public double GetLatticeModelInternalEnergy(MatrixCS dispMatrix,LatticeModelData latticeModelData)
+        {
+            double ret;
+            _LatticeModelData = latticeModelData;
+            _AssemblyData = GetNodeAssemblyData(latticeModelData.ListOfNodes);
+            var KG = GetGlobalStiffness_Latttice();
+
+            var firstPart = dispMatrix.Transpose().Multiply(KG);
+            ret = firstPart.Multiply(dispMatrix).Matrix[0, 0];
+
+
+            return ret;
+        }
+
 
 
         #endregion

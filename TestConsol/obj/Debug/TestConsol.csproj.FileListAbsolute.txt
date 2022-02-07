@@ -17,3 +17,4 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\ThesisProject.pdb
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\ThesisProject.dll.config
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\MathNet.Numerics.xml
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csproj.CopyComplete
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Accord.dll.config
