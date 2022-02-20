@@ -67,7 +67,22 @@ namespace Data
             }
             }
         }
+        public void SetTorsionalReleaseToAllMembers()
+        {
+            if (this.ListOfMembers != null)
+            {
+                
+                for (int i = 0; i < this.ListOfMembers.Count; i++)
+                {
+                    var member = this.ListOfMembers[i];
 
+                    member.IEndNode.SupportCondition.Restraints[5] = eRestrainedCondition.NotRestrained;
+                    member.JEndNode.SupportCondition.Restraints[5] = eRestrainedCondition.NotRestrained;
+                }
+
+            }
+            
+        }
         public void SetBorderNodesSupportCondition(eSupportType supportType)
         {
             var borderNodes = GetBorderNodes();

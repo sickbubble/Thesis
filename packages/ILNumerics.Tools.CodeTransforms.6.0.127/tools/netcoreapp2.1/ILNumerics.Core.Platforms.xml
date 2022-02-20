@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ILNumerics.Core.Platforms</name>
+    </assembly>
+    <members>
+        <member name="T:ILNumerics.Licensing.ILDevelopmentLicense">
+            <summary>
+            Allows the creation of AsmExecutionLicense instances. Installed into / loaded from local registry.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILDevelopmentLicense.TargetFrom">
+            <summary>
+            controls properties for the resulting AsmRuntimeLicense
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILDevelopmentLicense.TargetTo">
+            <summary>
+            controls properties for the resulting AsmRuntimeLicense
+            </summary>
+        </member>
+        <member name="M:ILNumerics.Licensing.ILDevelopmentLicense.#ctor">
+            <summary>
+            Create empty development license (used for serialization)
+            </summary>
+        </member>
+        <member name="T:ILNumerics.Licensing.ILLicense">
+            <summary> 
+            Base class for all licenses
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.MinVersion">
+            <summary>
+            Minimum version of the assembly hosting <see cref="P:ILNumerics.Licensing.ILLicense.TargetTypeName"/> which this license is able to unlock
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.MaxVersion">
+            <summary>
+            Maximum version of the assembly hosting <see cref="P:ILNumerics.Licensing.ILLicense.TargetTypeName"/> which this license is able to unlock
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.From">
+            <summary>
+            Start validity date of this license
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.To">
+            <summary>
+            End validity date of this license, set to DateTime.MaxValue for perpetual licenses.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.TargetTypeName">
+            <summary>
+            The type name this license is able to unlock.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.TargetAssemblySimpleName">
+            <summary>
+            Assembly qualified name of the assembly hosting the licensed type
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.Empty">
+            <summary>
+            Singleton of an empty license. 
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.ID">
+            <summary>
+            Unique identifier for this license.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILLicense.IsEvaluation">
+            <summary>
+            Flag determining if this is a trial license
+            </summary>
+        </member>
+        <member name="M:ILNumerics.Licensing.ILLicense.#ctor">
+            <summary>
+            Create empty license (used for serialization)
+            </summary>
+        </member>
+        <member name="M:ILNumerics.Licensing.ILLicense.Sign(System.Text.StringBuilder)">
+            <summary>
+            Sign the license content using ILNumerics private key 
+            </summary>
+            <param name="sb">string builder with complete license content</param>
+        </member>
+        <member name="T:ILNumerics.Licensing.ILLicenseProvider">
+            <summary>
+            Internal class. Don't rename this class! It would break compatibility with previous versions! 
+            </summary>
+        </member>
+        <member name="T:ILNumerics.Licensing.ILRegRuntimeLicense">
+            <summary>
+            Allows the execution of types. Installed into / Loaded  from Registry. Does not restrict execution to individual assemblies. Tagged to an individual machine. 
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILRegRuntimeLicense.MachineKey">
+            <summary>
+            base64 md5 hash of Netbios Name, OSVersion, ProcessorCount
+            </summary>
+        </member>
+        <member name="M:ILNumerics.Licensing.ILRegRuntimeLicense.#ctor">
+            <summary>
+            Create empty registry license (used for serialization)
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.LicenseManager.Current">
+            <summary>
+            Singleton instance of the license manager
+            </summary>
+        </member>
+        <member name="M:ILNumerics.Licensing.LicenseManager.GetLicenses``1(System.String,System.Boolean)">
+            <summary>
+            Retrieves a collection of licenses for all modules registered on the system.
+            </summary>
+            <returns>Collection of available licenses</returns>
+        </member>
+        <member name="T:ILNumerics.Licensing.LicensingAPIResponse">
+            <summary>
+            ILNumerics Licensing service's response.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.LicensingAPIResponse.Message">
+            <summary>
+            Message delivered from the licensing SVC. May be null. 
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.LicensingAPIResponse.IsSuccess">
+            <summary>
+            Flag to indicate if the response was successeful.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.LicensingAPIResponse.Content">
+            <summary>
+            Licenses fetched from the licensing server.
+            </summary>
+        </member>
+        <member name="T:ILNumerics.Licensing.LicensingSVCResponse">
+            <summary>
+            ILNumerics Licensing service's response.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.LicensingSVCResponse.Message">
+            <summary>
+            Message delivered from the licensing SVC. May be null. 
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.LicensingSVCResponse.IsSuccess">
+            <summary>
+            Flag to indicate if the response was successeful.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.LicensingSVCResponse.Content">
+            <summary>
+            Licenses fetched from the licensing server.
+            </summary>
+        </member>
+        <member name="F:ILNumerics.Licensing.LicSVCClient.DoInstall">
+            <summary>
+            By default: install downloaded licenses into the reg. Set this to false in order to not touch the lokal registry. 
+            </summary>
+        </member>
+        <member name="T:ILNumerics.Licensing.RuntimeLicenseProvider">
+            <summary>
+            This class is used for all runtime license validation requests. It provides the license for any ILNumerics module during runtime. 
+            </summary>
+            <remarks>Having this class prevents one from the need to distinguish individual licensing requests: regular program start at runtime / LC during build time. 
+            It also eases to sort out designer instantiations of ILPanel / ILScene which would give problems otherwise for partly licensed seats.</remarks>
+        </member>
+        <member name="M:ILNumerics.Licensing.RuntimeLicenseProvider.GetLicense(System.ComponentModel.LicenseContext,System.Type,System.Object,System.Boolean)">
+            <summary>
+            Gets a license.
+            </summary>
+            <param name="context">Licensing context.</param>
+            <param name="type">The type.</param>
+            <param name="instance">The instance.</param>
+            <param name="allowExceptions">Specifies whether errors produced within the function should result in an exception to be thrown.</param>
+            <returns>The license.</returns>
+        </member>
+        <member name="T:ILNumerics.Licensing.ILAsmRuntimeLicense">
+            <summary>
+            Allows the execution of types. Embedded and loaded from licensed assemblies, restrict execution to that assembly (and not to an individual machine).
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILAsmRuntimeLicense.Assembly">
+            <summary>
+            Reference to the assembly given by AssemblyName or null (matching all assemblies).
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILAsmRuntimeLicense.AssemblyName">
+            <summary>
+            Fully qualified name or '*' (matching all assemblies).
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Licensing.ILAsmRuntimeLicense.CreatedBy">
+            <summary>
+            Unique ID of the license used to create this asm license.
+            </summary>
+        </member>
+        <member name="M:ILNumerics.Licensing.ILAsmRuntimeLicense.#ctor">
+            <summary>
+            Create empty asm license (used for serialization)
+            </summary>
+        </member>
+    </members>
+</doc>

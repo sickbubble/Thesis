@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <Import Project="..\..\tools\netcoreapp2.1\ILNImports1.targets" Condition="$(ILNLicCompile) != 'true'" />
+  <Import Project="..\..\tools\netcoreapp2.1\ILNImports2.targets" Condition="$(ILNLicCompile) == 'true'" />
+</Project>

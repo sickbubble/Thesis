@@ -1,0 +1,206 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ILNumerics.F2NET.LAPACK</name>
+    </assembly>
+    <members>
+        <member name="T:ILNumerics.F2NET.ManagedLAPACK">
+            <summary>
+            Lapack interface implementation, specialized for the official netlib.org Lapack package, as a direct 1:1 translation utilizing ILNumerics.F2NET. 
+            </summary>
+            
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.dgemm(System.Char,System.Char,System.Int32,System.Int32,System.Int32,System.Double,System.Double*,System.Int32,System.Double*,System.Int32,System.Double,System.Double*,System.Int32)">
+            <summary>
+            Implement wrapper for BLAS GeneralMatrixMultiply
+            </summary>
+            <param name="TransA">Transposition state for matrix A: one of the constants in enum CBlas_Transpose</param>
+            <param name="TransB">Transposition state for matrix B: one of the constants in enum CBlas_Transpose</param>
+            <param name="M">Number of rows in A</param>
+            <param name="N">Number of columns in B</param>
+            <param name="K">Number of columns in A and number of rows in B</param>
+            <param name="alpha">multiplicationi factor for A</param>
+            <param name="A">pointer to double array A</param>
+            <param name="lda">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix B</param>
+            <param name="B">pointer to double array B</param>
+            <param name="ldb">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix A</param>
+            <param name="beta">multiplication faktor for matrix B</param>
+            <param name="C">pointer to predefined double array C of neccessary length</param>
+            <param name="ldc">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix C</param>
+            <remarks>All parameters except C are readonly. Only elements of matrix C will be altered. C must be a predefined 
+            continous double array of size MxN</remarks>
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.sgemm(System.Char,System.Char,System.Int32,System.Int32,System.Int32,System.Single,System.Single*,System.Int32,System.Single*,System.Int32,System.Single,System.Single*,System.Int32)">
+            <summary>
+            Implement wrapper for BLAS GeneralMatrixMultiply
+            </summary>
+            <param name="TransA">Transposition state for matrix A: one of the constants in enum CBlas_Transpose</param>
+            <param name="TransB">Transposition state for matrix B: one of the constants in enum CBlas_Transpose</param>
+            <param name="M">Number of rows in A</param>
+            <param name="N">Number of columns in B</param>
+            <param name="K">Number of columns in A and number of rows in B</param>
+            <param name="alpha">multiplicationi factor for A</param>
+            <param name="A">pointer to double array A</param>
+            <param name="lda">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix B</param>
+            <param name="B">pointer to double array B</param>
+            <param name="ldb">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix A</param>
+            <param name="beta">multiplication faktor for matrix B</param>
+            <param name="C">pointer to predefined double array C of neccessary length</param>
+            <param name="ldc">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix C</param>
+            <remarks>All parameters except C are readonly. Only elements of matrix C will be altered. C must be a predefined 
+            continous double array of size MxN</remarks>
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.cgemm(System.Char,System.Char,System.Int32,System.Int32,System.Int32,ILNumerics.fcomplex,ILNumerics.fcomplex*,System.Int32,ILNumerics.fcomplex*,System.Int32,ILNumerics.fcomplex,ILNumerics.fcomplex*,System.Int32)">
+            <summary>
+            Implement wrapper for BLAS GeneralMatrixMultiply
+            </summary>
+            <param name="TransA">Transposition state for matrix A: one of the constants in enum CBlas_Transpose</param>
+            <param name="TransB">Transposition state for matrix B: one of the constants in enum CBlas_Transpose</param>
+            <param name="M">Number of rows in A</param>
+            <param name="N">Number of columns in B</param>
+            <param name="K">Number of columns in A and number of rows in B</param>
+            <param name="alpha">multiplicationi factor for A</param>
+            <param name="A">pointer to double array A</param>
+            <param name="lda">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix B</param>
+            <param name="B">pointer to double array B</param>
+            <param name="ldb">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix A</param>
+            <param name="beta">multiplication faktor for matrix B</param>
+            <param name="C">pointer to predefined double array C of neccessary length</param>
+            <param name="ldc">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix C</param>
+            <remarks>All parameters except C are readonly. Only elements of matrix C will be altered. C must be a predefined 
+            continous double array of size MxN</remarks>
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.zgemm(System.Char,System.Char,System.Int32,System.Int32,System.Int32,ILNumerics.complex,ILNumerics.complex*,System.Int32,ILNumerics.complex*,System.Int32,ILNumerics.complex,ILNumerics.complex*,System.Int32)">
+            <summary>
+            Implement wrapper for BLAS GeneralMatrixMultiply
+            </summary>
+            <param name="TransA">Transposition state for matrix A: one of the constants in enum CBlas_Transpose</param>
+            <param name="TransB">Transposition state for matrix B: one of the constants in enum CBlas_Transpose</param>
+            <param name="M">Number of rows in A</param>
+            <param name="N">Number of columns in B</param>
+            <param name="K">Number of columns in A and number of rows in B</param>
+            <param name="alpha">multiplicationi factor for A</param>
+            <param name="A">pointer to double array A</param>
+            <param name="lda">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix B</param>
+            <param name="B">pointer to double array B</param>
+            <param name="ldb">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix A</param>
+            <param name="beta">multiplication factor for matrix B</param>
+            <param name="C">pointer to predefined double array C of neccessary length</param>
+            <param name="ldc">distance between first elements of each column for column based orientation or 
+            distance between first elements of each row for row based orientation for matrix C</param>
+            <remarks>All parameters except C are readonly. Only elements of matrix C will be altered. C must be a predefined 
+            continous double array of size MxN</remarks>
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.dgesvd(System.Char,System.Int32,System.Int32,System.Double*,System.Int32,System.Double*,System.Double*,System.Int32,System.Double*,System.Int32,System.Int32@)">
+            <summary>
+            singular value decomposition
+            </summary>
+            <param name="jobz"></param>
+            <param name="m"></param>
+            <param name="n"></param>
+            <param name="a"></param>
+            <param name="lda"></param>
+            <param name="s"></param>
+            <param name="u"></param>
+            <param name="ldu"></param>
+            <param name="vt"></param>
+            <param name="ldvt"></param>
+            <param name="info"></param>
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.sgesvd(System.Char,System.Int32,System.Int32,System.Single*,System.Int32,System.Single*,System.Single*,System.Int32,System.Single*,System.Int32,System.Int32@)">
+            <summary>
+            singular value decomposition
+            </summary>
+            <param name="jobz"></param>
+            <param name="m"></param>
+            <param name="n"></param>
+            <param name="a"></param>
+            <param name="lda"></param>
+            <param name="s"></param>
+            <param name="u"></param>
+            <param name="ldu"></param>
+            <param name="vt"></param>
+            <param name="ldvt"></param>
+            <param name="info"></param>
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.zgesvd(System.Char,System.Int32,System.Int32,ILNumerics.complex*,System.Int32,System.Double*,ILNumerics.complex*,System.Int32,ILNumerics.complex*,System.Int32,System.Int32@)">
+            <summary>
+            singular value decomposition
+            </summary>
+            <param name="jobz"></param>
+            <param name="m"></param>
+            <param name="n"></param>
+            <param name="a"></param>
+            <param name="lda"></param>
+            <param name="s"></param>
+            <param name="u"></param>
+            <param name="ldu"></param>
+            <param name="vt"></param>
+            <param name="ldvt"></param>
+            <param name="info"></param>
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.cgesvd(System.Char,System.Int32,System.Int32,ILNumerics.fcomplex*,System.Int32,System.Single*,ILNumerics.fcomplex*,System.Int32,ILNumerics.fcomplex*,System.Int32,System.Int32@)">
+            <summary>
+            singular value decomposition
+            </summary>
+            <param name="jobz"></param>
+            <param name="m"></param>
+            <param name="n"></param>
+            <param name="a"></param>
+            <param name="lda"></param>
+            <param name="s"></param>
+            <param name="u"></param>
+            <param name="ldu"></param>
+            <param name="vt"></param>
+            <param name="ldvt"></param>
+            <param name="info"></param>
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedLAPACK.ctrtrs(System.Char,System.Char,System.Char,System.Int32,System.Int32,ILNumerics.fcomplex*,System.Int32,ILNumerics.fcomplex*,System.Int32,System.Int32@)">
+            <summary>
+            
+            </summary>
+            <param name="uplo"></param>
+            <param name="transA"></param>
+            <param name="diag"></param>
+            <param name="N"></param>
+            <param name="nrhs"></param>
+            <param name="A"></param>
+            <param name="LDA"></param>
+            <param name="B"></param>
+            <param name="LDB"></param>
+            <param name="info"></param>
+        </member>
+        <member name="T:ILNumerics.F2NET.ManagedFFTPACK5">
+            <summary>
+            Lapack interface implementation, specialized for the official netlib.org Lapack package, as a direct 1:1 translation utilizing ILNumerics.F2NET. 
+            </summary>
+            
+        </member>
+        <member name="M:ILNumerics.F2NET.ManagedFFTPACK5.FreePlans">
+            <summary>
+            Releases all memory cached in plans. This method is NOT THREADSAFE!
+            </summary>
+        </member>
+        <member name="P:ILNumerics.Core.Internal.F2NETDescriptorCache`1.cache">
+            <summary>
+            One cache is currently enough, since we only use one transform type: CFFTM. Must split for multiple types. 
+            </summary>
+        </member>
+        <member name="M:ILNumerics.Core.Internal.F2NETDescriptorCache`1.ClearCache">
+            <summary>
+            Releases memory resources hold on by the cache. Memory is not stored back to the ILNumerics memory pool but released to the OS' heap. 
+            </summary>
+        </member>
+    </members>
+</doc>

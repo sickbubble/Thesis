@@ -63,12 +63,31 @@ namespace Solver
 
             var res = externalMass.Solve(externalKG);
 
+            var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix,mass.Matrix,true);
+            var w2 = solver.RealEigenvalues;
+
+
+            var w = new List<double>();
+
+            for (int i = 0; i < w2.Length; i++)
+            {
+                w.Add(Math.Sqrt(w2[i]));
+            }
+
+            var T = new List<double>();
+
+            for (int i = 0; i < w.Count; i++)
+            {
+                T.Add(2 * Math.PI / w[i]);
+            }
+
+
 
             //var eigen1 = Matrix<double>.Build.Diagonal(kG.NRows, kG.NRows);
 
             //    eigen
             //Evd<double> eigen = eigen1.Evd();
-   
+
             //generalizedeigensolver
 
             //eigen.Solve(externalKG, externalMass);
@@ -82,22 +101,22 @@ namespace Solver
 
 
 
-            var w = new List<double>();
+            //var w2 = new List<double>();
             
-            for (int i = 0; i < res.RowCount -1 ; i++)
-            {
-                 w.Add( Math.Sqrt(Convert.ToDouble(res[i, 0])));
-            }
-            w.Sort();
+            //for (int i = 0; i < res.RowCount -1 ; i++)
+            //{
+            //     w2.Add( Math.Sqrt(Convert.ToDouble(res[i, 0])));
+            //}
+            //w2.Sort();
 
-            for (int i = 0; i < w.Count; i++)
-            {
-                periods.Add(2 * Math.PI / w[i]);
-            }
+            //for (int i = 0; i < w.Count; i++)
+            //{
+            //    periods.Add(2 * Math.PI / w2[i]);
+            //}
 
 
 
-            return periods;
+            return T;
 
         }
 
@@ -269,7 +288,7 @@ namespace Solver
         }
 
         private MatrixCS GetGlobalStiffness_Latttice()
-        {
+         {
 
             var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
             var nodeEquationData = _AssemblyData.NodeEquationData;

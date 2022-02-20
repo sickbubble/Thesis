@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <ILNLicenseDistributionDirectory Condition="$(ILNLicenseDistributionDirectory)==''">ILNumerics_deploy</ILNLicenseDistributionDirectory>
+    <ILNLicenseDistributionEnabled Condition="$(ILNLicenseDistributionEnabled)==''">true</ILNLicenseDistributionEnabled>
+
+    <ILNumerics_LicToolsVersion>6.0.0.0</ILNumerics_LicToolsVersion>
+    <ILNIsLicensedSeat>false</ILNIsLicensedSeat>
+    <ILNIsLicensedSeat Condition="'$(OS)' == 'Windows_NT'">$([MSBuild]::GetRegistryValueFromView(`HKEY_CURRENT_USER\SOFTWARE\ILNumerics\ILNumerics_Ultimate_VS`, `LicenseKey`, ``, RegistryView.Registry32))</ILNIsLicensedSeat>
+    <ILNIsLicensedSeat Condition="($(ILNIsLicensedSeat)!= false) and ($(ILNIsLicensedSeat.Trim().Length)>0)">true</ILNIsLicensedSeat>
+    <ILNIsLicensedSeat Condition="$(ILNIsLicensedSeat)==''">false</ILNIsLicensedSeat>
+    <ILNLicStopOnError>true</ILNLicStopOnError>
+  </PropertyGroup>
+</Project>

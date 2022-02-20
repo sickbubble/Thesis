@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Target Name="ILNBeforeResGen" BeforeTargets="BeforeResGen" DependsOnTargets="DetectILNProject">
+    <CallTarget Condition="$(NeedsILNumericsRTLicense)=='true'" Targets="ProvideLicense"></CallTarget>
+  </Target>
+  <Target Name ="CleanDesignerLicensesLicx">
+    <ItemGroup>
+      <LicensesLicxFiles Include="$(MSBuildProjectDirectory)\**\licenses.licx"/>
+    </ItemGroup>
+    <PropertyGroup>
+      <LicensesLicxEntries></LicensesLicxEntries>
+    </PropertyGroup>
+    <ReadLinesFromFile File="@(LicensesLicxFiles)" Condition="@(LicensesLicxFiles -> Count()) == 1" >
+      <Output TaskParameter="Lines" ItemName="LicensesLicxEntries"/>
+    </ReadLinesFromFile>
+    <ItemGroup Condition="@(LicensesLicxFiles -> Count()) == 1">
+      <LicensesLicxEntriesFiltered Include="@(LicensesLicxEntries)" Condition="$([System.String]::Concat('%(LicensesLicxEntries.Identity)').StartsWith('ILNumerics.'))=='false'"></LicensesLicxEntriesFiltered>
+    </ItemGroup>
+    <WriteLinesToFile Condition="@(LicensesLicxFiles -> Count()) == 1" File="@(LicensesLicxFiles)" Lines="@(LicensesLicxEntriesFiltered)" Overwrite="true"/>
+  </Target>
+  <Target Name="DetectILNProject" DependsOnTargets="CleanDesignerLicensesLicx">
+    <ItemGroup>
+      <ILNReference Include="@(ProjectReference)" Condition="$([System.IO.Path]::GetFileName('%(ProjectReference.Identity)').StartsWith('ILNumerics.'))=='true'"></ILNReference>
+      <ILNReference Include="@(PackageReference)" Condition="$([System.String]::Concat('%(PackageReference.Identity)').StartsWith('ILNumerics.'))=='true'"></ILNReference>
+    </ItemGroup>
+    <PropertyGroup>
+      <NeedsILNumericsRTLicense Condition="@(ILNReference -> Count()) > 0 OR '$(UsingMicrosoftNETSdk)' != 'true'">true</NeedsILNumericsRTLicense>
+      <NeedsILNumericsRTLicense Condition="$(NeedsILNumericsRTLicense)==''">false</NeedsILNumericsRTLicense>
+    </PropertyGroup>
+    <Message Condition="$(NeedsILNumericsRTLicense)=='true'" Text="ILNumerics: project '$(MSBuildProjectName) ($(TargetFramework))' references ILNumerics. Creating runtime license file." Importance="low"/>
+    <Message Condition="$(NeedsILNumericsRTLicense)!='true'" Text="ILNumerics: project '$(MSBuildProjectName) ($(TargetFramework))' does not reference ILNumerics. Runtime license file creation skipped." Importance="low"/>
+  </Target>
+
+  <Target Name="DetectLicensedSeat">
+    <PropertyGroup>
+      <ILNLicenseDistributionFilePath>$([MSBuild]::EnsureTrailingSlash($(MSBuildProjectDirectory)\$(ILNLicenseDistributionDirectory)))</ILNLicenseDistributionFilePath>
+      <ILNLicenseDistributionFilePath Condition="$(TargetFramework) != ''">$(ILNLicenseDistributionFilePath)$([MSBuild]::EnsureTrailingSlash($(TargetFramework)))</ILNLicenseDistributionFilePath>
+      <ILNLicenseDistributionFilePath>$(ILNLicenseDistributionFilePath)ilnumerics.lic</ILNLicenseDistributionFilePath>
+    </PropertyGroup>
+    <Message Condition="$(ILNIsLicensedSeat)=='true'" Text="ILNumerics: building on licensed seat." Importance="low"/>
+    <Message Condition="$(ILNIsLicensedSeat)!='true' AND $(ILNLicenseDistributionEnabled)!='true'" Text="ILNumerics: building ILNumerics project on non-licensed seat. Please activate your seat and/or enable license file distribution (set: project property ILNLicenseDistributionEnabled = true)." Importance="high"/>
+    <Message Condition="$(ILNIsLicensedSeat)!='true' AND $(ILNLicenseDistributionEnabled)=='true' AND Exists('$(ILNLicenseDistributionFilePath)')" Text="ILNumerics: reusing existing license file at: '$(ILNLicenseDistributionFilePath)'." Importance="low"/>
+  </Target>
+
+  <Target Name="GetStandardBuildConfig" DependsOnTargets="DetectLicensedSeat">
+    <PropertyGroup>
+      <ILNConfiguration Condition="$(ILNIsLicensedSeat)=='true'">$(Configuration)</ILNConfiguration>
+      <ILNPlatform Condition="$(ILNIsLicensedSeat)=='true'">$(Platform)</ILNPlatform>
+      <ILNConfigurationSourceInfo>(from main config)</ILNConfigurationSourceInfo>
+      <LicfileLocation Condition="$(ILNIsLicensedSeat)!='true' AND $(ILNLicenseDistributionEnabled)=='true' AND Exists('$(ILNLicenseDistributionFilePath)')">$(ILNLicenseDistributionFilePath)</LicfileLocation>
+      <Pattern>%%ILLicBuildConfig=([a-zA-Z0-9]+)\|([a-zA-Z0-9]+)%%</Pattern>
+      <LicFileContent Condition="Exists('$(LicfileLocation)')">$([System.IO.File]::ReadAllText($(LicfileLocation)))</LicFileContent>
+      <ILNConfiguration Condition="$(LicFileContent)!=''">$([System.Text.RegularExpressions.Regex]::Match($(LicFileContent),$(Pattern)).Groups[1].Value)</ILNConfiguration>
+      <ILNPlatform Condition="$(LicFileContent)!=''">$([System.Text.RegularExpressions.Regex]::Match($(LicFileContent),$(Pattern)).Groups[2].Value)</ILNPlatform>
+      <ILNConfigurationSourceInfo Condition="$(LicFileContent)!=''">(from license file '$(LicfileLocation)')</ILNConfigurationSourceInfo>
+    </PropertyGroup>
+    <Message Text="ILNumerics: build configuration $(ILNConfigurationSource): '$(ILNConfiguration)|$(ILNPlatform)'" Importance="low"/>
+  </Target>
+
+  <Target Name="BuildStandardConfig" DependsOnTargets="GetStandardBuildConfig">
+    <PropertyGroup>
+      <ILNConfiguration Condition="$(ILNConfiguration)==''">$(Configuration)</ILNConfiguration>
+      <ILNPlatform Condition="$(ILNPlatform)==''">$(Platform)</ILNPlatform>
+      <ILNNewLicenseFilePath>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)ilnumerics.licenses</ILNNewLicenseFilePath>
+      <ILNChecksumFile>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)ga5llk91.tmp</ILNChecksumFile>
+    </PropertyGroup>
+    <Delete Condition="Exists('$(ILNNewLicenseFilePath)')" Files="$(ILNNewLicenseFilePath)" ContinueOnError="true"/>
+    <Delete Condition="Exists('$(ILNChecksumFile)')" Files="$(ILNChecksumFile)" ContinueOnError="true"/>
+    <!-- Starting the following build may triggers a rebuild of all dependencies, if ILNIntermediateOutputPath stems from a new targetframework target. -->
+    <MSBuild Targets="Build"
+             Projects="$(MSBuildProjectFile)"
+             Properties="Configuration=$(ILNConfiguration);Platform=$(ILNPlatform);ILNLicCompile=true;ILNLicStopOnError=$(ILNLicStopOnError);RunCodeAnalysis=false;WarningLevel=0"
+             Condition="($(ILNConfiguration)!='') AND ($(ILNPlatform)!='')">
+      <Output PropertyName="LicTargetName" TaskParameter="TargetOutputs"/>
+    </MSBuild>
+  </Target>
+
+  <Target Name="ProvideLicense"
+          DependsOnTargets="BuildStandardConfig" >
+    <PropertyGroup>
+      <ILNOldLicenseFile Condition="Exists('$(ILNLicenseDistributionFilePath)') AND $(ILNLicenseDistributionEnabled)">$(ILNLicenseDistributionFilePath)</ILNOldLicenseFile>
+      <ILNPerformLicensing>true</ILNPerformLicensing>
+      <ILNPerformLicensing Condition="$(ILNIsLicensedSeat)!='true' AND !Exists('$(ILNNewLicenseFilePath)') AND !Exists('$(ILNOldLicenseFile)')">false</ILNPerformLicensing>
+      <TargetFrameworkInfo Condition="$(TargetFramework)!=''">($(TargetFramework))</TargetFrameworkInfo>
+    </PropertyGroup>
+    <Message Importance="low" Condition="Exists('$(ILNNewLicenseFilePath)')" Text="ILNumerics: new license found: '$(ILNNewLicenseFilePath)'."/>
+    <Message Importance="low" Condition="Exists('$(ILNOldLicenseFile)')" Text="ILNumerics: old license found: '$(ILNOldLicenseFile)'."/>
+    <Message Importance="high" Condition="$(ILNPerformLicensing) != 'true'" Text="ILNumerics: no license found for embedding. Unable to unlock the assembly '$(TargetFileName)$(TargetFrameworkInfo)' for execution on non-licensed seats. Continue building..."/>
+    <ItemGroup Condition="$(ILNPerformLicensing)!='false'">
+      <EmbeddedResource Remove="@(EmbeddedResource)" Condition="'%(Filename)%(Extension)' == 'ilnumerics.lic'" />
+      <EmbeddedResource Remove="@(EmbeddedResource)" Condition="'%(Filename)%(Extension)' == 'ilnumerics.licenses'" />
+    </ItemGroup>
+    <ItemGroup Condition="$(ILNPerformLicensing)!='false'">
+      <Compile Include="$(ILNChecksumFile)" Condition="Exists('$(ILNChecksumFile)')"/>
+      <ILNNewLicFileItem Include="$(ILNNewLicenseFilePath)"/>
+      <ILNOldLicFileItem Include="$(ILNOldLicenseFile)"/>
+      <EmbeddedResource Condition="Exists('$(ILNNewLicenseFilePath)')"
+                        Include="$(ILNNewLicenseFilePath)"
+                        Type="Non-Resx" WithCulture="false" >
+        <LogicalName>%(ILNNewLicFileItem.Filename)%(ILNNewLicFileItem.Extension)</LogicalName>
+        <ManifestResourceName>%(ILNNewLicFileItem.Filename)%(ILNNewLicFileItem.Extension)</ManifestResourceName>
+      </EmbeddedResource>
+      <EmbeddedResource Condition="Exists('$(ILNOldLicenseFile)') AND !Exists('$(ILNNewLicenseFilePath)')"
+                        Include="$(ILNOldLicenseFile)"
+                        Type="Non-Resx" WithCulture="false">
+        <LogicalName>%(ILNOldLicFileItem.Filename)%(ILNOldLicFileItem.Extension)</LogicalName>
+        <ManifestResourceName>%(ILNOldLicFileItem.Filename)%(ILNOldLicFileItem.Extension)</ManifestResourceName>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <Copy
+            DestinationFiles="$(ILNLicenseDistributionFilePath)"
+            SourceFiles="$(ILNNewLicenseFilePath)"
+            OverwriteReadOnlyFiles="true"
+            Condition="$(ILNLicenseDistributionEnabled)!='false' AND Exists('$(ILNNewLicenseFilePath)')"/>
+
+    <Message
+          Text="ILNumerics: Licenses compiled to: &quot;$(ILNLicenseDistributionFilePath)&quot;"
+          Condition="Exists('$(ILNLicenseDistributionFilePath)') AND $(ILNLicenseDistributionEnabled)!='false' AND Exists('$(ILNNewLicenseFilePath)')"
+          Importance="High" />
+    <Message Condition="(!Exists('$(ILNLicenseDistributionFilePath)') OR $(ILNLicenseDistributionEnabled)!='true') AND (Exists('$(ILNOldLicenseFile)') OR Exists('$(ILNNewLicenseFilePath)'))"
+          Text="ILNumerics: Licenses embedded into '$(TargetFileName)($(TargetFrameworkInfo))'."
+          Importance="High" />
+  </Target>
+
+  <Target Name="CleanCheckSum" DependsOnTargets="GetStandardBuildConfig">
+    <Delete Condition="Exists('$(ILNNewLicenseFilePath)')" Files="$(ILNNewLicenseFilePath)" ContinueOnError="true"/>
+    <Delete Condition="Exists('$(ILNChecksumFile)')" Files="$(ILNChecksumFile)" ContinueOnError="true"/>
+  </Target>
+
+  <PropertyGroup>
+    <CleanDependsOn>
+      $(CleanDependsOn);
+      CleanCheckSum;
+    </CleanDependsOn>
+  </PropertyGroup>
+</Project>

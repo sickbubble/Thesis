@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <Target Name="AfterCompileILN" AfterTargets="Compile"
+          DependsOnTargets="ILNSetProperties;ILNDeployBuildItems;ILNDoCH;AfterLicCompileLS"></Target>
+
+  <Target Name="ILNSetProperties">
+    <PropertyGroup>
+      <LicHelperClassName>ILLicHelper_387E1D62_1FEE_432C_B4F2_EBC652BC5650_</LicHelperClassName>
+      <ILNMainTargetAssemblyFileName>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)$(TargetFilename)</ILNMainTargetAssemblyFileName>
+      <ILNNewLicenseFilePathGenerated>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)ilnumerics.licenses</ILNNewLicenseFilePathGenerated>
+      <ILNChecksumFileGenerated>$(MSBuildProjectDirectory)\$(IntermediateOutputPath)ga5llk91.tmp</ILNChecksumFileGenerated>
+      <ILNNewLicenseFilePathFinal>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)ilnumerics.licenses</ILNNewLicenseFilePathFinal>
+      <ILNChecksumFileFinal>$(MSBuildProjectDirectory)\$(BaseIntermediateOutputPath)ga5llk91.tmp</ILNChecksumFileFinal>
+      <ILNLicStopOnError Condition="$(ILNLicStopOnError)==''">true</ILNLicStopOnError>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="ILNDeployBuildItems">
+    <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' OR '$(TargetFrameworkIdentifier)' == '.NETStandard'">
+      <DeployItemsBuilderPath>$(MSBuildThisFileDirectory)</DeployItemsBuilderPath>
+      <DeployItemsBuilderName>ILNumerics.Tools.CodeTransforms.dll</DeployItemsBuilderName>
+      <DeployItemsBuilderApp>$(DeployItemsBuilderPath)$(DeployItemsBuilderName)</DeployItemsBuilderApp>
+      <DeployItemsBuilderCmd>dotnet exec --roll-forward Major "$(DeployItemsBuilderApp)"</DeployItemsBuilderCmd>
+      <DeployItemsBuilderTmp>@(ReferencePath);@(ReferenceDependencyPaths);$(MainTargetAssemblyFileName)</DeployItemsBuilderTmp>
+      <DeployItemsBuilderTmpfile>$([MSBuild]::EnsureTrailingSlash($(MSBuildProjectDirectory)))$(IntermediateOutputPath)ga5llk91netStd.cs</DeployItemsBuilderTmpfile>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'">
+      <DeployItemsBuilderPath>$(MSBuildThisFileDirectory)</DeployItemsBuilderPath>
+      <DeployItemsBuilderName>ILNumerics.Tools.CodeTransforms.exe</DeployItemsBuilderName>
+      <DeployItemsBuilderApp>$(DeployItemsBuilderPath)$(DeployItemsBuilderName)</DeployItemsBuilderApp>
+      <DeployItemsBuilderCmd>"$(DeployItemsBuilderApp)"</DeployItemsBuilderCmd>
+      <DeployItemsBuilderTmp>@(ReferencePath);@(ReferenceDependencyPaths);$(MainTargetAssemblyFileName)</DeployItemsBuilderTmp>
+      <DeployItemsBuilderTmpfile>$([MSBuild]::EnsureTrailingSlash($(MSBuildProjectDirectory)))$(IntermediateOutputPath)ga5llk91net4FW.cs</DeployItemsBuilderTmpfile>
+    </PropertyGroup>
+
+    <WriteLinesToFile File="$(DeployItemsBuilderTmpfile)" Lines="$(DeployItemsBuilderTmp)" Overwrite="true"/>
+    <Exec WorkingDirectory="$(IntermediateOutputPath)"
+          Command="$(DeployItemsBuilderCmd) -o &quot;$(MSBuildProjectDirectory)\$(IntermediateOutputPath) &quot; -t &quot;$(ILNMainTargetAssemblyFileName)&quot; -f &quot;$(DeployItemsBuilderTmpfile)&quot;"
+          Condition="Exists('$(DeployItemsBuilderApp)') AND Exists('$(ILNMainTargetAssemblyFileName)') AND Exists('$(DeployItemsBuilderTmpfile)')"
+          ConsoleToMsBuild="true"                                                                          
+          StandardOutputImportance="low" ContinueOnError="true">   
+      <!--                                                                                              ^ keep: ' ' !!!  -->
+      <Output TaskParameter="ConsoleOutput" PropertyName="DeployItemsBuilderOutput" />
+    </Exec>
+    <PropertyGroup>
+      <LicenseCompilerHasFailed Condition="'$(MSBuildLastTaskResult)' == 'false'">true</LicenseCompilerHasFailed>
+      <LicenseCompilerHasFailed Condition="'$(LicenseCompilerHasFailed)' == ''">false</LicenseCompilerHasFailed>
+    </PropertyGroup>
+    <Delete Files="$(DeployItemsBuilderTmpfile)" Condition="Exists('$(DeployItemsBuilderTmpfile)') AND '$(LicenseCompilerHasFailed)'=='false'" />
+    <Message Text="ILNumerics: The DeployBuildItems task completed with errors:\r\n$(DeployItemsBuilderOutput)" Condition="$(LicenseCompilerHasFailed)" Importance="normal"></Message>
+    <Message Text="ILNumerics: The DeployBuildItems task completed without errors." Condition="!$(LicenseCompilerHasFailed)" Importance="low"></Message>
+    <Error
+      Condition="$(ILNLicStopOnError)!='false' AND $(LicenseCompilerHasFailed)"
+      Text="License compiler has failed building runtime licenses for project '$(MSBuildProjectFullPath)' on platform: $(TargetFrameworkIdentifier). The build property 'ILNLicStopOnError' is eqal to: '$(ILNLicStopOnError)'. This caused the build to stop. Fix the error(s) or set this property to 'false' in your project to ignore license compiler errors and continue building. DeployItemsBuilder output was:\r\n$(DeployItemsBuilderOutput)"/>
+  </Target>
+
+  <Target Name="ILNDoCH">
+    <ReadLinesFromFile File="$(ILNChecksumFileGenerated)" Condition="Exists('$(ILNChecksumFileGenerated)')">
+      <Output PropertyName="ILNCH" TaskParameter="Lines"/>
+    </ReadLinesFromFile>
+    <Message Text="ILNumerics: Determined code state for assembly $(ILNMainTargetAssemblyFileName): $(ILNCH)" Importance="low" Condition="$(ILNCH.Length) > 0"></Message>
+    <Message Text="ILNumerics: Failed to determine code state for assembly $(ILNMainTargetAssemblyFileName)" Importance="low" Condition="$(ILNCH.Length) == 0"></Message>
+    <PropertyGroup>
+      <Pattern>(.+)\|(.+)</Pattern>
+      <LCErrorCode Condition="$(ILNCH)!=''">$([System.Text.RegularExpressions.Regex]::Match($(ILNCH),$(Pattern)).Groups[1].Value)</LCErrorCode>
+      <ILNCH Condition="$(ILNCH)!=''">$([System.Text.RegularExpressions.Regex]::Match($(ILNCH),$(Pattern)).Groups[2].Value)</ILNCH>
+      <CHFileContentVB>
+        Namespace ILNumerics_Licensing
+        Partial Public Class {0}
+        Public Const CH = "{1}"
+        End Class
+        End Namespace
+      </CHFileContentVB>
+      <CHFileContentCS>#pragma warning disable CS1591
+namespace ILNumerics_Licensing {{ public partial class {0} {{ public const string CH = &quot;{1}&quot;; }} }}
+#pragma warning restore CS1591</CHFileContentCS>
+      <CHHelperFileContent Condition="($(OptionStrict) != '') or ($(OptionExplicit) != '') or ($(MyType) != '')">$([System.String]::Format($(CHFileContentVB),$(LicHelperClassName),$(ILNCH)))</CHHelperFileContent>
+      <CHHelperFileContent Condition="'$(CHHelperFileContent)'==''">$([System.String]::Format(`$(CHFileContentCS)`,`$(LicHelperClassName)`,`$(ILNCH)`))</CHHelperFileContent>
+    </PropertyGroup>
+    <Message Text="ILNumerics: Error code returned from LC task: $(LCErrorCode)" Importance="low" />
+    <WriteLinesToFile
+      File="$(ILNChecksumFileFinal)"
+      Lines="$(CHHelperFileContent)"
+      Overwrite="true"></WriteLinesToFile>
+  </Target>
+
+  <Target Name="AfterLicCompileLS"
+          Condition="Exists('$(ILNNewLicenseFilePathGenerated)') and ('$(LicenseCompilerHasFailed)' != 'true') and ('$(LCErrorCode)'=='Success')">
+
+    <WriteLinesToFile
+          Overwrite="false"
+          ContinueOnError="true"
+          File="$(ILNNewLicenseFilePathGenerated)"
+          Lines="%%ILLicBuildConfig=$(Configuration)|$(Platform)%%"/>
+    <Message Text="ILNumerics: build config appended to: '$(ILNNewLicenseFilePathGenerated)'." Importance="low" />
+    <Move Condition="$(ILNNewLicenseFilePathGenerated) != $(ILNNewLicenseFilePathFinal)"
+      SourceFiles="$(ILNNewLicenseFilePathGenerated)" DestinationFiles="$(ILNNewLicenseFilePathFinal)"/>
+    
+  </Target>
+  
+</Project>

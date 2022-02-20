@@ -1,0 +1,3480 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ILNumerics.Core.Runtime</name>
+    </assembly>
+    <members>
+        <member name="T:ILNumerics.complex">
+            <summary>
+            Floating point complex value data type of double precision.
+            </summary>
+            <remarks>This class extends the system value types for real numbers to complex double 
+            values. Besides the publicly available members 'real' and 'imag' it provides all the 
+            basic functionality floating point type system.double brings (abs, log, sqrt, tan etc.).
+            Further it overrides basic unary and binary operators for all common system value 
+            types including rarely used types (e.g. UInt16). This includes the basic numerical operations 
+            like '+','-','/','*' and the relational operators: '==','>','>=' etc. Also, some 
+            explicit and some implicit casting operators from / to complex value into system 
+            value types exist.</remarks>
+        </member>
+        <member name="F:ILNumerics.complex.real">
+            <summary>
+            Real part of this complex number
+            </summary>
+        </member>
+        <member name="F:ILNumerics.complex.imag">
+            <summary>
+            Imaginary part of this complex number
+            </summary>
+        </member>
+        <member name="F:ILNumerics.complex.i">
+            <summary>
+            Imaginary unit 
+            </summary>
+        </member>
+        <member name="M:ILNumerics.complex.#ctor(System.Double,System.Double)">
+            <summary>
+            Constructor creating a new complex value
+            </summary>
+            <param name="real">Real part</param>
+            <param name="imag">Imaginary part</param>
+        </member>
+        <member name="P:ILNumerics.complex.conj">
+            <summary>
+            Returns the complex conjugate of this complex number.
+            </summary>
+            <seealso cref="M:ILNumerics.complex.Conjugate(ILNumerics.complex)"/>
+            <seealso cref="M:ILNumerics.complex.Conjugate"/>
+        </member>
+        <member name="P:ILNumerics.complex.INF">
+            <summary>
+            Positive infinity for real and imag part of complex value
+            </summary>
+        </member>
+        <member name="P:ILNumerics.complex.PositiveInfinity">
+            <summary>
+            Positive infinity for real and imag part of complex value
+            </summary>
+        </member>
+        <member name="P:ILNumerics.complex.Zero">
+            <summary>
+            New complex, real and imaginary parts are zero
+            </summary>
+        </member>
+        <member name="P:ILNumerics.complex.NaN">
+            <summary>
+            Complex quantity, marked as being "not a number"
+            </summary>
+        </member>
+        <member name="M:ILNumerics.complex.Equals(System.Object)">
+            <summary>
+            Are obj's real and imaginary part identical to the real and imaginary parts of this fcomplex
+            </summary>
+            <param name="obj">fcomplex object to determine the equality for</param>
+            <returns>true if obj is of fcomplex type and its real and imag part has the same 
+            values as the real and imaginary part of this array.</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Equals(ILNumerics.complex)">
+            <summary>
+            Check if a complex number equals this complex number
+            </summary>
+            <param name="other">other complex number</param>
+            <returns>true if both, real and imaginary parts of both complex number are (binary) equal, false otherwise</returns>
+        </member>
+        <member name="M:ILNumerics.complex.GetHashCode">
+            <summary>
+            Hash code of this comples
+            </summary>
+            <returns>Hash code of this complex</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Conjugate">
+            <summary>
+            Conjugates this complex number inplace.
+            </summary>
+            <seealso cref="P:ILNumerics.complex.conj"/>
+            <seealso cref="M:ILNumerics.complex.Conjugate(ILNumerics.complex)"/>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Subtract two complex values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Multiply two complex values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Divide two complex numbers.
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+            <remarks><para>Unless the operator must handle special inputs (Inf or 0 values), 
+            the algorithm described in [1] is used for division. This is considered to be 
+            more robust against floating point overflow than the naive approach of simple 
+            cartesian division.</para>
+            <para>References: [1]: Smith, R.L., Algorithm 116: Complex division. Commun.ACM 5,8 (1962),435 <br />
+            [2]: Stewart, G.W., A note on complex division, ACM trans.on math software, Vol.11, N.3 (1985)</para>
+            <para>For a more detailed investigation of the robustnes and performance of various complex division algorithms, see: [3]: M.Baudin, R.L.Smith: A Robust Complex Division in Scilab (https://arxiv.org/pdf/1210.4539.pdf)</para>
+            </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true, if real and imaginary part are identical</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Subtract two complex values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Multiply two complex values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Divide two complex numbers.
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+            <remarks><para>Unless the operator must handle special inputs (Inf or 0 values), 
+            the algorithm described in [1] is used for division. This is considered to be 
+            more robust against floating point overflow than the naive approach of simple 
+            cartesian division.</para>
+            <para>References: [1]: Smith, R.L., Algorithm 116: Complex division. Commun.ACM 5,8 (1962),435 <br />
+            [2]: Stewart, G.W., A note on complex division, ACM trans.on math software, Vol.11, N.3 (1985)</para>
+            <para>For a more detailed investigation of the robustnes and performance of various complex division algorithms, see: [3]: M.Baudin, R.L.Smith: A Robust Complex Division in Scilab (https://arxiv.org/pdf/1210.4539.pdf)</para>
+            </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true, if real and imaginary part are identical</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(ILNumerics.complex,ILNumerics.fcomplex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(ILNumerics.complex,System.Double)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(ILNumerics.complex,System.Double)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(ILNumerics.complex,System.Double)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(ILNumerics.complex,System.Double)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(ILNumerics.complex,System.Double)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(ILNumerics.complex,System.Double)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(ILNumerics.complex,System.Double)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(ILNumerics.complex,System.Double)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(ILNumerics.complex,System.Double)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(ILNumerics.complex,System.Double)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(ILNumerics.complex,System.Int64)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(ILNumerics.complex,System.Int64)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(ILNumerics.complex,System.Int64)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(ILNumerics.complex,System.Int64)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(ILNumerics.complex,System.Int64)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(ILNumerics.complex,System.Int64)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(ILNumerics.complex,System.Int64)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(ILNumerics.complex,System.Int64)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(ILNumerics.complex,System.Int64)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(ILNumerics.complex,System.Int64)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(ILNumerics.complex,System.Int32)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(ILNumerics.complex,System.Int32)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(ILNumerics.complex,System.Int32)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(ILNumerics.complex,System.Int32)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(ILNumerics.complex,System.Int32)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(ILNumerics.complex,System.Int32)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(ILNumerics.complex,System.Int32)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(ILNumerics.complex,System.Int32)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(ILNumerics.complex,System.Int32)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(ILNumerics.complex,System.Int32)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(ILNumerics.complex,System.Single)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(ILNumerics.complex,System.Single)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(ILNumerics.complex,System.Single)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(ILNumerics.complex,System.Single)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(ILNumerics.complex,System.Single)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(ILNumerics.complex,System.Single)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(ILNumerics.complex,System.Single)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(ILNumerics.complex,System.Single)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(ILNumerics.complex,System.Single)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(ILNumerics.complex,System.Single)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(ILNumerics.complex,System.Byte)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(ILNumerics.complex,System.Byte)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(ILNumerics.complex,System.Byte)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(ILNumerics.complex,System.Byte)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(ILNumerics.complex,System.Byte)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(ILNumerics.complex,System.Byte)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(ILNumerics.complex,System.Byte)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(ILNumerics.complex,System.Byte)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(ILNumerics.complex,System.Byte)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(ILNumerics.complex,System.Byte)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(System.Double,ILNumerics.complex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(System.Double,ILNumerics.complex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(System.Double,ILNumerics.complex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(System.Double,ILNumerics.complex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(System.Double,ILNumerics.complex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(System.Double,ILNumerics.complex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(System.Double,ILNumerics.complex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(System.Double,ILNumerics.complex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(System.Double,ILNumerics.complex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(System.Double,ILNumerics.complex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(System.Int64,ILNumerics.complex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(System.Int64,ILNumerics.complex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(System.Int64,ILNumerics.complex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(System.Int64,ILNumerics.complex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(System.Int64,ILNumerics.complex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(System.Int64,ILNumerics.complex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(System.Int64,ILNumerics.complex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(System.Int64,ILNumerics.complex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(System.Int64,ILNumerics.complex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(System.Int64,ILNumerics.complex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(System.Int32,ILNumerics.complex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(System.Int32,ILNumerics.complex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(System.Int32,ILNumerics.complex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(System.Int32,ILNumerics.complex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(System.Int32,ILNumerics.complex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(System.Int32,ILNumerics.complex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(System.Int32,ILNumerics.complex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(System.Int32,ILNumerics.complex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(System.Int32,ILNumerics.complex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(System.Int32,ILNumerics.complex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(System.Single,ILNumerics.complex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(System.Single,ILNumerics.complex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(System.Single,ILNumerics.complex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(System.Single,ILNumerics.complex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(System.Single,ILNumerics.complex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(System.Single,ILNumerics.complex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(System.Single,ILNumerics.complex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(System.Single,ILNumerics.complex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(System.Single,ILNumerics.complex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(System.Single,ILNumerics.complex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Addition(System.Byte,ILNumerics.complex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Subtraction(System.Byte,ILNumerics.complex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Multiply(System.Byte,ILNumerics.complex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Division(System.Byte,ILNumerics.complex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Equality(System.Byte,ILNumerics.complex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Inequality(System.Byte,ILNumerics.complex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThan(System.Byte,ILNumerics.complex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThan(System.Byte,ILNumerics.complex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_GreaterThanOrEqual(System.Byte,ILNumerics.complex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_LessThanOrEqual(System.Byte,ILNumerics.complex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_UnaryNegation(ILNumerics.complex)">
+            <summary>
+            Unary minus operator
+            </summary>
+            <param name="A">Complex input</param>
+            <returns>Complex number similar to A, having real and imag part negated</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Implicit(System.Double)~ILNumerics.complex">
+            <summary>
+            Cast value to complex number
+            </summary>
+            <param name="a">Value to cast</param>
+            <returns>Complex number with the real part having the value of a and the imaginary part of 0.</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Implicit(ILNumerics.fcomplex)~ILNumerics.complex">
+            <summary>
+            Cast value to complex number
+            </summary>
+            <param name="a">Value to cast</param>
+            <returns>Complex number with the real part having the value of a casted to double and the imaginary part is 0.</returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.Double">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>Double number with the real part of a </returns>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.Single">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>number with the real part of a </returns>
+            <remarks>the return value is the result of a cast from double to float.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~ILNumerics.fcomplex">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>float complex number with the real and imaginary parts being a copy of a </returns>
+            <remarks>The real and imaginary parts are the result of a cast to float.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.Byte">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>Number with the real part of a </returns>
+            <remarks>The return value is the result of a cast to Byte.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.SByte">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>Number with the real part of a </returns>
+            <remarks>The return value is the result of a cast to SByte.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.Int16">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>Number with the real part of a </returns>
+            <remarks>The return value is the result of a cast to Int16.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.UInt16">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>Number with the real part of a </returns>
+            <remarks>The return value is the result of a cast to UInt16.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.Int32">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>Number with the real part of a </returns>
+            <remarks>The return value is the result of a cast to Int32.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.UInt32">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>Number with the real part of a </returns>
+            <remarks>The return value is the result of a cast to UInt32.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.Int64">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>number with the real part of a </returns>
+            <remarks>the return value is the result of a cast to Int64.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Explicit(ILNumerics.complex)~System.UInt64">
+            <summary>
+            Cast value from complex number
+            </summary>
+            <param name="a">Complex value to cast</param>
+            <returns>number with the real part of a </returns>
+            <remarks>the return value is the result of a cast to UInt64.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.op_Implicit(System.Numerics.Complex)~ILNumerics.complex">
+            <summary>
+            Implicitly converts a System.Numerics.Complex type to an ILNumerics.complex.
+            </summary>
+            <param name="a">System.Numerics.Complex number.</param>
+            <returns>ILNumerics.complex number.</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Abs(ILNumerics.complex)">
+            <summary>
+            Absolute value of input
+            </summary>
+            <param name="input">Input value</param>
+            <returns>The absolute value of the input</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Angle(ILNumerics.complex)">
+            <summary>
+            Phase angle of complex number
+            </summary>
+            <param name="input">Input value</param>
+            <returns>The phase angle of the input</returns>
+            <remarks>For the result the Atan2 function of the <see cref="T:System.Math"/> class is used.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Atan(ILNumerics.complex)">
+            <summary>
+            Arcus tangens of complex input
+            </summary>
+            <param name="input">Complex input</param>
+            <returns>Arcus tangens of complex input</returns>
+            <remarks></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Acos(ILNumerics.complex)">
+            <summary>
+            Arcus cosinus of complex input
+            </summary>
+            <param name="input">Complex input</param>
+            <returns>Arcus cosinus of input</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Acos(System.Double)">
+            <summary>
+            Arcus cosinus of input
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Arcus cosinus of input</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Asin(System.Double)">
+            <summary>
+            Arcus sinus of complex input
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Arcus sinus of input</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Asin(ILNumerics.complex)">
+            <summary>
+            Arcus sinus of input
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Arcus sinus of  input</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Ceiling(ILNumerics.complex)">
+            <summary>
+            Round towards positive infinity
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Result is the next integer value greater then input</returns>
+            <remarks>ILMath.Ceiling operates in both: real and imaginary parts separately</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Floor(ILNumerics.complex)">
+            <summary>
+            Round towards negative infinity
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Result is the next integer value lower then input</returns>
+            <remarks>ILMath.Floor operates in both: real and imaginary parts separately</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Round(ILNumerics.complex)">
+            <summary>
+            Rounds towards nearest integer.
+            </summary>
+            <param name="a">Input value.</param>
+            <returns>The value of <paramref name="a"/>, rounded to the nearest integer.</returns>
+            <remarks><para>Rounding is performed for <see cref="F:ILNumerics.complex.real"/> and <see cref="F:ILNumerics.complex.imag"/> 
+            separately.</para>
+            <para>Numbers halfway between two others (0.5, 1.5,...) are rounded towards 
+            the next even number. See: <see cref="F:System.MidpointRounding.ToEven"/>.</para></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Round(ILNumerics.complex,System.Int32,System.MidpointRounding)">
+            <summary>
+            Rounds towards nearest integer, optionally specify fractional digits and/or midpoint rounding mode.
+            </summary>
+            <param name="a">Input value.</param>
+            <param name="digits">[Optional] Number of fractional digits to round to. Default: 0 (integral number).</param>
+            <param name="roundingMode">[Optional] Midpoint rounding mode. Default: <see cref="F:System.MidpointRounding.ToEven"/>.</param>
+            <returns>The value of <paramref name="a"/>, rounded to the nearest integer.</returns>
+            <remarks><para>Rounding is performed for <see cref="F:ILNumerics.complex.real"/> and <see cref="F:ILNumerics.complex.imag"/> 
+            separately.</para>
+            <para>Numbers halfway between two others (0.5, 1.5,...) are rounded towards 
+            the next even number. See: <see cref="F:System.MidpointRounding.ToEven"/>.</para></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Round(ILNumerics.complex,System.Int32)">
+            <summary>
+            Rounds to a specified number of fractional digits.
+            </summary>
+            <param name="a">Input value.</param>
+            <param name="digits">Number of fractional digits to round to.</param>
+            <returns>The value of <paramref name="a"/>, rounded to the 
+            specified number of fractional digits.</returns>
+            <remarks><para>Rounding is performed for <see cref="F:ILNumerics.complex.real"/> and <see cref="F:ILNumerics.complex.imag"/> 
+            separately.</para>
+            <para>Numbers halfway between two others (0.5, 1.5,...) are rounded towards 
+            the next even number. See: <see cref="F:System.MidpointRounding.ToEven"/>.</para></remarks>
+            <exception cref="T:System.ArgumentOutOfRangeException">if digits is negative.</exception>
+        </member>
+        <member name="M:ILNumerics.complex.Sign(ILNumerics.complex)">
+            <summary>
+            Signum function
+            </summary>
+            <param name="input">Complex input </param>
+            <returns>Sesult as input / Abs(input)</returns>
+            <remarks>Sign(input) with input being complex returns the projection onto
+            the unit circle. If input is 0+0i the result will be 0+0i.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Truncate(ILNumerics.complex)">
+            <summary>
+            Truncate a floating point complex value
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Integer part of input</returns>
+            <remarks>Operates on real and imaginary parts separately.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Conjugate(ILNumerics.complex)">
+            <summary>
+            Creates the complex conjugate of the complex value <paramref name="a"/>.
+            </summary>
+            <param name="a">The complex value.</param>
+            <returns>The conjugate of a.</returns>
+            <seealso cref="P:ILNumerics.complex.conj"/>
+            <seealso cref="M:ILNumerics.complex.Conjugate"/>
+        </member>
+        <member name="M:ILNumerics.complex.Cos(ILNumerics.complex)">
+            <summary>
+            Cosinus
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Cosine of input</returns>
+            <remarks><para>The cosine is computed by the trigonometric euler equation: </para>
+            <para>0.5 * [exp(i input) + exp(-i input)]</para></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Cosh(ILNumerics.complex)">
+            <summary>
+            Cosinus hyperbolicus
+            </summary>
+            <param name="input">Input</param>
+            <returns>Cosine hyperbolicus of input</returns>
+            <remarks><para>The cosine is computed by the trigonometric euler equation: </para>
+            <para>(Exp(input) + Exp(-1.0 * input)) / 2.0</para></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Sin(ILNumerics.complex)">
+            <summary>
+            Sinus
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Sinus of input</returns>
+            <remarks><para>The sinus is computed by the trigonometric euler equation: </para>
+            <para>(Exp(i * input) - Exp(-1.0 * i * input)) / (2.0 * i)</para></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Sinh(ILNumerics.complex)">
+            <summary>
+            Sinus hyperbolicus
+            </summary>
+            <param name="input">Input</param>
+            <returns>Sinus hyperbolicus of input</returns>
+            <remarks><para>The sinus hyperbolicus is computed by the trigonometric euler equation: </para>
+            <para>(Exp(input) - Exp(-1.0 * input)) / 2.0</para></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Exp(ILNumerics.complex)">
+            <summary>
+            Complex exponent
+            </summary>
+            <param name="exponent">Exponent</param>
+            <returns>Result of exp(exponent)</returns>
+            <remarks>For complex exponents, exp(exponent) is computed by
+            <para>complex.FromPol(Math.Exp(exponent.real), exponent.imag)</para></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Pow(ILNumerics.complex,System.Double)">
+            <summary>
+            Complex power for real exponent
+            </summary>
+            <param name="input">Basis</param>
+            <param name="exponent">Exponent</param>
+            <returns>Result of input power exponent</returns>
+            <remarks>The computation will be carried out by 
+            <para>exp(log(input) * exponent)</para></remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Pow(System.Double,System.Double)">
+            <summary>
+            Complex power - real basis, real exponent
+            </summary>
+            <param name="basis">Basis</param>
+            <param name="exponent">Exponent</param>
+            <returns>Complex number.</returns>
+            <remarks>The result will be a complex number. For negative basis 
+            the basis will be converted to a complex number and the power 
+            will be computed in the complex plane.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Pow(ILNumerics.complex,ILNumerics.complex)">
+            <summary>
+            Complex power - complex exponent
+            </summary>
+            <param name="basis">Basis</param>
+            <param name="exponent">Exponent</param>
+            <returns>Complex number exp(log(basis) * exponent).</returns>
+            <remarks>The result will be the complex number exp(log(basis) * exponent). </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Sqrt(System.Double)">
+            <summary>
+            Square root
+            </summary>
+            <param name="input">Input value</param>
+            <returns>The square root of input</returns>
+            <remarks>If input is smaller than 0.0, the computation will be done in the complex plane. </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Sqrt(ILNumerics.complex)">
+            <summary>
+            Square root
+            </summary>
+            <param name="input">Input value</param>
+            <returns>The square root of input</returns>
+            <remarks>Numerical recipes in C: Appendix C </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Tan(ILNumerics.complex)">
+            <summary>
+            Tangens
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Tangens of input</returns>
+            <remarks>The tangens is 
+            <para>sin(input) / cos(input)</para>
+            if cos(input) == 0.0+0.0i, PositiveInfinity will be returned.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Tanh(ILNumerics.complex)">
+            <summary>
+            Tangens hyperbolicus
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Tangens hyperbolicus</returns>
+            <remarks>The tangens hyperbolicus is 
+            <para>sinh(input) / cosh(input)</para>
+            if cosh(input) == 0.0+0.0i, PositiveInfinity will be returned.</remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Log(ILNumerics.complex)">
+            <summary>
+            Complex logarithm 
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Complex logarithm of input</returns>
+            <remarks>The real part of the logarithm is computed by 
+            <para>log (abs (input))</para>
+            <para>The imaginary part holds the phase of input.</para>
+            </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Log(System.Double)">
+            <summary>
+            Logarithm of real input 
+            </summary>
+            <param name="input">Input value - may be negative</param>
+            <returns>Complex logarithm</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Log10(System.Double)">
+            <summary>
+            Logarithm of base 10 of real input 
+            </summary>
+            <param name="input">Input value - may be negative</param>
+            <returns>Complex logarithm of base 10</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Log2(System.Double)">
+            <summary>
+            Logarithm of base 2 of real input 
+            </summary>
+            <param name="input">Input value - may be negative</param>
+            <returns>Complex logarithm of base 2</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Log10(ILNumerics.complex)">
+            <summary>
+            Logarithm of base 10
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Logarithm of base 10</returns>
+            <seealso cref="M:ILNumerics.complex.Log(ILNumerics.complex)"/>
+        </member>
+        <member name="M:ILNumerics.complex.Log2(ILNumerics.complex)">
+            <summary>
+            Logarithm of base 2
+            </summary>
+            <param name="input">Input value</param>
+            <returns>Logarithm of base 2.</returns>
+            <seealso cref="M:ILNumerics.complex.Log(ILNumerics.complex)"/>
+        </member>
+        <member name="M:ILNumerics.complex.FromPol(System.Double,System.Double)">
+            <summary>
+            Convert polar notation into cartesian notation
+            </summary>
+            <param name="magnitude">Magnitude</param>
+            <param name="angle">Phase</param>
+            <returns>Complex value having magnitude and phase</returns>
+        </member>
+        <member name="M:ILNumerics.complex.ToString">
+            <summary>
+            Convert this complex number into a string representation.
+            </summary>
+            <returns>String displaying the complex number (full precision).</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Abs">
+            <summary>
+            Magnitude of this complex instance
+            </summary>
+            <returns>Magnitude</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Angle">
+            <summary>
+            Phase of this complex instance
+            </summary>
+            <returns>Phase</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Acos">
+            <summary>
+            Arcus cosinus of this complex instance
+            </summary>
+            <returns>Arcus cosinus</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Asin">
+            <summary>
+            Arcus sinus of this complex instance
+            </summary>
+            <returns>arcus sinus</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Exp">
+            <summary>
+            Exponential / power of base e
+            </summary>
+            <returns>Power of base e</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Pow(System.Double)">
+            <summary>
+            Complex power real exponent
+            </summary>
+            <param name="exponent">Exponent</param>
+            <returns>New complex number with result</returns>
+            <remarks>If this instance is a and the exponent is e than 
+            the result will be the complex number exp(log(a) * e). </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Pow(ILNumerics.complex)">
+            <summary>
+            Complex power - complex exponent
+            </summary>
+            <param name="exponent">Exponent</param>
+            <returns>Complex number exp(log(this) * exponent).</returns>
+            <remarks>If this instance is a than 
+            the result will be the complex number exp(log(a) * exponent). </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.Sqrt">
+            <summary>
+            Square root of this complex value
+            </summary>
+            <returns>Square root of this complex value</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Log">
+            <summary>
+            Logarithm of base e
+            </summary>
+            <returns>Logarithm of base e</returns>
+            <remarks>The logarithm of a complex number A is defined as follows: <br />
+            <list type="none"><item>real part: log(abs(A))</item>
+            <item>imag part: Atan2(imag(A),real(A))</item></list>
+            </remarks>
+        </member>
+        <member name="M:ILNumerics.complex.IsNaN(ILNumerics.complex)">
+            <summary>
+            Test if any of real or imaginary parts are NAN's
+            </summary>
+            <param name="input">Complex number to test</param>
+            <returns>true if any of real or imag part is not a number</returns>
+        </member>
+        <member name="M:ILNumerics.complex.IsInfinity(ILNumerics.complex)">
+            <summary>
+            Test if any of real or imaginary parts are infinite
+            </summary>
+            <param name="input">Complex number to test</param>
+            <returns>true if any of real or imag part is infinite</returns>
+        </member>
+        <member name="M:ILNumerics.complex.IsPositiveInfinity(ILNumerics.complex)">
+            <summary>
+            Test if any of real or imaginary parts are pos.nfinite
+            </summary>
+            <param name="input">Complex number to test</param>
+            <returns>true if any of real or imag part is positive infinite</returns>
+        </member>
+        <member name="M:ILNumerics.complex.IsNegativeInfinity(ILNumerics.complex)">
+            <summary>
+            Test if any of real or imaginary parts are neg. infinite
+            </summary>
+            <param name="input">Complex number to test</param>
+            <returns>true if any of real or imag part is negative infinite</returns>
+        </member>
+        <member name="M:ILNumerics.complex.IsFinite(ILNumerics.complex)">
+            <summary>
+            Test if any of real or imaginary parts are finite
+            </summary>
+            <param name="input">Complex number to test</param>
+            <returns>true if any of real and imag part is finite</returns>
+        </member>
+        <member name="M:ILNumerics.complex.iszero">
+            <summary>
+            Test if both of real or imaginary parts are 0
+            </summary>
+            <returns>true if real and imag part is 0</returns>
+        </member>
+        <member name="M:ILNumerics.complex.Parse(System.String,System.Globalization.NumberStyles,System.Globalization.CultureInfo)">
+            <summary>
+            Converts the string <paramref name="text"/> containing a complex number into the complex number.
+            </summary>
+            <param name="text">String representation of the complex number.</param>
+            <param name="style">Number style used for parsing individual parts (real, imag).</param>
+            <param name="culture">The culture determining separators and floating point formats.</param>
+            <returns>The complex number.</returns>
+            <exception cref="T:System.FormatException">if the string is in an invalid format and/or cannot be converted.</exception>
+        </member>
+        <member name="M:ILNumerics.complex.Partition(System.String,System.String@,System.String@)">
+            <summary>
+            Splits a string assumed to contain a complex number into real and imaginary parts. Removes 'i' identifiers.
+            </summary>
+            <param name="text">Number as text.</param>
+            <param name="real">[Output] string with real part</param>
+            <param name="imag">[Output] string with imaginary part.</param>
+        </member>
+        <member name="T:ILNumerics.Core.Runtime.F90File">
+            <summary>
+            Stream reader for list directed input tokens / values from FORTRAN data files. Return r, *, c, valid value separators and end marks as strings / null. See FORTRAN 90 spec: 10.8.
+            </summary>
+        </member>
+        <member name="M:ILNumerics.Core.Runtime.F90File.ReadRaw(System.Int64)">
+            <summary>
+             Reads w characters from the current stream position, but stops at record boundary. Use for formatted input.
+            </summary>
+            <param name="w">Number of characters to read.</param>
+            <returns>String with w characters read (or less if EOF or EOR occured).</returns>
+        </member>
+        <member name="M:ILNumerics.Core.Runtime.F90File.SkipToNextRecord(System.Int64)">
+            <summary>
+            Positions the stream to point to the character right after the current record.
+            </summary>
+            <param name="start">[Optional] Current position in the record. Default: end of current token + 1.</param>
+        </member>
+        <member name="M:ILNumerics.Core.Runtime.F90File.ReadToken">
+            <summary>
+            Read the next token in list directed input mode.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ILNumerics.Core.Runtime.F90File.GetEnumerator">
+            <summary>
+            Create an enumerator iterating over the values within the file. Implements special handling required for FORTRAN list directed input.
+            </summary>
+            <returns>Values enumerator.</returns>
+        </member>
+        <member name="M:ILNumerics.F2NET.ExtensionMethods.AssignTo(ILNumerics.F2NET.FString,System.Int32)">
+            <summary>
+            Fortran CHARACTER assignment semantic for FString. 
+            </summary>
+            <param name="length">Target length.</param>
+            <returns>A new instance of FString, as a deep copy of this FString, with a length of 'length'.</returns>
+        </member>
+        <member name="M:ILNumerics.F2NET.ExtensionMethods.Convert(ILNumerics.F2NET.FString,System.Int32)">
+            <summary>
+            Converts current FString instance into different length instance, keeping the same reference. 
+            </summary>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
+        <member name="P:ILNumerics.F2NET.Formatting.FormatItem.Parent">
+            <summary>
+             The format item list hosting this format item.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.F2NET.Formatting.FormatItem.Reverted">
+            <summary>
+            Flag determining if this format item is the result of reverting the list of format items after reaching the end of the original list. 
+            </summary>
+        </member>
+        <member name="T:ILNumerics.F2NET.Formatting.FormatItemList">
+            <summary>
+            Handling Fortran format expressions. 
+            </summary>
+            <remarks>
+            <para></para>
+            </remarks>
+        </member>
+        <member name="P:ILNumerics.F2NET.Formatting.FormatItemList.ScaleFactor">
+            <summary>
+            Current scaling factor (P editing).
+            </summary>
+        </member>
+        <member name="M:ILNumerics.F2NET.Formatting.FormatItemList.GetEnumerator">
+            <summary>
+            Gives an iterater over the individual format items in this list. CAUTION!! This will iterate forever! It must be stopped from the outside (see Fortran spec). 
+            </summary>
+            <returns>Enumerator over format items in this list.</returns>
+            <example><![CDATA[
+            foreach (var item in FormatParser.Parse("(1x,A, /4(2I3), 2E15 .4E2, 'H')")) {
+                Console.WriteLine($"FormatItem: {item}");
+                if (item.Reverted) break; 
+            }
+            Output: 
+            FormatItem: 1X
+            FormatItem: 1A
+            FormatItem: 1/
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1E15.4E2
+            FormatItem: 1E15.4E2
+            FormatItem: 'H'
+            FormatItem: 1/]]></example>
+        </member>
+        <member name="T:ILNumerics.F2NET.Formatting.FormatParser">
+            <summary>
+            Parser for Fortran format expression strings. Use this with <see cref="T:ILNumerics.F2NET.Formatting.FormatItemList"/> and <see cref="T:ILNumerics.F2NET.Formatting.FormatItem"/> to iterate the format item list in a Fortran format string.
+            </summary>
+            <example><![CDATA[
+            foreach (var item in FormatParser.Parse("(1x,A, /4(2I3), 2E15 .4E2, 'H')")) {
+                Console.WriteLine($"FormatItem: {item}");
+                if (item.Reverted) break; 
+            }
+            Output: 
+            FormatItem: 1X
+            FormatItem: 1A
+            FormatItem: 1/
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1I3
+            FormatItem: 1E15.4E2
+            FormatItem: 1E15.4E2
+            FormatItem: 'H'
+            FormatItem: 1/]]></example>
+        </member>
+        <member name="T:ILNumerics.F2NET.Formatting.FormatToken">
+            <summary>
+            Class representing simple tokens within Fortran format strings. Examples: I, /, ), 4...
+            </summary>
+        </member>
+        <member name="F:ILNumerics.F2NET.Formatting.PlusSignStates.S">
+            <summary>
+            Optional plus sign (default).
+            </summary>
+        </member>
+        <member name="F:ILNumerics.F2NET.Formatting.PlusSignStates.SS">
+            <summary>
+            No plus sign-
+            </summary>
+        </member>
+        <member name="F:ILNumerics.F2NET.Formatting.PlusSignStates.SP">
+            <summary>
+            Obligatory plus sign.
+            </summary>
+        </member>
+        <member name="P:ILNumerics.F2NET.FString.Length">
+            <summary>
+            Gets the length configured for the current CHARACTER type. Variable length strings return -1. 
+            </summary>
+        </member>
+        <member name="P:ILNumerics.F2NET.FString.ActualLength">
+            <summary>
+            Gets the actual length of the current FString instance. 
+            </summary>
+        </member>
+        <member name="M:ILNumerics.F2NET.FString.#ctor(System.UInt32)">
+            <summary>
+            Creates a new FString object of specified length.
+            </summary>
+            <param name="len"></param>
+        </member>
+        <member name="M:ILNumerics.F2NET.FString.AssignTo(System.Int32)">
+            <summary>
+            Fortran CHARACTER assignment semantic for FString. 
+            </summary>
+            <param name="length">Target length.</param>
+            <returns>A new instance of FString, as a deep copy of this FString, with a length of 'length'.</returns>
+        </member>
+        <member name="P:ILNumerics.F2NET.FString.Item(System.Nullable{System.Int64},System.Nullable{System.Int64})">
+            <summary>
+            1-based (!) subscript into this FString. 
+            </summary>
+            <param name="start">First character position, 1-based!</param>
+            <param name="end">last included character position, 1-based.</param>
+            <value>New string value to be copied into the specified part of this array. Note, that the underlying string is mutated(!), hence, all FString instances, referencing this string are changed, too.</value>
+            <returns>New (!) FString as a copy of the substring specified by start &amp; end.</returns>
+        </member>
+        <member name="M:ILNumerics.F2NET.FStringArray.Convert(System.Int32)">
+            <summary>
+            Converts current FString instance into different length instance, keeping the same reference. 
+            </summary>
+            <param name="length"></param>
+            <returns></returns>
+        </member>
+        <member name="P:ILNumerics.F2NET.FStringArray.Item(System.Int64)">
+            <summary>
+            0-based (!) subscript into this 1dim (!) FStringArray. 
+            </summary>
+            <param name="start">First character position, 1-based!</param>
+            <param name="end">last included character position, 1-based.</param>
+            <value>New string value to be copied into the specified part of this array. Note, that the underlying string is mutated(!), hence, all FString instances, referencing this string are changed, too.</value>
+            <returns>New (!) FString as a copy of the substring specified by start &amp; end.</returns>
+        </member>
+        <member name="M:ILNumerics.F2NET.Intrinsics.CDABS(ILNumerics.complex)">
+            <summary>
+            Alias used by GFortran compiler (and PG ?).
+            </summary>
+            <param name="a"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ILNumerics.fcomplex">
+            <summary>
+            Floating point complex value data type of float (single) precision
+            </summary>
+            <remarks>This class extends the system value types for real numbers to complex float 
+            values. Besides the publicly available members 'real' and 'imag' it provides all the 
+            basis functionality the floating point System.double brings (abs, log, sqrt, tan etc.) for 
+            float precision complex,
+            as well as it overrides the basic unary and binary operators for all common system value 
+            types including rarely used types (e.g. UInt16). This includes the basic numerical operations 
+            like '+','-','/','*' and the relational operators: '==','>','>=' etc. Also there are some 
+            explicit and some implicit casting operators from / to fcomplex values into system 
+            value types. </remarks>
+        </member>
+        <member name="F:ILNumerics.fcomplex.real">
+            <summary>
+            Real part of this complex number
+            </summary>
+        </member>
+        <member name="F:ILNumerics.fcomplex.imag">
+            <summary>
+            Imaginary part of this complex number
+            </summary>
+        </member>
+        <member name="F:ILNumerics.fcomplex.i">
+            <summary>
+            Imaginary unit 
+            </summary>
+        </member>
+        <member name="M:ILNumerics.fcomplex.#ctor(System.Single,System.Single)">
+            <summary>
+            Construct new float complex number
+            </summary>
+            <param name="real">Real part</param>
+            <param name="imag">Imaginary part</param>
+        </member>
+        <member name="P:ILNumerics.fcomplex.conj">
+            <summary>
+            Returns the complex conjugate of this complex number.
+            </summary>
+            <seealso cref="M:ILNumerics.fcomplex.Conjugate"/>
+        </member>
+        <member name="P:ILNumerics.fcomplex.INF">
+            <summary>
+            Positive infinity for real and imaginary part of complex value
+            </summary>
+        </member>
+        <member name="P:ILNumerics.fcomplex.PositiveInfinity">
+            <summary>
+            Positive infinity for real and imag part of complex value
+            </summary>
+        </member>
+        <member name="P:ILNumerics.fcomplex.Zero">
+            <summary>
+            New fcomplex, real and imaginary parts are zero
+            </summary>
+        </member>
+        <member name="P:ILNumerics.fcomplex.NaN">
+            <summary>
+            fcomplex quantity, marked as being "not a number"
+            </summary>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Equals(System.Object)">
+            <summary>
+            Are obj's real and imaginary part identical to the real and imaginary parts of this fcomplex
+            </summary>
+            <param name="obj">fcomplex object to determine the equality for</param>
+            <returns>true if obj is of fcomplex type and its real and imag part has the same 
+            values as the real and imaginary part of this array.</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Equals(ILNumerics.fcomplex)">
+            <summary>
+            Check if a fcomplex number equals this fcomplex number
+            </summary>
+            <param name="other">other complex number</param>
+            <returns>true if both, real and imaginary parts of both complex number are (binary) equal, false otherwise</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.GetHashCode">
+            <summary>
+            Give HashCode of this fcomplex number
+            </summary>
+            <returns>HashCode of this fcomplex number</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Conjugate">
+            <summary>
+            Conjugates this complex number inplace.
+            </summary>
+            <seealso cref="P:ILNumerics.fcomplex.conj"/>
+            <seealso cref="M:ILNumerics.fcomplex.Conjugate(ILNumerics.fcomplex)"/>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Subtract two complex values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Multiply two complex values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Divide two complex numbers.
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+            <remarks><para>Unless the operator must handle special inputs (Inf or 0 values), 
+            the algorithm described in [1] is used for division. This is considered to be 
+            more robust against floating point overflow than the naive approach of simple 
+            cartesian division.</para>
+            <para>References: [1]: Smith, R.L., Algorithm 116: Complex division. Commun.ACM 5,8 (1962),435 <br />
+            [2]: Stewart, G.W., A note on complex division, ACM trans.on math software, Vol.11, N.3 (1985)</para>
+            <para>For a more detailed investigation of the robustnes and performance of various complex division algorithms, see: [3]: M.Baudin, R.L.Smith: A Robust Complex Division in Scilab (https://arxiv.org/pdf/1210.4539.pdf)</para>
+            </remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true, if real and imaginary part are identical</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(ILNumerics.fcomplex,ILNumerics.complex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Subtract two complex values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Multiply two complex values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Divide two complex numbers.
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+            <remarks><para>Unless the operator must handle special inputs (Inf or 0 values), 
+            the algorithm described in [1] is used for division. This is considered to be 
+            more robust against floating point overflow than the naive approach of simple 
+            cartesian division.</para>
+            <para>References: [1]: Smith, R.L., Algorithm 116: Complex division. Commun.ACM 5,8 (1962),435 <br />
+            [2]: Stewart, G.W., A note on complex division, ACM trans.on math software, Vol.11, N.3 (1985)</para>
+            <para>For a more detailed investigation of the robustnes and performance of various complex division algorithms, see: [3]: M.Baudin, R.L.Smith: A Robust Complex Division in Scilab (https://arxiv.org/pdf/1210.4539.pdf)</para>
+            </remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true, if real and imaginary part are identical</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(ILNumerics.fcomplex,System.Int64)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(ILNumerics.fcomplex,System.Single)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(ILNumerics.fcomplex,System.Byte)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Add two complex numbers
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Divide two numbers
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Freater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(System.Int64,ILNumerics.fcomplex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(System.Int32,ILNumerics.fcomplex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(System.Single,ILNumerics.fcomplex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Addition(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Add two complex values
+            </summary>
+            <param name="A">First summand</param>
+            <param name="B">Second summand</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Subtraction(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Subtract two values
+            </summary>
+            <param name="A">Minuend</param>
+            <param name="B">Subtrahend</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Multiply(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Multiply two values
+            </summary>
+            <param name="A">First factor</param>
+            <param name="B">Second factor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Division(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Divide two values
+            </summary>
+            <param name="A">Divident</param>
+            <param name="B">Divisor</param>
+            <returns>Result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Equality(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Equality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>Result</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Inequality(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Unequality comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real and imaginary parts of A and B are not equal, false otherwise</returns>
+            <remarks>Real inputs are converted to a complex number and the result is compared to the complex input.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThan(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Greater than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThan(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Lower than comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_GreaterThanOrEqual(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Greater than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is greater than real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_LessThanOrEqual(System.Byte,ILNumerics.fcomplex)">
+            <summary>
+            Lower than or equal to comparison for complex numbers
+            </summary>
+            <param name="A">Left side</param>
+            <param name="B">Right side</param>
+            <returns>true if real part of A is lower then real part of B, false otherwise</returns>
+            <remarks>Only the real parts are compared!</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_UnaryNegation(ILNumerics.fcomplex)">
+            <summary>
+            Unary minus operator
+            </summary>
+            <param name="in1">fcomplex input</param>
+            <returns>fcomplex number similar to in1, having real and imag part negated</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Abs(ILNumerics.fcomplex)">
+            <summary>
+            Magnitude value of float complex number
+            </summary>
+            <param name="input">fcomplex number</param>
+            <returns>Magnitude of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Angle(ILNumerics.fcomplex)">
+            <summary>
+            Angle of complex number
+            </summary>
+            <param name="input">fcomplex number to compute angle of</param>
+            <returns>Angle of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Acos(ILNumerics.fcomplex)">
+            <summary>
+            Arcus cosinus for float complex number
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Arcus cosinus of input</returns>
+            <remarks>The arcus cosinus of a complex number is computed by
+            <para>Log(Sqrt(input^2 - 1) + input) * i </para></remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Acos(System.Single)">
+            <summary>
+            Arcus cosinus of real number
+            </summary>
+            <param name="input">float input</param>
+            <returns>Arcus cosinus of input</returns>
+            <remarks>For input > 1.0, <see cref="M:ILNumerics.fcomplex.Acos(ILNumerics.fcomplex)"/> will be used. </remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Asin(System.Single)">
+            <summary>
+            Arcus sinus of real number
+            </summary>
+            <param name="input">float input</param>
+            <returns>Arcus sinus of input</returns>
+            <remarks>For input > 1.0, <see cref="M:ILNumerics.fcomplex.Asin(ILNumerics.fcomplex)"/> will be used. </remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Asin(ILNumerics.fcomplex)">
+            <summary>
+            Arcus sinus for complex number
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Arcus sinus of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Exp(ILNumerics.fcomplex)">
+            <summary>
+            Power of base e for float complex number
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Result of Exp(input)</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Pow(ILNumerics.fcomplex,System.Double)">
+            <summary>
+            fcomplex power real exponent
+            </summary>
+            <param name="input">Basis </param>
+            <param name="exponent">Exponent</param>
+            <returns>New fcomplex number with result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Pow(System.Double,System.Double)">
+            <summary>
+            Complex power - real basis, real exponent
+            </summary>
+            <param name="basis">Basis</param>
+            <param name="exponent">Exponent</param>
+            <returns>fcomplex number.</returns>
+            <remarks>The result will be a fcomplex number. For negative basis 
+            the basis will be converted to a fcomplex number and the power 
+            will be computed in the fcomplex plane.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Pow(ILNumerics.fcomplex,ILNumerics.fcomplex)">
+            <summary>
+            Power: complex base, complex exponent
+            </summary>
+            <param name="basis">Basis</param>
+            <param name="exponent">Exponent</param>
+            <returns>result of basis^exponent</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Sqrt(System.Single)">
+            <summary>
+            Square root of real input
+            </summary>
+            <param name="input">float input</param>
+            <returns>Square root of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Sqrt(ILNumerics.fcomplex)">
+            <summary>
+            Square root of complex number
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Square root of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Tan(ILNumerics.fcomplex)">
+            <summary>
+            Tangens of float complex number
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Tangens of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Tanh(ILNumerics.fcomplex)">
+            <summary>
+            Tangens hyperbolicus of float complex input
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Tangens hyperbolicus</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Log(ILNumerics.fcomplex)">
+            <summary>
+            Natural logarithm of complex input
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Natural logarithm of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Log10(ILNumerics.fcomplex)">
+            <summary>
+            Logarithm to base 10
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Logarithm of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Log2(ILNumerics.fcomplex)">
+            <summary>
+            Logarithm of base 2
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Logarithm of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Log(System.Single)">
+            <summary>
+            Logarithm of real input 
+            </summary>
+            <param name="input">float input - may be negative</param>
+            <returns>Complex logarithm</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Log10(System.Single)">
+            <summary>
+            Logarithm of base 10 of real input 
+            </summary>
+            <param name="input">float input - may be negative</param>
+            <returns>Complex logarithm of base 10</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Log2(System.Single)">
+            <summary>
+            Logarithm of base 2
+            </summary>
+            <param name="input">float input - may be negative</param>
+            <returns>Complex logarithm of base 2</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.FromPol(System.Single,System.Single)">
+            <summary>
+            Convert from polar to cartesian form
+            </summary>
+            <param name="magnitude">Magnitude</param>
+            <param name="angle">Angle</param>
+            <returns>fcomplex number with magnitude <c>magnitude</c> 
+            and phase <c>angle</c></returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.ToString">
+            <summary>
+            Convert this complex number into a string representation.
+            </summary>
+            <returns>String displaying the complex number (full precision).</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Abs">
+            <summary>
+            Magnitude of this float complex number
+            </summary>
+            <returns>Magnitude</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Angle">
+            <summary>
+            Phase angle of this float complex number
+            </summary>
+            <returns>Phase angle </returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Acos">
+            <summary>
+            Arcus cosinus of this float complex number
+            </summary>
+            <returns>Arcus cosinus</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Asin">
+            <summary>
+            Arcus sinus of this float complex number
+            </summary>
+            <returns>Arcus sinus</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Atan(ILNumerics.fcomplex)">
+            <summary>
+            Arcus tangens of float complex number
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Arcus tangens of input</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Ceiling(ILNumerics.fcomplex)">
+            <summary>
+            Round towards next greater integer
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Rounded float complex number</returns>
+            <remarks>Real and imaginary parts are independently rounded 
+            towards the next integer value towards positive infinity.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Floor(ILNumerics.fcomplex)">
+            <summary>
+            Round towards next lower integer
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Rounded float complex number</returns>
+            <remarks>Real and imaginary parts are independently rounded 
+            towards the next integer value towards negative infinity.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Round(ILNumerics.fcomplex)">
+            <summary>
+            Rounds towards nearest integer.
+            </summary>
+            <param name="a">Input value.</param>
+            <returns>The value of <paramref name="a"/>, rounded to the nearest integer.</returns>
+            <remarks><para>Rounding is performed for <see cref="F:ILNumerics.fcomplex.real"/> and <see cref="F:ILNumerics.fcomplex.imag"/> 
+            separately.</para>
+            <para>Numbers halfway between two others (0.5, 1.5,...) are rounded towards 
+            the next even number. See: <see cref="F:System.MidpointRounding.ToEven"/>.</para></remarks>
+            <see cref="M:System.Math.Round(System.Double)"/>
+            <see cref="M:ILNumerics.complex.Round(ILNumerics.complex)"/>
+            <see cref="M:ILNumerics.complex.Round(ILNumerics.complex,System.Int32)"/>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Round(ILNumerics.fcomplex,System.Int32)">
+            <summary>
+            Rounds to a specified number of fractional digits.
+            </summary>
+            <param name="a">Input value.</param>
+            <param name="digits">Number of fractional digits to round to.</param>
+            <returns>The value of <paramref name="a"/>, rounded to the 
+            specified number of fractional digits.</returns>
+            <remarks><para>Rounding is performed for <see cref="F:ILNumerics.fcomplex.real"/> and <see cref="F:ILNumerics.fcomplex.imag"/> 
+            separately.</para>
+            <para>Numbers halfway between two others (0.5, 1.5,...) are rounded towards 
+            the next even number. See: <see cref="F:System.MidpointRounding.ToEven"/>.</para></remarks>
+            <exception cref="T:System.ArgumentOutOfRangeException">if digits is negative.</exception>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Sign(ILNumerics.fcomplex)">
+            <summary>
+            Signum function
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns> Signum of input</returns>
+            <remarks>
+            For numbers a = 0.0 + 0.0i, sign(a)'s real and imag parts are 0.0. 
+            For all other numbers sign(a) is the projection onto the unit circle.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Truncate(ILNumerics.fcomplex)">
+            <summary>
+            Truncate a floating point complex value
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Integer part of input</returns>
+            <remarks>Operates on real and imaginary parts separately.</remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Conjugate(ILNumerics.fcomplex)">
+            <summary>
+            Creates the complex conjugate of the complex value <paramref name="a"/>.
+            </summary>
+            <param name="a">The complex value.</param>
+            <returns>The conjugate of a.</returns>
+            <seealso cref="P:ILNumerics.fcomplex.conj"/>
+            <seealso cref="M:ILNumerics.fcomplex.Conjugate"/>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Cos(ILNumerics.fcomplex)">
+            <summary>
+            Cosinus
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Cosinus of input</returns>
+            <remarks><para>The cosinus is computed by the trigonometric euler equation: </para>
+            <para>0.5 * [exp(i input) + exp(-i input)]</para></remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Cosh(ILNumerics.fcomplex)">
+            <summary>
+            Cosinus hyperbolicus
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Cosinus hyperbolicus of input</returns>
+            <remarks><para>The cosinus is computed by the trigonometric euler equation: </para>
+            <para>(Exp(input) + Exp(-1.0 * input)) / 2.0</para></remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Sin(ILNumerics.fcomplex)">
+            <summary>
+            Sinus
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Sinus of input</returns>
+            <remarks><para>The sinus is computed by the trigonometric euler equation: </para>
+            <para>(Exp(i * input) - Exp(-1.0 * i * input)) / (2.0 * i)</para></remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Sinh(ILNumerics.fcomplex)">
+            <summary>
+            Sinus hyperbolicus
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>Sinus hyperbolicus of input</returns>
+            <remarks><para>The sinus hyperbolicus is computed by the trigonometric euler equation: </para>
+            <para>(Exp(input) - Exp(-1.0 * input)) / 2.0</para></remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Exp">
+            <summary>
+            Exponential / power of base e
+            </summary>
+            <returns>Power of base e</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Pow(System.Double)">
+            <summary>
+            Power of fcomplex number, real exponent
+            </summary>
+            <param name="exponent">Exponent</param>
+            <returns>New fcomplex number with result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Pow(ILNumerics.fcomplex)">
+            <summary>
+            Power of fcomplex number, complex exponent
+            </summary>
+            <param name="exponent">Exponent</param>
+            <returns>New fcomplex number with result</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Sqrt">
+            <summary>
+            Square root of fcomplex number
+            </summary>
+            <returns>Square root</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Log">
+            <summary>
+            Logarithm of fcomplex number
+            </summary>
+            <returns>Natural logarithm</returns>
+            <remarks>The logarithm of a complex number A is defined as follows: <br />
+            <list type="none"><item>real part: log(abs(A))</item>
+            <item>imag part: Atan2(imag(A),real(A))</item></list>
+            </remarks>
+        </member>
+        <member name="M:ILNumerics.fcomplex.IsNaN(ILNumerics.fcomplex)">
+            <summary>
+            Test if any of real or imaginary parts are NAN's
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>true if any of real or imag part is not a number</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.IsInfinity(ILNumerics.fcomplex)">
+            <summary>
+            Test if any of real or imaginary parts are infinite
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>true if any of real or imag part is infinite</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.IsPositiveInfinity(ILNumerics.fcomplex)">
+            <summary>
+            Test if any of real or imaginary parts are pos. infinite
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>true if any of real or imag part is positive infinite</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.IsNegativeInfinity(ILNumerics.fcomplex)">
+            <summary>
+            Test if any of real or imaginary parts are neg. infinite
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>true if any of real or imag part is negative infinite</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.IsFinite(ILNumerics.fcomplex)">
+            <summary>
+            Test if any of real or imaginary parts are finite
+            </summary>
+            <param name="input">fcomplex input</param>
+            <returns>true if any of real and imag part is finite</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.Double)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">double</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.Single)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">float</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.Byte)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">byte</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.SByte)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">byte</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.Char)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">char</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.Int16)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">Int16</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.Int32)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">Int32</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.Int64)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">Int64</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.UInt16)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">UInt16</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.UInt32)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">UInt32</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Implicit(System.UInt64)~ILNumerics.fcomplex">
+            <summary>
+            Implicit cast real number into complex number
+            </summary>
+            <param name="a">UInt64</param>
+            <returns>fcomplex number with real part equals a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.Double">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.Single">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.Byte">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.SByte">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.Char">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.Int16">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.Int32">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">complex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.Int64">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.UInt16">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.UInt32">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.op_Explicit(ILNumerics.fcomplex)~System.UInt64">
+            <summary>
+            Explicit cast complex number into real number
+            </summary>
+            <param name="a">fcomplex number</param>
+            <returns>Real number with real part of a</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.iszero">
+            <summary>
+            Test if real and imag part are zero
+            </summary>
+            <returns>true if real and imag parts are zero, false else</returns>
+        </member>
+        <member name="M:ILNumerics.fcomplex.Parse(System.String,System.Globalization.NumberStyles,System.Globalization.CultureInfo)">
+            <summary>
+            Converts the string <paramref name="text"/> containing a complex number into the complex number.
+            </summary>
+            <param name="text">String representation of the complex number.</param>
+            <param name="style">Number style used for parsing individual parts (real, imag).</param>
+            <param name="culture">The culture determining separators and floating point formats.</param>
+            <returns>The complex number.</returns>
+            <exception cref="T:System.FormatException">if the string is in an invalid format and/or cannot be converted.</exception>
+        </member>
+    </members>
+</doc>

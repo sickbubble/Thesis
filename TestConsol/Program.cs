@@ -21,6 +21,7 @@ namespace TestConsol
             latticeModelData.FillMemberInfoList();
             latticeModelData.SetBorderNodesSupportCondition(eSupportType.Pinned);
             latticeModelData.AssignLoadToMiddle();
+            latticeModelData.SetTorsionalReleaseToAllMembers();
 
 
             var shellModelData = new ShellModelData();
