@@ -108,6 +108,7 @@ namespace Data
                     if (lengthOfMember < 1.42 * _MeshSize)
                     {
                         var frameMember = new FrameMember() { IEndNode = _ListOfNodes[i], JEndNode = _ListOfNodes[j], ID = labelCounter };
+                        //frameMember.SetAsTrussMember();
                         frameMember.Section = new FrameSection();
                         _ListOfMembers.Add(frameMember);
                         labelCounter ++;

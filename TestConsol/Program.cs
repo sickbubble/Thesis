@@ -16,7 +16,7 @@ namespace TestConsol
             var latticeModelData = new LatticeModelData();
             latticeModelData.Width = 16;
             latticeModelData.Height = 16;
-            latticeModelData.MeshSize = 4;
+            latticeModelData.MeshSize = 2;
             latticeModelData.FillNodeInfo();
             latticeModelData.FillMemberInfoList();
             latticeModelData.SetBorderNodesSupportCondition(eSupportType.Pinned);
@@ -27,7 +27,7 @@ namespace TestConsol
             var shellModelData = new ShellModelData();
             shellModelData.Width = 16;
             shellModelData.Height = 16;
-            shellModelData.MeshSize = 4;
+            shellModelData.MeshSize = 2;
             shellModelData.FillNodeInfo();
             shellModelData.FillMemberInfoList();
             shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);

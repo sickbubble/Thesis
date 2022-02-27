@@ -65,6 +65,21 @@ namespace ThesisProject.Structural_Members
             return globalStiffnessMatrix;
         }
 
+        public void SetAsTrussMember()
+        {
+            var trussReleases= new EndCondition() ;
+            trussReleases.IsReleaseMx = true;
+            trussReleases.IsReleaseMy = true;
+            trussReleases.IsReleaseMz = true;
+
+
+
+            this.IEndCondition = trussReleases;
+            this.JEndCondition = trussReleases;
+        }
+
+      
+
         public double GetLength()
         {
             double length = 0;
