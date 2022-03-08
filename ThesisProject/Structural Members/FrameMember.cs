@@ -322,7 +322,7 @@ namespace ThesisProject.Structural_Members
 
             var A = this.Section.Area;
             var rho = this.Section.Material.Uw * A;
-            rho = 0.1; //todo
+            rho = 1; //todo
             double L = this.GetLength();
 
 

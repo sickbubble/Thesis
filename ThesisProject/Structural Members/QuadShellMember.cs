@@ -892,7 +892,8 @@ namespace ThesisProject.Structural_Members
                 var area = Math.Abs(((x1 * y2) - (x2 * y1)) + ((x2 * y3) - (x3 * y2)) + ((x3 * y4) - (x4 * y3)) + ((x4 * y1) - (x1 * y4))) * 0.5;
 
                 // Get total mass
-                var totalMass = area * this.Section.Thickness * this.Material.Uw;
+                this.Section.Material.Uw = 1;
+                var totalMass = area * this.Section.Thickness * this.Section.Material.Uw;
 
                 // Get nodal mass contribution
                 // TODO : Assumption is shell is rectangular. For non-rectangular shells (i.e. edges are not perpendicular), implement 
