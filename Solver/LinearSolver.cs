@@ -61,7 +61,6 @@ namespace Solver
             var externalKG = Matrix<double>.Build.DenseOfArray(kG.Matrix);
             var externalMass = Matrix<double>.Build.DenseOfArray(mass.Matrix);
 
-            var res = externalMass.Solve(externalKG);
 
             var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix,mass.Matrix,true);
             var w2 = solver.RealEigenvalues;
@@ -122,6 +121,7 @@ namespace Solver
 
         public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata)
         {
+            var latticeModelResultData = new LatticeModelResultData();
             _LatticeModelData = latticemodeldata;
             _AssemblyData = GetNodeAssemblyData(latticemodeldata.ListOfNodes);
 
@@ -131,14 +131,19 @@ namespace Solver
 
             var mass = GetMassMatrix_Latttice();
             var res = GetPeriodsOfTheSystem(KG, mass);
-            Console.WriteLine("Lattice Model Periods");
 
-            Console.WriteLine("--------------------------");
-            for (int i = 0; i < res.Count; i++)
-            {
-                Console.WriteLine("Mode No: " + (i + 1).ToString() + " Period:" + res[i].ToString());
-            }
-            Console.WriteLine("--------------------------");
+            //for (int i = 0; i < 6; i++)
+            //{
+            //    latticeModelResultData.ListOfPeriods.Add(res[i]);
+            //}
+            //Console.WriteLine("Lattice Model Periods");
+
+            //Console.WriteLine("--------------------------");
+            //for (int i = 0; i < res.Count; i++)
+            //{
+            //    Console.WriteLine("Mode No: " + (i + 1).ToString() + " Period:" + res[i].ToString());
+            //}
+            //Console.WriteLine("--------------------------");
 
 
 
@@ -155,7 +160,6 @@ namespace Solver
 
             dispResMatrix.Matrix = dispResAsArray;
 
-            var latticeModelResultData = new LatticeModelResultData();
             latticeModelResultData.DispRes = dispResMatrix;
             latticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
             latticeModelResultData.FrameResults = new Dictionary<int, FrameMemberResults>();
@@ -182,7 +186,6 @@ namespace Solver
 
 
             var mass = GetMassMatrix_Latttice();
-            var res = GetPeriodsOfTheSystem(KG, mass);
 
 
 
@@ -215,7 +218,7 @@ namespace Solver
             return latticeModelResultData;
         }
 
-        public LatticeModelData EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel)
+        public double EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel, MatrixCS kgShell, MatrixCS massShell)
         {
             var shellInternalEnergy = GetShellModelInternalEnergy(shellModelRes.DispRes);
             var latticeInternalEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
@@ -224,49 +227,25 @@ namespace Solver
             foreach (var item in latticeModel.ListOfMembers)
                 item.Section.Material.E *= ratio;
 
-            var oldArea = latticeModel.ListOfMembers.FirstOrDefault().Section.I11;
-            var oldArea2 = latticeModel.ListOfMembers.FirstOrDefault().Section.I22;
-            var oldArea3 = latticeModel.ListOfMembers.FirstOrDefault().Section.J;
-
-            var newArea = oldArea * latticeInternalEnergy / shellInternalEnergy;
-            var newArea2 = oldArea2 * latticeInternalEnergy / shellInternalEnergy;
-            var newArea3 = oldArea3 * latticeInternalEnergy / shellInternalEnergy;
-
-/*
-            for (int i = 0; i < latticeModel.ListOfMembers.Count; i++)
-            {
-                var member = latticeModel.ListOfMembers[i];
-                member.Section.I11 = newArea;
-                member.Section.I22 = newArea2;
-                member.Section.J = newArea3;
-#if false // Print members
-                var Ix = member.IEndNode.Point.X;
-                var Iy = member.IEndNode.Point.Y;
-                var Jx = member.JEndNode.Point.X;
-                var Jy = member.JEndNode.Point.Y;
-
-                string memberIDStrign =member.ID.ToString();
-                if (member.ID < 10)
-                {
-                    memberIDStrign = member.ID.ToString() + " ";
-                }
-                Console.WriteLine("Member ID: " + memberIDStrign +   ", ICoord:  " +   Ix.ToString() + " , " + Iy.ToString()+ " ,JCoord: " + Jx.ToString() + " , " + Jy.ToString());
-#endif
-            }
-*/
-
             var newLatticeRes = RunAnalysis_Lattice(latticeModel);
+            //var kgLattice = GetGlobalStiffness_Latttice();
+
+            //var shellPeriods =  GetPeriodsOfTheSystem(kgShell, massShell);
+            //var latticePeriods = GetPeriodsOfTheSystem(kgLattice, massShell);
+
+
 
 
 
             var latticeInternalEnergyNew = GetLatticeModelInternalEnergy(newLatticeRes.DispRes, latticeModel);
 
 
-            return latticeModel;
+            return ratio;
         }
 
         public ShellModelResultData RunAnalysis_Shell(ShellModelData shellModelData)
         {
+            var shellModelResultData = new ShellModelResultData();
             _ShellModelData = shellModelData;
             _AssemblyData = GetNodeAssemblyData(shellModelData.ListOfNodes);
             
@@ -286,19 +265,23 @@ namespace Solver
             var res = GetPeriodsOfTheSystem(KG, mass);
 
 
-            Console.WriteLine("Shell Model Periods");
+            //for (int i = 0; i < 6; i++)
+            //{
+            //    shellModelResultData.ListOfPeriods.Add(res[i]);
+            //}
 
-            Console.WriteLine("--------------------------");
-            for (int i = 0; i < res.Count; i++)
-            {
-                Console.WriteLine("Mode No: " + (i + 1).ToString() + " Period:" + res[i].ToString());
-            }
-            Console.WriteLine("--------------------------");
+            //Console.WriteLine("Shell Model Periods");
+
+            //Console.WriteLine("--------------------------");
+            //for (int i = 0; i < res.Count; i++)
+            //{
+            //    Console.WriteLine("Mode No: " + (i + 1).ToString() + " Period:" + res[i].ToString());
+            //}
+            //Console.WriteLine("--------------------------");
 
             var internalEnergy = GetShellModelInternalEnergy(dispResMatrix);
 
 
-            var shellModelResultData = new ShellModelResultData();
             shellModelResultData.DispRes = dispResMatrix;
             shellModelResultData.NodeResults = new Dictionary<int, List<double>>();
 
@@ -383,7 +366,7 @@ namespace Solver
             return rightHandSide;
         }
 
-        private MatrixCS GetGlobalStiffness_Latttice()
+        public MatrixCS GetGlobalStiffness_Latttice()
          {
 
             var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
@@ -508,7 +491,7 @@ namespace Solver
         }
 
 
-        private MatrixCS GetGlobalStiffness_Shell()
+        public MatrixCS GetGlobalStiffness_Shell()
         {
 
             var numOfUnknowns = _AssemblyData.NumberOfUnknowns;

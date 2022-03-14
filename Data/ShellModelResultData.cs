@@ -24,6 +24,8 @@ namespace Data
 
         #region Private Fields
         private MatrixCS _DispRes;
+        private List<double> _ListOfPeriods;
+
 
         #endregion
 
@@ -37,6 +39,7 @@ namespace Data
         /// </summary>
         public Dictionary<int, List<double>> NodeResults { get  ; set ; }
         public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
+        public List<double> ListOfPeriods { get => _ListOfPeriods; set => _ListOfPeriods = value; }
 
 
         #endregion

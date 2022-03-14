@@ -27,6 +27,7 @@ namespace Data
         private Dictionary<int, List<double>> _NodeResults; 
         private Dictionary<int, FrameMemberResults> _FrameResults;
         private MatrixCS _DispRes;
+        private List<double> _ListOfPeriods;
 
 
 
@@ -47,6 +48,7 @@ namespace Data
         /// </summary>
         public Dictionary<int, FrameMemberResults> FrameResults { get => _FrameResults; set => _FrameResults = value; }
         public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
+        public List<double> ListOfPeriods { get => _ListOfPeriods; set => _ListOfPeriods = value; }
 
         #endregion
     }
