@@ -113,24 +113,24 @@ namespace Data
                 node.SupportCondition = new Support(supportType);
             }
 
-            foreach (var n 
-                in this.ListOfNodes)
-            {
+            //foreach (var n 
+            //    in this.ListOfNodes)
+            //{
                 
-                if (!borderNodes.Contains(n))
-                {
-                     n.SupportCondition = new Support(eSupportType.Fixed);
+            //    if (!borderNodes.Contains(n))
+            //    {
+            //         n.SupportCondition = new Support(eSupportType.Fixed);
 
 
-                    n.SupportCondition.Restraints[0] = eRestrainedCondition.Restrained;
-                    n.SupportCondition.Restraints[1] = eRestrainedCondition.Restrained;
-                    n.SupportCondition.Restraints[5] = eRestrainedCondition.Restrained;
+            //        n.SupportCondition.Restraints[0] = eRestrainedCondition.Restrained;
+            //        n.SupportCondition.Restraints[1] = eRestrainedCondition.Restrained;
+            //        n.SupportCondition.Restraints[5] = eRestrainedCondition.Restrained;
 
-                    n.SupportCondition.Restraints[2] = eRestrainedCondition.NotRestrained;
-                    n.SupportCondition.Restraints[3] = eRestrainedCondition.NotRestrained;
-                    n.SupportCondition.Restraints[4] = eRestrainedCondition.NotRestrained;
-                }
-            }
+            //        n.SupportCondition.Restraints[2] = eRestrainedCondition.NotRestrained;
+            //        n.SupportCondition.Restraints[3] = eRestrainedCondition.NotRestrained;
+            //        n.SupportCondition.Restraints[4] = eRestrainedCondition.NotRestrained;
+            //    }
+            //}
 
 
         }

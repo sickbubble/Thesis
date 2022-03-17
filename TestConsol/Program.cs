@@ -22,19 +22,19 @@ namespace TestConsol
             {
 
             var latticeModelData = new LatticeModelData();
-            latticeModelData.Width = 4;
-            latticeModelData.Height = 4;
+            latticeModelData.Width = 10;
+            latticeModelData.Height = 10;
             latticeModelData.MeshSize = 1;
             latticeModelData.FillNodeInfo();
             latticeModelData.FillMemberInfoList();
             latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
-            latticeModelData.AssignLoadToMiddle();
-            //latticeModelData.SetTorsionalReleaseToAllMembers();
+                latticeModelData.AssignLoadToMiddle();
+                latticeModelData.SetTorsionalReleaseToAllMembers();
 
 
-            var shellModelData = new ShellModelData();
-            shellModelData.Width = 4;
-            shellModelData.Height = 4;
+                var shellModelData = new ShellModelData();
+            shellModelData.Width = 10;
+            shellModelData.Height = 10;
             shellModelData.MeshSize = 1;
             shellModelData.FillNodeInfo();
             shellModelData.FillMemberInfoList();
@@ -48,13 +48,21 @@ namespace TestConsol
             var linearSolver = new LinearSolver();
             var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
                 var kg_Lattice = linearSolver.GetGlobalStiffness_Latttice();
-            var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
+
+                var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
                 var kg_Shell = linearSolver.GetGlobalStiffness_Latttice();
 
                 var shellMassMatrix = linearSolver.GetMassMatrix_Shell();
 
 
                 var ratio =  linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData,kg_Shell,shellMassMatrix);
+                 kg_Lattice = linearSolver.GetGlobalStiffness_Latttice();
+
+
+
+                var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_Lattice, shellMassMatrix);
+                var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix);
+
 
                 res.Add(thicknes, ratio);
                 thicknes = thicknes + increment;

@@ -43,8 +43,8 @@ namespace ThesisProject.Structural_Members
         #region Interface Implementations
         public eMemberType MemberType { get => _MemberType; set => _MemberType = value; }
         public FrameSection Section { get => _Section; set => _Section = value; }
-        internal EndCondition IEndCondition { get => _IEndCondition; set => _IEndCondition = value; }
-        internal EndCondition JEndCondition { get => _JEndCondition; set => _JEndCondition = value; }
+        public EndCondition IEndCondition { get => _IEndCondition; set => _IEndCondition = value; }
+        public EndCondition JEndCondition { get => _JEndCondition; set => _JEndCondition = value; }
       
 
         public MatrixCS GetGlobalStiffnessMatrix()
@@ -370,7 +370,7 @@ namespace ThesisProject.Structural_Members
 
     }
 
-    class EndCondition
+    public class EndCondition
     {
         public EndCondition()
         {

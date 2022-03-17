@@ -75,9 +75,7 @@ namespace Data
                 for (int i = 0; i < this.ListOfMembers.Count; i++)
                 {
                     var member = this.ListOfMembers[i];
-
-                    member.IEndNode.SupportCondition.Restraints[5] = eRestrainedCondition.NotRestrained;
-                    member.JEndNode.SupportCondition.Restraints[5] = eRestrainedCondition.NotRestrained;
+                    member.IEndCondition.IsReleaseMz = true;
                 }
 
             }
