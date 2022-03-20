@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModelInfo;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,13 @@ using ThesisProject.Structural_Members;
 
 namespace Data
 {
+    public enum eModelGeometryType
+    {
+        Rectangular=0,
+        LShape = 1,
+        WithOpening =2
+    }
+
     public class ShellModelData
     {
         public ShellModelData()
@@ -46,6 +54,24 @@ namespace Data
         #endregion
 
         #region Public Methods
+        public void SetModelGeometryType(eModelGeometryType geometryType, Point pt = null, double gapSize = 0)
+        {
+
+            switch (geometryType)
+            {
+                case eModelGeometryType.Rectangular:
+                    break;
+                case eModelGeometryType.LShape:
+                    SetModelShapeAsL(pt);
+                    break;
+                case eModelGeometryType.WithOpening:
+                    SetModelShapeAsGapped(pt, gapSize);
+                    break;
+                default:
+                    break;
+            }
+
+        }
         public void FillNodeInfo()
         {
             var listOfNodes = new List<Node>();
@@ -72,6 +98,95 @@ namespace Data
 
             }
             this.ListOfNodes = listOfNodes;
+        }
+        private void SetModelShapeAsL(Point pointToCut)
+        {
+            //  ________  . . . . . . 
+            // |        | . . . . . .
+            // |        | . . . . . .
+            // |        |_____________
+            // |      pt              |
+            // |______________________|
+
+            var limitX = pointToCut.X;
+            var limitY = pointToCut.Y;
+
+            // Remove Nodes
+            var nodesToDelete = _ListOfNodes.Where(x => x.Point.X > limitX &&
+                                                        x.Point.Y > limitY).ToList();
+            if (nodesToDelete == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < nodesToDelete.Count; i++)
+            {
+                _ListOfNodes.Remove(nodesToDelete[i]);
+            }
+
+            //Remove Members
+
+            var membersToDelete = _ListOfMembers.Where(m => (m.IEndNode.Point.X > limitX &&
+                                                            m.IEndNode.Point.Y > limitY) ||
+                                                            (m.JEndNode.Point.X > limitX &&
+                                                            m.JEndNode.Point.Y > limitY)).ToList();
+
+
+            for (int i = 0; i < membersToDelete.Count; i++)
+            {
+                _ListOfMembers.Remove(membersToDelete[i]);
+            }
+
+
+
+
+        }
+
+        private void SetModelShapeAsGapped(Point instPoint, double gapSize)
+        {
+            //  ______________________ 
+            // |                      |
+            // |         ______       |
+            // |        |      |      |
+            // |        |______|      |
+            // |      pt              |
+            // |______________________|
+
+            var limitBotX = instPoint.X;
+            var limitBotY = instPoint.Y;
+            var limitTopX = instPoint.X + gapSize;
+            var limitTopY = instPoint.Y + gapSize;
+
+            // Remove Nodes
+            var nodesToDelete = _ListOfNodes.Where(x => x.Point.X > limitBotX && x.Point.X < limitTopX &&
+                                                        x.Point.Y > limitBotY && x.Point.Y < limitTopY).ToList();
+            if (nodesToDelete == null)
+            {
+                return;
+            }
+
+            for (int i = 0; i < nodesToDelete.Count; i++)
+            {
+                _ListOfNodes.Remove(nodesToDelete[i]);
+            }
+
+            //Remove Members
+
+            var membersToDelete = _ListOfMembers.Where(m => (m.IEndNode.Point.X > limitBotX &&
+                                                            m.IEndNode.Point.X < limitTopX &&
+                                                            m.IEndNode.Point.Y > limitBotY &&
+                                                            m.IEndNode.Point.Y < limitTopY) ||
+                                                            (m.JEndNode.Point.X > limitBotX &&
+                                                            m.JEndNode.Point.X < limitTopX &&
+                                                            m.JEndNode.Point.Y > limitBotY &&
+                                                            m.JEndNode.Point.Y < limitTopY)).ToList();
+
+
+            for (int i = 0; i < membersToDelete.Count; i++)
+            {
+                _ListOfMembers.Remove(membersToDelete[i]);
+            }
+
         }
         private List<Node> GetBorderNodes()
         {
@@ -102,7 +217,7 @@ namespace Data
                 }
             }
         }
-        public void SetBorderNodesSupportCondition(eSupportType supportType)
+        public void SetBorderNodesSupportCondition(eSupportType supportType,Point LShapeInstPt = null)
         {
             var borderNodes = GetBorderNodes();
             _ListOfSupports = new List<Support>();
@@ -113,10 +228,28 @@ namespace Data
                 node.SupportCondition = new Support(supportType);
             }
 
+
+            if (LShapeInstPt != null)
+            {
+                var limitX = LShapeInstPt.X;
+                var limitY = LShapeInstPt.Y;
+                var extraLNodes = _ListOfNodes.Where(n => (n.Point.X > limitX && n.Point.Y == limitY) ||
+                                                         (n.Point.Y > limitY && n.Point.X == limitX)).ToList();
+
+                if (extraLNodes != null)
+                {
+                    for (int i = 0; i < extraLNodes.Count; i++)
+                    {
+                        var node = extraLNodes[i];
+                        node.SupportCondition = new Support(supportType);
+                    }
+                }
+
+            }
             //foreach (var n 
             //    in this.ListOfNodes)
             //{
-                
+
             //    if (!borderNodes.Contains(n))
             //    {
             //         n.SupportCondition = new Support(eSupportType.Fixed);

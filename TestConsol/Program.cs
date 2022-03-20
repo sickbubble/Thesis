@@ -1,4 +1,5 @@
 ﻿using Data;
+using ModelInfo;
 using Solver;
 using System;
 using System.Collections.Generic;
@@ -21,13 +22,17 @@ namespace TestConsol
             for (int i = 0; i < 20; i++)
             {
 
+                var gapInstPt = new Point(6, 6, 0);
+                double gapSize = 2;
+
             var latticeModelData = new LatticeModelData();
             latticeModelData.Width = 10;
             latticeModelData.Height = 10;
             latticeModelData.MeshSize = 1;
             latticeModelData.FillNodeInfo();
             latticeModelData.FillMemberInfoList();
-            latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
+                latticeModelData.SetModelGeometryType(eModelGeometryType.LShape,gapInstPt,gapSize);
+            latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed,gapInstPt);
                 latticeModelData.AssignLoadToMiddle();
                 latticeModelData.SetTorsionalReleaseToAllMembers();
 
@@ -56,11 +61,11 @@ namespace TestConsol
 
 
                 var ratio =  linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData,kg_Shell,shellMassMatrix);
-                 kg_Lattice = linearSolver.GetGlobalStiffness_Latttice();
+                var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
 
 
 
-                var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_Lattice, shellMassMatrix);
+                var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_LatticeNew, shellMassMatrix);
                 var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix);
 
 
