@@ -25,33 +25,35 @@ namespace TestConsol
                 var gapInstPt = new Point(6, 6, 0);
                 double gapSize = 2;
 
-            var latticeModelData = new LatticeModelData();
-            latticeModelData.Width = 10;
-            latticeModelData.Height = 10;
-            latticeModelData.MeshSize = 1;
-            latticeModelData.FillNodeInfo();
-            latticeModelData.FillMemberInfoList();
-                latticeModelData.SetModelGeometryType(eModelGeometryType.LShape,gapInstPt,gapSize);
-            latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed,gapInstPt);
+                var latticeModelData = new LatticeModelData();
+                latticeModelData.Width = 10;
+                latticeModelData.Height = 10;
+                latticeModelData.MeshSize = 1;
+                latticeModelData.FillNodeInfo();
+                latticeModelData.FillMemberInfoList();
+                latticeModelData.SetModelGeometryType(eModelGeometryType.WithOpening, gapInstPt, gapSize);
+                latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed, gapInstPt);
                 latticeModelData.AssignLoadToMiddle();
                 latticeModelData.SetTorsionalReleaseToAllMembers();
 
 
                 var shellModelData = new ShellModelData();
-            shellModelData.Width = 10;
-            shellModelData.Height = 10;
-            shellModelData.MeshSize = 1;
-            shellModelData.FillNodeInfo();
-            shellModelData.FillMemberInfoList();
-            shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
-            shellModelData.AssignLoadToMiddle();
+                shellModelData.Width = 10;
+                shellModelData.Height = 10;
+                shellModelData.MeshSize = 1;
+                shellModelData.FillNodeInfo();
+                shellModelData.FillMemberInfoList();
+                shellModelData.SetModelGeometryType(eModelGeometryType.WithOpening, gapInstPt, gapSize);
+                shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed, gapInstPt);
+                shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
+                shellModelData.AssignLoadToMiddle();
 
                 foreach (var item in shellModelData.ListOfMembers)
                     item.Thickness = thicknes;
-                
 
-            var linearSolver = new LinearSolver();
-            var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
+
+                var linearSolver = new LinearSolver();
+                var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
                 var kg_Lattice = linearSolver.GetGlobalStiffness_Latttice();
 
                 var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
@@ -60,7 +62,7 @@ namespace TestConsol
                 var shellMassMatrix = linearSolver.GetMassMatrix_Shell();
 
 
-                var ratio =  linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData,kg_Shell,shellMassMatrix);
+                var ratio = linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData, kg_Shell, shellMassMatrix);
                 var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
 
 
@@ -81,7 +83,7 @@ namespace TestConsol
 
             for (int i = 0; i < res.Count; i++)
             {
-                Console.WriteLine(res.Keys.ElementAt(i).ToString() + ", " + res.Values.ElementAt(i).ToString() + "," + listOfControlValues[i].ToString() );
+                Console.WriteLine(res.Keys.ElementAt(i).ToString() + ", " + res.Values.ElementAt(i).ToString() + "," + listOfControlValues[i].ToString());
             }
 
             Console.ReadLine();

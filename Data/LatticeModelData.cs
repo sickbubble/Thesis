@@ -98,8 +98,8 @@ namespace Data
             {
                 var limitX = LShapeInstPt.X;
                 var limitY = LShapeInstPt.Y;
-                var extraLNodes = _ListOfNodes.Where(n => (n.Point.X > limitX && n.Point.Y == limitY) ||
-                                                         (n.Point.Y > limitY && n.Point.X == limitX)).ToList();
+                var extraLNodes = _ListOfNodes.Where(n => (n.Point.X >= limitX && n.Point.Y == limitY) ||
+                                                         (n.Point.Y >= limitY && n.Point.X == limitX)).ToList();
 
                 if (extraLNodes != null)
                 {

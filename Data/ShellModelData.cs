@@ -129,7 +129,11 @@ namespace Data
             var membersToDelete = _ListOfMembers.Where(m => (m.IEndNode.Point.X > limitX &&
                                                             m.IEndNode.Point.Y > limitY) ||
                                                             (m.JEndNode.Point.X > limitX &&
-                                                            m.JEndNode.Point.Y > limitY)).ToList();
+                                                            m.JEndNode.Point.Y > limitY)||
+                                                            (m.KEndNode.Point.X > limitX &&
+                                                            m.KEndNode.Point.Y > limitY)||
+                                                            (m.LEndNode.Point.X > limitX &&
+                                                            m.LEndNode.Point.Y > limitY)).ToList();
 
 
             for (int i = 0; i < membersToDelete.Count; i++)
@@ -179,7 +183,15 @@ namespace Data
                                                             (m.JEndNode.Point.X > limitBotX &&
                                                             m.JEndNode.Point.X < limitTopX &&
                                                             m.JEndNode.Point.Y > limitBotY &&
-                                                            m.JEndNode.Point.Y < limitTopY)).ToList();
+                                                            m.JEndNode.Point.Y < limitTopY)||
+                                                            (m.KEndNode.Point.X > limitBotX &&
+                                                            m.KEndNode.Point.X < limitTopX &&
+                                                            m.KEndNode.Point.Y > limitBotY &&
+                                                            m.KEndNode.Point.Y < limitTopY)||
+                                                            (m.LEndNode.Point.X > limitBotX &&
+                                                            m.LEndNode.Point.X < limitTopX &&
+                                                            m.LEndNode.Point.Y > limitBotY &&
+                                                            m.LEndNode.Point.Y < limitTopY)).ToList();
 
 
             for (int i = 0; i < membersToDelete.Count; i++)
@@ -233,8 +245,8 @@ namespace Data
             {
                 var limitX = LShapeInstPt.X;
                 var limitY = LShapeInstPt.Y;
-                var extraLNodes = _ListOfNodes.Where(n => (n.Point.X > limitX && n.Point.Y == limitY) ||
-                                                         (n.Point.Y > limitY && n.Point.X == limitX)).ToList();
+                var extraLNodes = _ListOfNodes.Where(n => (n.Point.X >= limitX && n.Point.Y == limitY) ||
+                                                         (n.Point.Y >= limitY && n.Point.X == limitX)).ToList();
 
                 if (extraLNodes != null)
                 {
