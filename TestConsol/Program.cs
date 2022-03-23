@@ -26,24 +26,29 @@ namespace TestConsol
                 double gapSize = 2;
 
                 var latticeModelData = new LatticeModelData();
-                latticeModelData.Width = 10;
-                latticeModelData.Height = 10;
+                latticeModelData.Width =4;
+                latticeModelData.Height =4;
                 latticeModelData.MeshSize = 1;
                 latticeModelData.FillNodeInfo();
                 latticeModelData.FillMemberInfoList();
-                latticeModelData.SetModelGeometryType(eModelGeometryType.WithOpening, gapInstPt, gapSize);
+
+                latticeModelData.SetModelGeometryType(eModelGeometryType.Rectangular, gapInstPt, gapSize);
+
+
                 latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed, gapInstPt);
                 latticeModelData.AssignLoadToMiddle();
                 latticeModelData.SetTorsionalReleaseToAllMembers();
 
 
                 var shellModelData = new ShellModelData();
-                shellModelData.Width = 10;
-                shellModelData.Height = 10;
+                shellModelData.Width = 4;
+                shellModelData.Height = 4;
                 shellModelData.MeshSize = 1;
                 shellModelData.FillNodeInfo();
                 shellModelData.FillMemberInfoList();
-                shellModelData.SetModelGeometryType(eModelGeometryType.WithOpening, gapInstPt, gapSize);
+
+                shellModelData.SetModelGeometryType(eModelGeometryType.Rectangular, gapInstPt, gapSize);
+
                 shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed, gapInstPt);
                 shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
                 shellModelData.AssignLoadToMiddle();
@@ -54,16 +59,16 @@ namespace TestConsol
 
                 var linearSolver = new LinearSolver();
                 var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
-                var kg_Lattice = linearSolver.GetGlobalStiffness_Latttice();
 
                 var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
-                var kg_Shell = linearSolver.GetGlobalStiffness_Latttice();
-
+                var kg_Shell = linearSolver.GetGlobalStiffness_Shell();
+                kg_Shell.Print();
                 var shellMassMatrix = linearSolver.GetMassMatrix_Shell();
+                shellMassMatrix.Print();
 
-
-                var ratio = linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData, kg_Shell, shellMassMatrix);
+                var ratio = linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData);
                 var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
+                kg_LatticeNew.Print();
 
 
 

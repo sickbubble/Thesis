@@ -32,15 +32,15 @@ namespace ThesisProject
 
         public void Print()
         {
-            //Console.WriteLine("This Matrix");
-            //for (int i = 0; i < this.NRows; i++)
-            //{
-            //    for (int j = 0; j < this.NColumns; j++)
-            //    {
-            //        Console.Write(this.Matrix[i, j].ToString() + " ");
-            //    }
-            //    Console.WriteLine();
-            //}
+            Console.WriteLine("This Matrix");
+            for (int i = 0; i < this.NRows; i++)
+            {
+                for (int j = 0; j < this.NColumns; j++)
+                {
+                    Console.Write(this.Matrix[i, j].ToString() + " ; ");
+                }
+                Console.WriteLine();
+            }
         }
 
         public void InsertMatrix(MatrixCS matrix, int startingRow, int startingColumn)

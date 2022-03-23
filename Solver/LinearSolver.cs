@@ -13,6 +13,11 @@ using Accord.Math.Decompositions;
 
 namespace Solver
 {
+    public enum eAssemblyDataType
+    {
+        Lattice = 1, 
+        Shell = 2
+    }
     public class AssemblyDataContainer
     {
 
@@ -24,9 +29,11 @@ namespace Solver
 
         private int _NumberOfUnknowns;
         private Dictionary<int, List<int>> _NodeEquationData;
+        private eAssemblyDataType _DataType;
 
         public int NumberOfUnknowns { get => _NumberOfUnknowns; set => _NumberOfUnknowns = value; }
         public Dictionary<int, List<int>> NodeEquationData { get => _NodeEquationData; set => _NodeEquationData = value; }
+        public eAssemblyDataType DataType { get => _DataType; set => _DataType = value; }
     }
     public class LinearSolver
     {
@@ -56,11 +63,6 @@ namespace Solver
 
         public List<double> GetPeriodsOfTheSystem(MatrixCS kG, MatrixCS mass)
         {
-            var periods = new List<double>();
-
-            var externalKG = Matrix<double>.Build.DenseOfArray(kG.Matrix);
-            var externalMass = Matrix<double>.Build.DenseOfArray(mass.Matrix);
-
 
             var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix,mass.Matrix,true);
             var w2 = solver.RealEigenvalues;
@@ -122,8 +124,10 @@ namespace Solver
         public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata)
         {
             var latticeModelResultData = new LatticeModelResultData();
+            
             _LatticeModelData = latticemodeldata;
             _AssemblyData = GetNodeAssemblyData(latticemodeldata.ListOfNodes);
+            _AssemblyData.DataType = eAssemblyDataType.Lattice;
 
             var KG = GetGlobalStiffness_Latttice();
             var RHS = GetRightHandSide();
@@ -179,7 +183,7 @@ namespace Solver
         {
             _LatticeModelData = latticemodeldata;
             _AssemblyData = GetNodeAssemblyData(latticemodeldata.ListOfNodes);
-
+            _AssemblyData.DataType = eAssemblyDataType.Lattice;
             var KG = GetGlobalStiffness_Latttice();
             KG = KG.Multiply(coeff);
             var RHS = GetRightHandSide();
@@ -218,7 +222,7 @@ namespace Solver
             return latticeModelResultData;
         }
 
-        public double EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel, MatrixCS kgShell, MatrixCS massShell)
+        public double EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel)
         {
             var shellInternalEnergy = GetShellModelInternalEnergy(shellModelRes.DispRes);
             var latticeInternalEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
@@ -228,14 +232,6 @@ namespace Solver
                 item.Section.Material.E *= ratio;
 
             var newLatticeRes = RunAnalysis_Lattice(latticeModel);
-            //var kgLattice = GetGlobalStiffness_Latttice();
-
-            //var shellPeriods =  GetPeriodsOfTheSystem(kgShell, massShell);
-            //var latticePeriods = GetPeriodsOfTheSystem(kgLattice, massShell);
-
-
-
-
 
             var latticeInternalEnergyNew = GetLatticeModelInternalEnergy(newLatticeRes.DispRes, latticeModel);
 
@@ -248,7 +244,8 @@ namespace Solver
             var shellModelResultData = new ShellModelResultData();
             _ShellModelData = shellModelData;
             _AssemblyData = GetNodeAssemblyData(shellModelData.ListOfNodes);
-            
+            _AssemblyData.DataType = eAssemblyDataType.Shell;
+
             var KG = GetGlobalStiffness_Shell();
             var RHS = GetRightHandSide();
 
@@ -309,6 +306,7 @@ namespace Solver
             double ret;
             _LatticeModelData = latticeModelData;
             _AssemblyData = GetNodeAssemblyData(latticeModelData.ListOfNodes);
+            _AssemblyData.DataType = eAssemblyDataType.Lattice;
             var KG = GetGlobalStiffness_Latttice();
             KG = KG.Multiply(coeff);
             var firstPart = dispMatrix.Transpose().Multiply(KG);

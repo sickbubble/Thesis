@@ -121,7 +121,7 @@ namespace ThesisProject.Structural_Members
             mappedCoords.Matrix[2, 0] = x3; mappedCoords.Matrix[2, 1] = y3;
             mappedCoords.Matrix[3, 0] = x4; mappedCoords.Matrix[3, 1] = y4;
 
-            mappedCoords.Print();
+            //mappedCoords.Print();
 
             // Membrane action resists in-plane translational degrees of freedom and the plate 
             // action resists bending effects. 
@@ -458,7 +458,7 @@ namespace ThesisProject.Structural_Members
                 kD.Matrix[11, 5] = -0.25 * kDia;
                 kD.Matrix[11, 8] = -0.75 * kDia;
                 kDrilling = kDrilling.Sum(kD);
-                kDrilling.Print();
+                //kDrilling.Print();
 
                 // Map membrane stifness to element stiffness(For a plate at XY - plane, it resists translation - X, translation - Y and rotation - Z)
                 int mapper1 = 0; // Row updader
@@ -842,9 +842,9 @@ namespace ThesisProject.Structural_Members
         //var globalStiffnesMatrix = new MatrixCS()
 
         var rotMatrix = this.GetRotationMatrix();
-        rotMatrix.Print();
+        //rotMatrix.Print();
         var localStiffness = this.GetLocalStiffnessMatrix();
-        localStiffness.Print();
+        //localStiffness.Print();
         var rotTrans = rotMatrix.Transpose();
 
         var globalStiffnesMatrix = (rotTrans.Multiply(localStiffness)).Multiply(rotMatrix);
