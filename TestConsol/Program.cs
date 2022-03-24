@@ -35,7 +35,7 @@ namespace TestConsol
                 latticeModelData.SetModelGeometryType(eModelGeometryType.Rectangular, gapInstPt, gapSize);
 
 
-                latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed, gapInstPt);
+                latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
                 latticeModelData.AssignLoadToMiddle();
                 latticeModelData.SetTorsionalReleaseToAllMembers();
 
@@ -49,7 +49,6 @@ namespace TestConsol
 
                 shellModelData.SetModelGeometryType(eModelGeometryType.Rectangular, gapInstPt, gapSize);
 
-                shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed, gapInstPt);
                 shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
                 shellModelData.AssignLoadToMiddle();
 
@@ -62,16 +61,12 @@ namespace TestConsol
 
                 var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
                 var kg_Shell = linearSolver.GetGlobalStiffness_Shell();
-                kg_Shell.Print();
                 var shellMassMatrix = linearSolver.GetMassMatrix_Shell();
-                shellMassMatrix.Print();
 
                 var ratio = linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData);
                 var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
-                kg_LatticeNew.Print();
-
-
-
+                var latticeMassMatrix = linearSolver.GetMassMatrix_Latttice();
+        
                 var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_LatticeNew, shellMassMatrix);
                 var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix);
 

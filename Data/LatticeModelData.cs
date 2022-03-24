@@ -77,6 +77,8 @@ namespace Data
                 {
                     var member = this.ListOfMembers[i];
                     member.IEndCondition.IsReleaseMz = true;
+                    member.JEndCondition.IsReleaseMz = true;
+
                 }
 
             }

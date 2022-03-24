@@ -179,48 +179,7 @@ namespace Solver
         }
 
 
-        public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata, double coeff)
-        {
-            _LatticeModelData = latticemodeldata;
-            _AssemblyData = GetNodeAssemblyData(latticemodeldata.ListOfNodes);
-            _AssemblyData.DataType = eAssemblyDataType.Lattice;
-            var KG = GetGlobalStiffness_Latttice();
-            KG = KG.Multiply(coeff);
-            var RHS = GetRightHandSide();
-
-
-            var mass = GetMassMatrix_Latttice();
-
-
-
-
-            var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
-            var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
-
-            var dispRes = externalKG.Solve(externalRHS);
-
-
-
-
-            var dispResAsArray = dispRes.ToArray();
-            var dispResMatrix = new MatrixCS(dispResAsArray.Length, 1);
-
-            dispResMatrix.Matrix = dispResAsArray;
-
-            var latticeModelResultData = new LatticeModelResultData();
-            latticeModelResultData.DispRes = dispResMatrix;
-            latticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
-            latticeModelResultData.FrameResults = new Dictionary<int, FrameMemberResults>();
-
-            GetNodeResults(dispResAsArray, latticeModelResultData.NodeResults);
-            FillFrameMemberResults(latticeModelResultData);
-
-            var midNodeID = latticemodeldata.ListOfNodes.FirstOrDefault(x => x.Point.X == 1 && x.Point.Y == 1).ID;
-
-            var midDisp = latticeModelResultData.NodeResults[midNodeID][2];
-
-            return latticeModelResultData;
-        }
+    
 
         public double EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel)
         {
@@ -231,9 +190,43 @@ namespace Solver
             foreach (var item in latticeModel.ListOfMembers)
                 item.Section.Material.E *= ratio;
 
+            latticeModel.SetTorsionalReleaseToAllMembers();
             var newLatticeRes = RunAnalysis_Lattice(latticeModel);
 
             var latticeInternalEnergyNew = GetLatticeModelInternalEnergy(newLatticeRes.DispRes, latticeModel);
+
+            var latticeMidPoint = latticeModel.ListOfNodes.FirstOrDefault(x => x.Point.X == latticeModel.Width / 2 && x.Point.Y == latticeModel.Height / 2);
+            
+            var midPointDispsLatt =newLatticeRes.NodeResults[latticeMidPoint.ID];
+            var midPointDispsShell =shellModelRes.NodeResults[latticeMidPoint.ID];
+
+            //shellModelRes.DispRes.Print();
+            //newLatticeRes.DispRes.Print();
+
+            var latticeNodeRes = newLatticeRes.NodeResults;
+            Console.WriteLine("Lattice Node Vertical Deflections");
+            for (int i = 0; i < latticeNodeRes.Count; i++)
+            {
+                var nodeID = latticeNodeRes.Keys.ElementAt(i);
+                var nodeRes = latticeNodeRes[nodeID];
+                var verticalDef = nodeRes[2];
+
+                Console.WriteLine(nodeID.ToString() + "  ;  " + verticalDef.ToString());
+            }
+
+
+            var shellNodeRes = shellModelRes.NodeResults;
+            Console.WriteLine("Shell Node Vertical Deflections");
+            for (int i = 0; i < shellNodeRes.Count; i++)
+            {
+                var nodeID = shellNodeRes.Keys.ElementAt(i);
+                var nodeRes = shellNodeRes[nodeID];
+                var verticalDef = nodeRes[2];
+                var nodePoint =  latticeModel.ListOfNodes.FirstOrDefault(x => x.ID == nodeID).Point;
+
+
+                Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString());
+            }
 
 
             return ratio;
