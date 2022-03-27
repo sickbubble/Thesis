@@ -13,6 +13,7 @@ namespace ThesisProject
             _E = E;
             _Poissons = poissons;
             _G = GetModulusOfRigidity(E,poissons);
+            _Uw = 1;
         }
 
         #region Private Fields

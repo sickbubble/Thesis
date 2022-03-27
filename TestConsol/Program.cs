@@ -24,11 +24,13 @@ namespace TestConsol
 
                 var gapInstPt = new Point(6, 6, 0);
                 double gapSize = 2;
+                double meshSize = 1;
+                double memberDim = 4;
 
                 var latticeModelData = new LatticeModelData();
-                latticeModelData.Width =4;
-                latticeModelData.Height =4;
-                latticeModelData.MeshSize = 1;
+                latticeModelData.Width =memberDim;
+                latticeModelData.Height =memberDim;
+                latticeModelData.MeshSize = meshSize;
                 latticeModelData.FillNodeInfo();
                 latticeModelData.FillMemberInfoList();
 
@@ -40,12 +42,23 @@ namespace TestConsol
                 latticeModelData.SetTorsionalReleaseToAllMembers();
 
 
+                var latticeMass = latticeModelData.GetTotalMass();
+
                 var shellModelData = new ShellModelData();
-                shellModelData.Width = 4;
-                shellModelData.Height = 4;
-                shellModelData.MeshSize = 1;
+                shellModelData.IsOnlyPlate = false;
+                shellModelData.Width = memberDim;
+                shellModelData.Height = memberDim;
+                shellModelData.MeshSize = meshSize;
                 shellModelData.FillNodeInfo();
                 shellModelData.FillMemberInfoList();
+
+                var shellMemberCount = shellModelData.ListOfMembers.Count;
+                var singleMemberMass = latticeMass / shellMemberCount;
+                var shellUw =singleMemberMass / (meshSize * meshSize * thicknes);
+
+
+
+
 
                 shellModelData.SetModelGeometryType(eModelGeometryType.Rectangular, gapInstPt, gapSize);
 
@@ -53,7 +66,10 @@ namespace TestConsol
                 shellModelData.AssignLoadToMiddle();
 
                 foreach (var item in shellModelData.ListOfMembers)
+                {
                     item.Thickness = thicknes;
+                    //item.Section.Material.Uw = shellUw;
+                }
 
 
                 var linearSolver = new LinearSolver();
@@ -67,7 +83,7 @@ namespace TestConsol
                 var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
                 var latticeMassMatrix = linearSolver.GetMassMatrix_Latttice();
         
-                var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_LatticeNew, shellMassMatrix);
+                var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_LatticeNew, latticeMassMatrix);
                 var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix);
 
 

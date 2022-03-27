@@ -53,6 +53,21 @@ namespace Data
 
 
         #region Public Methods
+
+        public double GetTotalMass()
+        {
+            var members = this.ListOfMembers;
+            double totalMass = 0;
+            for (int i = 0; i < members.Count; i++)
+            {
+                var member = members[i];
+
+                totalMass += member.GetMass();
+
+            }
+            return totalMass;
+        }
+
         public void AssignLoadToMiddle()
         {
             if (ListOfNodes != null )

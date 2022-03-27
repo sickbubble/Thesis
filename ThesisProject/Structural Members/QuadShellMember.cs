@@ -45,6 +45,7 @@ namespace ThesisProject.Structural_Members
 
         private eMembraneType _MembraneType;
         private ePlateType _PlateType;
+        private bool _IsOnlyPlate;
 
         #endregion
 
@@ -65,6 +66,7 @@ namespace ThesisProject.Structural_Members
         public eMembraneType MembraneType1 { get => _MembraneType; set => _MembraneType = value; }
         public ePlateType PlateType { get => _PlateType; set => _PlateType = value; }
         public int ID { get => _ID; set => _ID = value; }
+        public bool IsOnlyPlate { get => _IsOnlyPlate; set => _IsOnlyPlate = value; }
 
         public MatrixCS GetLocalStiffnessMatrix()
         {
@@ -130,6 +132,9 @@ namespace ThesisProject.Structural_Members
             MatrixCS kMembrane = new MatrixCS(8, 8);
             MembraneType = eMembraneType.Drilling;
             PlateType = ePlateType.MindlinFourNode;
+
+            if (!this.IsOnlyPlate)
+            {
             if (MembraneType == eMembraneType.Bilinear)
             {
                 var gp = 1 / Math.Sqrt(3);
@@ -660,6 +665,10 @@ namespace ThesisProject.Structural_Members
 
                 }
             }
+            }
+
+
+
             // For an element on XY-Plane, plate action resists translation-Z, rotation-X and rotation-Y. For bending stiffness, use 2x2 gauss integration (weight is 1 for each point) 
             // and for shear part, use 1x1 gauss integration (weight is 2 for midpoint integration).
             if (this.PlateType == ePlateType.MindlinFourNode)
@@ -892,7 +901,6 @@ namespace ThesisProject.Structural_Members
                 var area = Math.Abs(((x1 * y2) - (x2 * y1)) + ((x2 * y3) - (x3 * y2)) + ((x3 * y4) - (x4 * y3)) + ((x4 * y1) - (x1 * y4))) * 0.5;
 
                 // Get total mass
-                this.Section.Material.Uw = 1;
                 var totalMass = area * this.Section.Thickness * this.Section.Material.Uw;
 
                 // Get nodal mass contribution

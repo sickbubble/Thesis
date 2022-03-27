@@ -64,7 +64,7 @@ namespace Solver
         public List<double> GetPeriodsOfTheSystem(MatrixCS kG, MatrixCS mass)
         {
 
-            var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix,mass.Matrix,true);
+            var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix,mass.Matrix,false);
             var w2 = solver.RealEigenvalues;
 
 

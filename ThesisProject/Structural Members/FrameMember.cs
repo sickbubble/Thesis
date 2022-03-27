@@ -78,7 +78,14 @@ namespace ThesisProject.Structural_Members
             this.JEndCondition = trussReleases;
         }
 
-      
+      public double GetMass()
+        {
+            var A = this.Section.Area;
+            var rho = this.Section.Material.Uw * A;
+            double L = this.GetLength();
+
+            return rho * L;
+        }
 
         public double GetLength()
         {
@@ -322,7 +329,6 @@ namespace ThesisProject.Structural_Members
 
             var A = this.Section.Area;
             var rho = this.Section.Material.Uw * A;
-            rho = 1; //todo
             double L = this.GetLength();
 
 
@@ -330,13 +336,13 @@ namespace ThesisProject.Structural_Members
             massMatrix.Matrix[0, 0] = m;
             massMatrix.Matrix[1, 1] = m;
             massMatrix.Matrix[2, 2] = m;
-            massMatrix.Matrix[4, 4] = 1e-6 * m * L * L;
-            massMatrix.Matrix[5, 5] = 1e-6 * m * L * L;
+            //massMatrix.Matrix[4, 4] = 1e-6 * m * L * L;
+            //massMatrix.Matrix[5, 5] = 1e-6 * m * L * L;
             massMatrix.Matrix[6, 6] = m;
             massMatrix.Matrix[7, 7] = m;
             massMatrix.Matrix[8, 8] = m;
-            massMatrix.Matrix[10, 10] = 1e-6 * m * L * L;
-            massMatrix.Matrix[11, 11] = 1e-6 * m * L * L;
+            //massMatrix.Matrix[10, 10] = 1e-6 * m * L * L;
+            //massMatrix.Matrix[11, 11] = 1e-6 * m * L * L;
 
 
             return massMatrix;

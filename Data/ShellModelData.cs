@@ -38,6 +38,7 @@ namespace Data
         private double _Width;
         private double _Height;
         private double _MeshSize;
+        private bool _IsOnlyPlate;
 
         #endregion
 
@@ -50,6 +51,7 @@ namespace Data
         public double Width { get => _Width; set => _Width = value; }
         public double Height { get => _Height; set => _Height = value; }
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
+        public bool IsOnlyPlate { get => _IsOnlyPlate; set => _IsOnlyPlate = value; }
 
         #endregion
 
@@ -296,7 +298,7 @@ namespace Data
                     int lNodeIdx = kNodeIdx - 1;
                     var member = new QuadShellMember() { IEndNode = ListOfNodes[iNodeIdx], JEndNode = ListOfNodes[jNodeIdx], KEndNode = ListOfNodes[kNodeIdx], LEndNode = ListOfNodes[lNodeIdx], ID = idx,
                     Section = new ShellSection(), Thickness = 0.1 };
-               
+                    member.IsOnlyPlate = this.IsOnlyPlate;
                     idx++;
 
                     ListOfMembers.Add(member);
