@@ -16,8 +16,9 @@ namespace TestConsol
         {
             var res = new Dictionary<double, double>();
 
-            double thicknes = 0.1;
-            double increment = 0.01;
+            double alphaRatio = 0.2;
+            double increment = 0.1;
+            double thickness = 1;
 
             for (int i = 0; i < 20; i++)
             {
@@ -25,7 +26,7 @@ namespace TestConsol
                 var gapInstPt = new Point(6, 6, 0);
                 double gapSize = 2;
                 double meshSize = 1;
-                double memberDim = 4;
+                double memberDim = 6;
 
                 var latticeModelData = new LatticeModelData();
                 latticeModelData.Width =memberDim;
@@ -54,7 +55,7 @@ namespace TestConsol
 
                 var shellMemberCount = shellModelData.ListOfMembers.Count;
                 var singleMemberMass = latticeMass / shellMemberCount;
-                var shellUw =singleMemberMass / (meshSize * meshSize * thicknes);
+                var shellUw =singleMemberMass / (meshSize * meshSize * thickness);
 
 
 
@@ -67,8 +68,8 @@ namespace TestConsol
 
                 foreach (var item in shellModelData.ListOfMembers)
                 {
-                    item.Thickness = thicknes;
-                    //item.Section.Material.Uw = shellUw;
+                    //item.Thickness = thickness;
+                    item.Section.Material.Uw = shellUw;
                 }
 
 
@@ -79,7 +80,8 @@ namespace TestConsol
                 var kg_Shell = linearSolver.GetGlobalStiffness_Shell();
                 var shellMassMatrix = linearSolver.GetMassMatrix_Shell();
 
-                var ratio = linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData);
+                var ratio = linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData,alphaRatio);
+                
                 var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
                 var latticeMassMatrix = linearSolver.GetMassMatrix_Latttice();
         
@@ -87,8 +89,8 @@ namespace TestConsol
                 var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix);
 
 
-                res.Add(thicknes, ratio);
-                thicknes = thicknes + increment;
+                res.Add(alphaRatio, ratio);
+                alphaRatio = alphaRatio + increment;
             }
 
             var listOfControlValues = new List<double>();

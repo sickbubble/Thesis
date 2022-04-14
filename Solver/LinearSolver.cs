@@ -77,7 +77,7 @@ namespace Solver
 
             var T = new List<double>();
 
-            for (int i = 0; i < w.Count; i++)
+            for (int i = w.Count - 1; i>=0; i--)
             {
                 T.Add(2 * Math.PI / w[i]);
             }
@@ -181,16 +181,28 @@ namespace Solver
 
     
 
-        public double EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel)
+        public double EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel,double alphaRatio)
         {
             var shellInternalEnergy = GetShellModelInternalEnergy(shellModelRes.DispRes);
             var latticeInternalEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
             var ratio = latticeInternalEnergy / shellInternalEnergy;
 
-            foreach (var item in latticeModel.ListOfMembers)
-                item.Section.Material.E *= ratio;
+            var shortMemberLength = latticeModel.ListOfMembers.Min(x => x.GetLength());
 
-            latticeModel.SetTorsionalReleaseToAllMembers();
+            for (int i = 0; i < latticeModel.ListOfMembers.Count; i++)
+            {
+                var mem = latticeModel.ListOfMembers[i];
+                if (mem.GetLength() == shortMemberLength )
+                {
+                    mem.Section.Material.E *= ratio; 
+                }
+                else
+                {
+                    mem.Section.Material.E *=(alphaRatio  * ratio);
+
+                }
+            }
+
             var newLatticeRes = RunAnalysis_Lattice(latticeModel);
 
             var latticeInternalEnergyNew = GetLatticeModelInternalEnergy(newLatticeRes.DispRes, latticeModel);
@@ -204,29 +216,32 @@ namespace Solver
             //newLatticeRes.DispRes.Print();
 
             var latticeNodeRes = newLatticeRes.NodeResults;
-            Console.WriteLine("Lattice Node Vertical Deflections");
+            var shellNodeRes = shellModelRes.NodeResults;
+            Console.WriteLine("Lattice/Shell Node Vertical Deflections");
             for (int i = 0; i < latticeNodeRes.Count; i++)
             {
                 var nodeID = latticeNodeRes.Keys.ElementAt(i);
                 var nodeRes = latticeNodeRes[nodeID];
+                var nodeResShell = shellNodeRes[nodeID];
+                var nodePoint = latticeModel.ListOfNodes.FirstOrDefault(x => x.ID == nodeID).Point;
                 var verticalDef = nodeRes[2];
+                var verticalDefShell = nodeResShell[2];
 
-                Console.WriteLine(nodeID.ToString() + "  ;  " + verticalDef.ToString());
+                Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString() + " ; " + verticalDefShell.ToString());
             }
 
 
-            var shellNodeRes = shellModelRes.NodeResults;
-            Console.WriteLine("Shell Node Vertical Deflections");
-            for (int i = 0; i < shellNodeRes.Count; i++)
-            {
-                var nodeID = shellNodeRes.Keys.ElementAt(i);
-                var nodeRes = shellNodeRes[nodeID];
-                var verticalDef = nodeRes[2];
-                var nodePoint =  latticeModel.ListOfNodes.FirstOrDefault(x => x.ID == nodeID).Point;
+            //Console.WriteLine("Shell Node Vertical Deflections");
+            //for (int i = 0; i < shellNodeRes.Count; i++)
+            //{
+            //    var nodeID = shellNodeRes.Keys.ElementAt(i);
+            //    var nodeRes = shellNodeRes[nodeID];
+            //    var verticalDef = nodeRes[2];
+            //    var nodePoint =  latticeModel.ListOfNodes.FirstOrDefault(x => x.ID == nodeID).Point;
 
 
-                Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString());
-            }
+            //    Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString());
+            //}
 
 
             return ratio;
