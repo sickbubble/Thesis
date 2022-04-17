@@ -226,7 +226,7 @@ namespace Data
                         node.Point.Y == Height / 2)
                     {
                         //TODO: Tolerance ekle
-                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 3 });
+                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 2 });
                     }
                 }
             }

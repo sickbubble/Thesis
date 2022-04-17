@@ -6,6 +6,12 @@ using System.Linq;
 namespace ThesisProject.Structural_Members
 {
 
+    public enum eFrameMemberType
+    {
+        Rectangle = 0,
+        DiagonalFirst = 1,
+        DiagonalSecond = 2
+    }
 
     public class FrameMember : IStructuralMember
     {
@@ -24,6 +30,7 @@ namespace ThesisProject.Structural_Members
         private int _ID;
         private EndCondition _IEndCondition;
         private EndCondition _JEndCondition;
+        private eFrameMemberType FrameType;
 
 
         private eMemberType _MemberType;
@@ -45,7 +52,7 @@ namespace ThesisProject.Structural_Members
         public FrameSection Section { get => _Section; set => _Section = value; }
         public EndCondition IEndCondition { get => _IEndCondition; set => _IEndCondition = value; }
         public EndCondition JEndCondition { get => _JEndCondition; set => _JEndCondition = value; }
-      
+        public eFrameMemberType FrameType1 { get => FrameType; set => FrameType = value; }
 
         public MatrixCS GetGlobalStiffnessMatrix()
         {

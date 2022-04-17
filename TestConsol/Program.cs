@@ -25,15 +25,15 @@ namespace TestConsol
 
                 var gapInstPt = new Point(6, 6, 0);
                 double gapSize = 2;
-                double meshSize = 1;
-                double memberDim = 6;
+                double meshSize = 0.5;
+                double memberDim = 5;
 
                 var latticeModelData = new LatticeModelData();
                 latticeModelData.Width =memberDim;
                 latticeModelData.Height =memberDim;
                 latticeModelData.MeshSize = meshSize;
                 latticeModelData.FillNodeInfo();
-                latticeModelData.FillMemberInfoList();
+                latticeModelData.FillMemberInfoList(3.01);
 
                 latticeModelData.SetModelGeometryType(eModelGeometryType.Rectangular, gapInstPt, gapSize);
 
@@ -68,7 +68,7 @@ namespace TestConsol
 
                 foreach (var item in shellModelData.ListOfMembers)
                 {
-                    //item.Thickness = thickness;
+                    item.Thickness = thickness;
                     item.Section.Material.Uw = shellUw;
                 }
 
@@ -85,11 +85,12 @@ namespace TestConsol
                 var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
                 var latticeMassMatrix = linearSolver.GetMassMatrix_Latttice();
         
-                var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_LatticeNew, latticeMassMatrix);
-                var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix);
+                //var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_LatticeNew, latticeMassMatrix);
+                //var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix);
 
 
                 res.Add(alphaRatio, ratio);
+                Console.Clear();
                 alphaRatio = alphaRatio + increment;
             }
 

@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "Itlos3zZYZYtqXKjJYwVY9yY6ZhdlU3leWrR3z+tNp9Z1UneyxRG0gSqSQnoM6fptflZQTB4RbYuHnQB+8M7+g==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Burak T\\Desktop\\Tez\\Drawer\\Drawer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Burak T\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\Burak T\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

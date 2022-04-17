@@ -150,7 +150,7 @@ namespace Data
 
         }
 
-        public void FillMemberInfoList()
+        public void FillMemberInfoList(double horizon)
         {
             var labelCounter = 1;
             for (int i = 0; i < _ListOfNodes.Count; i++)
@@ -159,7 +159,7 @@ namespace Data
                 {
                     var lengthOfMember = Math.Sqrt(Math.Pow(_ListOfNodes[j].Point.X - _ListOfNodes[i].Point.X, 2) + Math.Pow(_ListOfNodes[j].Point.Y - _ListOfNodes[i].Point.Y, 2) + Math.Pow(_ListOfNodes[j].Point.Z - _ListOfNodes[i].Point.Z, 2));
 
-                    if (lengthOfMember < 1.5 * _MeshSize)
+                    if (lengthOfMember < horizon * _MeshSize)
                     {
                         var frameMember = new FrameMember() { IEndNode = _ListOfNodes[i], JEndNode = _ListOfNodes[j], ID = labelCounter };
                         //frameMember.SetAsTrussMember();

@@ -63,7 +63,7 @@ namespace Solver
 
         public List<double> GetPeriodsOfTheSystem(MatrixCS kG, MatrixCS mass)
         {
-
+            
             var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix,mass.Matrix,false);
             var w2 = solver.RealEigenvalues;
 
@@ -76,6 +76,7 @@ namespace Solver
             }
 
             var T = new List<double>();
+
 
             for (int i = w.Count - 1; i>=0; i--)
             {
@@ -134,7 +135,7 @@ namespace Solver
 
 
             var mass = GetMassMatrix_Latttice();
-            var res = GetPeriodsOfTheSystem(KG, mass);
+            //var res = GetPeriodsOfTheSystem(KG, mass);
 
             //for (int i = 0; i < 6; i++)
             //{
@@ -227,7 +228,10 @@ namespace Solver
                 var verticalDef = nodeRes[2];
                 var verticalDefShell = nodeResShell[2];
 
-                Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString() + " ; " + verticalDefShell.ToString());
+                var percentDiff = (verticalDef - verticalDefShell) / verticalDefShell * 100; 
+
+
+                Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString() + " ; " + verticalDefShell.ToString() + " ; " + percentDiff.ToString());
             }
 
 
@@ -267,7 +271,7 @@ namespace Solver
 
             dispResMatrix.Matrix = dispResAsArray;
             var mass = GetMassMatrix_Shell();
-            var res = GetPeriodsOfTheSystem(KG, mass);
+            //var res = GetPeriodsOfTheSystem(KG, mass);
 
 
             //for (int i = 0; i < 6; i++)
