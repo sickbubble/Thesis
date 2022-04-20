@@ -120,42 +120,125 @@ namespace ThesisProject.Structural_Members
 
         public MatrixCS GetRotationMatrix()
         {
-            var L = Math.Sqrt(Math.Pow(this.JEndNode.Point.X - this.IEndNode.Point.X, 2) + Math.Pow(this.JEndNode.Point.Y - this.IEndNode.Point.Y, 2) + Math.Pow(this.JEndNode.Point.Z - this.IEndNode.Point.Z, 2));
+            //var L = GetLength();
+            //var Cx = (this.JEndNode.Point.X - this.IEndNode.Point.X) / L;
+            //var Cy = (this.JEndNode.Point.Y - this.IEndNode.Point.Y) / L;
+            //var Cz = (this.JEndNode.Point.Z - this.IEndNode.Point.Z) / L;
+            //var Cxy = Math.Sqrt(Cx * Cx + Cy * Cy);
+            //var alpha = 0;
 
-            var Cx = (this.JEndNode.Point.X - this.IEndNode.Point.X) / L;
-            var Cy = (this.JEndNode.Point.Y - this.IEndNode.Point.Y) / L;
-            var Cz = (this.JEndNode.Point.Z - this.IEndNode.Point.Z) / L;
-            var Cxz = Math.Sqrt(Cx * Cx + Cy * Cy);
-            var alpha = 0;
+            //var Ri = new MatrixCS(3, 3);
 
-            var Ri = new MatrixCS(3, 3);
+            //var rAlpha = new MatrixCS(3, 3);
 
-            Ri.Matrix[0, 0] = Cx;
-            Ri.Matrix[0, 1] = Cz;
-            Ri.Matrix[0, 2] = Cy;
-            Ri.Matrix[1, 0] = (-Cz * Cx * Math.Cos(alpha)) - Cy * Math.Sin(alpha) / Cxz;
-            Ri.Matrix[1, 1] = Cxz * Math.Cos(alpha);
-            Ri.Matrix[1, 2] = (-Cz * Cy * Math.Cos(alpha)) + Cx * Math.Sin(alpha) / Cxz;
-            Ri.Matrix[2, 0] = ((Cz * Cx * Math.Sin(alpha)) - Cy * Math.Cos(alpha)) / Cxz;
-            Ri.Matrix[2, 1] = -Cxz * Math.Sin(alpha);
-            Ri.Matrix[2, 2] = ((Cz * Cy * Math.Sin(alpha)) + Cx * Math.Cos(alpha)) / Cxz;
+            //rAlpha.Matrix[0, 0] = 1; 
+            //rAlpha.Matrix[0, 1] = 0; 
+            //rAlpha.Matrix[0, 2] = 0;
+
+            //rAlpha.Matrix[1, 0] = 0;
+            //rAlpha.Matrix[1, 1] = Math.Cos(alpha);
+            //rAlpha.Matrix[1, 2] = Math.Sin(alpha);
+
+            //rAlpha.Matrix[2, 0] = 1;
+            //rAlpha.Matrix[2, 1] = -Math.Sin(alpha);
+            //rAlpha.Matrix[2, 2] = Math.Cos(alpha);
 
 
-            var rotElm = new MatrixCS(12, 12); // 3 columns will be added by using InsertRange
-            rotElm.InsertMatrix(Ri, 0, 0);
-            rotElm.InsertMatrix(Ri, 3, 3);
-            rotElm.InsertMatrix(Ri, 6, 6);
-            rotElm.InsertMatrix(Ri, 9, 9);
+            //Ri.Matrix[0, 0] = Cx;
+            //Ri.Matrix[0, 1] = Cz;
+            //Ri.Matrix[0, 2] = Cy;
+            //Ri.Matrix[1, 0] = (-Cz * Cx * Math.Cos(alpha)) - Cy * Math.Sin(alpha) / Cxy;
+            //Ri.Matrix[1, 1] = Cxy * Math.Cos(alpha);
+            //Ri.Matrix[1, 2] = (-Cz * Cy * Math.Cos(alpha)) + Cx * Math.Sin(alpha) / Cxy;
+            //Ri.Matrix[2, 0] = ((Cz * Cx * Math.Sin(alpha)) - Cy * Math.Cos(alpha)) / Cxy;
+            //Ri.Matrix[2, 1] = -Cxy * Math.Sin(alpha);
+            //Ri.Matrix[2, 2] = ((Cz * Cy * Math.Sin(alpha)) + Cx * Math.Cos(alpha)) / Cxy;
 
+
+            //var rotElm = new MatrixCS(12, 12); // 3 columns will be added by using InsertRange
+            //rotElm.InsertMatrix(Ri, 0, 0);
+            //rotElm.InsertMatrix(Ri, 3, 3);
+            //rotElm.InsertMatrix(Ri, 6, 6);
+            //rotElm.InsertMatrix(Ri, 9, 9);
+
+            var L = GetLength();
+            var cX = (this.JEndNode.Point.X - this.IEndNode.Point.X) / L;
+            var cY = (this.JEndNode.Point.Y - this.IEndNode.Point.Y) / L;
+            var cZ = (this.JEndNode.Point.Z - this.IEndNode.Point.Z) / L;
+            var cXZ = Math.Sqrt((cX * cX) + (cZ * cZ));
+
+            double compareVal = 0.0;
+            double alpha = 0;
+            double tol = 1e-8;
+
+            MatrixCS retVal = new MatrixCS(3, 3);
+
+            var areEqual = Math.Abs(Math.Abs(cXZ) - Math.Abs(compareVal)) <= tol;
+
+            if (areEqual) // Vertical members
+            {
+                retVal.Matrix[0, 0] = 0.0;
+                retVal.Matrix[0, 1] = cY;
+                retVal.Matrix[0, 2] = 0.0;
+
+                retVal.Matrix[1, 0] = -1 * cY * Math.Cos(alpha);
+                retVal.Matrix[1, 1] = 0;
+                retVal.Matrix[1, 2] = Math.Sin(alpha);
+
+                retVal.Matrix[2, 0] = cY * Math.Sin(alpha);
+                retVal.Matrix[2, 1] = 0.0;
+                retVal.Matrix[2, 2] = Math.Cos(alpha);
+            }
+            else // General case
+            {
+                retVal.Matrix[0, 0] = cX;
+                retVal.Matrix[0, 1] = cY;
+                retVal.Matrix[0, 2] = cZ;
+
+                retVal.Matrix[1, 0] = -1 * ((cX * cY * Math.Cos(alpha)) + (cZ * Math.Sin(alpha))) / cXZ;
+                retVal.Matrix[1, 1] = cXZ * Math.Cos(alpha);
+                retVal.Matrix[1, 2] = ((-cY * cZ * Math.Cos(alpha)) + (cX * Math.Sin(alpha))) / cXZ;
+
+                retVal.Matrix[2, 0] = ((cX * cY * Math.Sin(alpha)) - (cZ * Math.Cos(alpha))) / cXZ;
+                retVal.Matrix[2, 1] = -1 * cXZ * Math.Sin(alpha);
+                retVal.Matrix[2, 2] = ((cY * cZ * Math.Sin(alpha)) + (cX * Math.Cos(alpha))) / cXZ;
+            }
+
+
+            var rotElm = new MatrixCS(12, 12);
+
+            for (int i = 0; i < 12; i++)
+                for (int j = 0; j < 12; j++)
+                    rotElm.Matrix[i, j] = 0;
+
+            for (int i = 0; i < 3; i++)
+                for (int j = 0; j < 3; j++)
+                    rotElm.Matrix[i, j] = retVal.Matrix[i, j];
+
+            for (int i = 3; i < 6; i++)
+                for (int j = 3; j < 6; j++)
+                    rotElm.Matrix[i, j] = retVal.Matrix[i - 3, j - 3];
+
+            for (int i = 6; i < 9; i++)
+                for (int j = 6; j < 9; j++)
+                    rotElm.Matrix[i, j] = retVal.Matrix[i - 6, j - 6];
+
+            for (int i = 9; i < 12; i++)
+                for (int j = 9; j < 12; j++)
+                    rotElm.Matrix[i, j] = retVal.Matrix[i - 9, j - 9];
+
+    
 
             return rotElm;
+
+            //return rotElm;
         }
 
         public MatrixCS GetLocalStiffnessMatrix()
         {
             var section = (FrameSection)_Section;
             var kElm = new MatrixCS(12, 12);
-            var L = Math.Sqrt(Math.Pow(this.JEndNode.Point.X - this.IEndNode.Point.X, 2) + Math.Pow(this.JEndNode.Point.Y - this.IEndNode.Point.Y, 2) + Math.Pow(this.JEndNode.Point.Z - this.IEndNode.Point.Z, 2));
+            var L = GetLength();
             var L2 = L * L;
             var L3 = Math.Pow(L, 3);
             var E = section.Material.E;
@@ -169,41 +252,41 @@ namespace ThesisProject.Structural_Members
             kElm.Matrix[0, 0] = E * A / L;
             kElm.Matrix[0, 6] = -1 * E * A / L;
 
-            kElm.Matrix[1, 1] = 12 * E * I11 / L3;
-            kElm.Matrix[1, 5] = 6 * E * I11 / L2;
-            kElm.Matrix[1, 7] = -12 * E * I11 / L3;
-            kElm.Matrix[1, 11] = 6 * E * I11 / L2;
+            kElm.Matrix[1, 1] = 12 * E * I22 / L3;
+            kElm.Matrix[1, 5] = 6 * E * I22 / L2;
+            kElm.Matrix[1, 7] = -12 * E * I22 / L3;
+            kElm.Matrix[1, 11] = 6 * E * I22 / L2;
 
-            kElm.Matrix[2, 2] = 12 * E * I22 / L3;
-            kElm.Matrix[2, 4] = -6 * E * I22 / L2;
-            kElm.Matrix[2, 8] = -12 * E * I22 / L3;
-            kElm.Matrix[2, 10] = -6 * E * I22 / L2;
+            kElm.Matrix[2, 2] = 12 * E * I11 / L3;
+            kElm.Matrix[2, 4] = -6 * E * I11 / L2;
+            kElm.Matrix[2, 8] = -12 * E * I11 / L3;
+            kElm.Matrix[2, 10] = -6 * E * I11 / L2;
 
             kElm.Matrix[3, 3] = G * J / L;
             kElm.Matrix[3, 9] = -1 * G * J / L;
 
             kElm.Matrix[4, 2] = kElm.Matrix[2, 4];
-            kElm.Matrix[4, 4] = 4 * E * I11 / L;
-            kElm.Matrix[4, 8] = 6 * E * I11 / L2;
-            kElm.Matrix[4, 10] = 2 * E * I11 / L;
+            kElm.Matrix[4, 4] = 4 * E * I22 / L;
+            kElm.Matrix[4, 8] = 6 * E * I22 / L2;
+            kElm.Matrix[4, 10] = 2 * E * I22 / L;
 
             kElm.Matrix[5, 1] = kElm.Matrix[1, 5];
-            kElm.Matrix[5, 5] = 4 * E * I22 / L;
-            kElm.Matrix[5, 7] = -6 * E * I22 / L2;
-            kElm.Matrix[5, 11] = 2 * E * I22 / L;
+            kElm.Matrix[5, 5] = 4 * E * I11 / L;
+            kElm.Matrix[5, 7] = -6 * E * I11 / L2;
+            kElm.Matrix[5, 11] = 2 * E * I11 / L;
 
             kElm.Matrix[6, 0] = kElm.Matrix[0, 6];
             kElm.Matrix[6, 6] = E * A / L;
 
             kElm.Matrix[7, 1] = kElm.Matrix[1, 7];
             kElm.Matrix[7, 5] = kElm.Matrix[5, 7];
-            kElm.Matrix[7, 7] = 12 * E * I11 / L3;
-            kElm.Matrix[7, 11] = -6 * E * I11 / L2;
+            kElm.Matrix[7, 7] = 12 * E * I22 / L3;
+            kElm.Matrix[7, 11] = -6 * E * I22 / L2;
 
             kElm.Matrix[8, 2] = kElm.Matrix[2, 8];
             kElm.Matrix[8, 4] = kElm.Matrix[4, 8];
-            kElm.Matrix[8, 8] = 12 * E * I22 / L3;
-            kElm.Matrix[8, 10] = 6 * E * I22 / L2;
+            kElm.Matrix[8, 8] = 12 * E * I11 / L3;
+            kElm.Matrix[8, 10] = 6 * E * I11 / L2;
 
             kElm.Matrix[9, 3] = kElm.Matrix[3, 9];
             kElm.Matrix[9, 9] = G * J / L;
@@ -211,12 +294,12 @@ namespace ThesisProject.Structural_Members
             kElm.Matrix[10, 2] = kElm.Matrix[2, 10];
             kElm.Matrix[10, 4] = kElm.Matrix[4, 10];
             kElm.Matrix[10, 8] = kElm.Matrix[8, 10];
-            kElm.Matrix[10, 10] = 4 * E * I11 / L;
+            kElm.Matrix[10, 10] = 4 * E * I22 / L;
 
             kElm.Matrix[11, 1] = kElm.Matrix[1, 11];
             kElm.Matrix[11, 5] = kElm.Matrix[5, 11];
             kElm.Matrix[11, 7] = kElm.Matrix[7, 11];
-            kElm.Matrix[11, 11] = 4 * E * I22 / L;
+            kElm.Matrix[11, 11] = 4 * E * I11 / L;
 
 
             // Check I-End Releases

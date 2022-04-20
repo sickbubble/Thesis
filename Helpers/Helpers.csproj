@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalysisDataHelper.cs" />
-    <Compile Include="Class1.cs" />
+    <Compile Include="ResultData.cs" />
     <Compile Include="UIHelper.cs" />
     <Compile Include="Mesher.cs" />
     <Compile Include="RunInfoHelper.cs" />

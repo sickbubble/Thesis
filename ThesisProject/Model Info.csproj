@@ -46,7 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LocalDataHolders\Class1.cs" />
+    <Compile Include="LocalDataHolders\Vector.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="LocalDataHolders\MatrixCs.cs" />
     <Compile Include="Loads\DistributedLoad.cs" />

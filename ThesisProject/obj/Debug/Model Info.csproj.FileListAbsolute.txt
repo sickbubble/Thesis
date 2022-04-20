@@ -6,3 +6,4 @@ C:\Users\Burak T\Desktop\Tez\ThesisProject\bin\Debug\ThesisProject.pdb
 C:\Users\Burak T\Desktop\Tez\ThesisProject\obj\Debug\Model Info.csproj.CoreCompileInputs.cache
 C:\Users\Burak T\Desktop\Tez\ThesisProject\obj\Debug\ThesisProject.dll
 C:\Users\Burak T\Desktop\Tez\ThesisProject\obj\Debug\ThesisProject.pdb
+C:\Users\Burak T\Desktop\Tez\ThesisProject\obj\Debug\Model Info.csprojAssemblyReference.cache

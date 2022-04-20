@@ -67,8 +67,22 @@ namespace Data
             }
             return totalMass;
         }
-
         public void AssignLoadToMiddle()
+        {
+            if (ListOfNodes != null)
+            {
+                for (int i = 0; i < ListOfNodes.Count; i++)
+                {
+                    var node = ListOfNodes[i];
+                    if (node.Point.X == Width / 2 &&
+                        node.Point.Y == Height / 2)
+                    {
+                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 2 });
+                    }
+                }
+            }
+        }
+        public void AssignLoadToMiddle2()
         {
             if (ListOfNodes != null )
             {
@@ -76,9 +90,9 @@ namespace Data
             {
                     var node = ListOfNodes[i];
                     if (node.Point.X == Width/2 &&
-                        node.Point.Y == Height/ 2)
+                        node.Point.Z == Height/ 2)
                     {
-                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node,DofID = 2 });
+                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node,DofID = 1 });
                     }
             }
             }
@@ -91,8 +105,8 @@ namespace Data
                 for (int i = 0; i < this.ListOfMembers.Count; i++)
                 {
                     var member = this.ListOfMembers[i];
-                    member.IEndCondition.IsReleaseMz = true;
-                    member.JEndCondition.IsReleaseMz = true;
+                    member.IEndCondition.IsReleaseMx = true;
+                    member.JEndCondition.IsReleaseMx = true;
 
                 }
 
@@ -129,6 +143,42 @@ namespace Data
 
             }
 
+
+
+        }
+        public void SetBorderNodesSupportCondition2(eSupportType supportType, Point LShapeInstPt = null)
+        {
+            var borderNodes = GetBorderNodes2();
+            //var borderNodes = GetBorderNodes();
+            _ListOfSupports = new List<Support>();
+
+            for (int i = 0; i < borderNodes.Count; i++)
+            {
+                var node = borderNodes[i];
+                node.SupportCondition = new Support(supportType);
+            }
+
+
+            if (LShapeInstPt != null)
+            {
+                var limitX = LShapeInstPt.X;
+                var limitY = LShapeInstPt.Y;
+                var extraLNodes = _ListOfNodes.Where(n => (n.Point.X >= limitX && n.Point.Y == limitY) ||
+                                                         (n.Point.Y >= limitY && n.Point.X == limitX)).ToList();
+
+                if (extraLNodes != null)
+                {
+                    for (int i = 0; i < extraLNodes.Count; i++)
+                    {
+                        var node = extraLNodes[i];
+                        node.SupportCondition = new Support(supportType);
+                    }
+                }
+
+            }
+
+
+
         }
 
         public void SetModelGeometryType(eModelGeometryType geometryType,Point pt = null,double gapSize = 0)
@@ -163,6 +213,10 @@ namespace Data
                     {
                         var frameMember = new FrameMember() { IEndNode = _ListOfNodes[i], JEndNode = _ListOfNodes[j], ID = labelCounter };
                         //frameMember.SetAsTrussMember();
+
+                        if (_ListOfMembers.Any(x => x.IEndNode == frameMember.JEndNode && x.JEndNode == frameMember.IEndNode))
+                            continue;
+
                         frameMember.Section = new FrameSection();
                         _ListOfMembers.Add(frameMember);
                         labelCounter ++;
@@ -172,10 +226,59 @@ namespace Data
         }
 
         public void FillNodeInfo() 
-        { 
-            FillRectangularNodeInfo();
-             }
+        {
+            var listOfNodes = new List<Node>();
+            var nx = (this.Width / this.MeshSize + 1);
+            var ny = (this.Height / this.MeshSize + 1);
 
+            var nodeIDCounter = 1;
+            for (int i = 0; i < ny; i++)
+            {
+                for (int j = 0; j < nx; j++)
+                {
+                    var node = new Node();
+                    node.Point = new ModelInfo.Point();
+                    node.Point.Z = 0; // Level of system, not necessary at the moment. 
+
+                    node.Point.Y = i * this.MeshSize;
+                    node.Point.X = j * this.MeshSize;
+
+                    node.SupportCondition = new Support(eSupportType.Free);
+                    node.ID = nodeIDCounter;
+                    listOfNodes.Add(node);
+                    nodeIDCounter++;
+                }
+
+            }
+            this.ListOfNodes = listOfNodes;
+        }
+        public void FillNodeInfo2()
+        {
+            var listOfNodes = new List<Node>();
+            var nx = (this.Width / this.MeshSize + 1);
+            var nZ = (this.Height / this.MeshSize + 1);
+
+            var nodeIDCounter = 1;
+            for (int i = 0; i < nZ; i++)
+            {
+                for (int j = 0; j < nx; j++)
+                {
+                    var node = new Node();
+                    node.Point = new ModelInfo.Point();
+                    node.Point.Y = 0; // Level of system, not necessary at the moment. 
+
+                    node.Point.Z = i * this.MeshSize;
+                    node.Point.X = j * this.MeshSize;
+
+                    node.SupportCondition = new Support(eSupportType.Free);
+                    node.ID = nodeIDCounter;
+                    listOfNodes.Add(node);
+                    nodeIDCounter++;
+                }
+
+            }
+            this.ListOfNodes = listOfNodes;
+        }
         #endregion
 
 
@@ -272,35 +375,10 @@ namespace Data
         }
 
 
-        private void FillRectangularNodeInfo()
-        {
-            var listOfNodes = new List<Node>();
-            var nx = (this.Width / this.MeshSize + 1);
-            var ny = (this.Height / this.MeshSize + 1);
 
-            var nodeIDCounter = 1;
-            for (int i = 0; i < ny; i++)
-            {
-                for (int j = 0; j < nx; j++)
-                {
-                    var node = new Node();
-                    node.Point = new ModelInfo.Point();
-                    node.Point.Z = 0; // Level of system, not necessary at the moment. 
-
-                    node.Point.Y = i * this.MeshSize;
-                    node.Point.X = j * this.MeshSize;
-
-                    node.SupportCondition = new Support(eSupportType.Free);
-                    node.ID = nodeIDCounter;
-                    listOfNodes.Add(node);
-                    nodeIDCounter++;
-                }
-
-            }
-            this.ListOfNodes = listOfNodes;
-
-        }
         
+
+
         private List<Node> GetBorderNodes()
         {
             var ret = new List<Node>();
@@ -314,7 +392,21 @@ namespace Data
             }
             return ret;
         }
-        
+
+        private List<Node> GetBorderNodes2()
+        {
+            var ret = new List<Node>();
+            if (this.ListOfNodes != null)
+            {
+                ret = this.ListOfNodes.Where(x => x.Point.X == 0 ||
+                                            x.Point.X == _Width ||
+                                             x.Point.Z == 0 ||
+                                             x.Point.Z == _Height).ToList();
+
+            }
+            return ret;
+        }
+
         #endregion
     }
 
