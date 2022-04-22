@@ -20,12 +20,14 @@ namespace Solver
 
         #region Private Fields
 
+        private Node _MinControlNode; 
         private List<NodeCompareData> _NodeCompareData;
         private double _ShellThickness;
         private double _EnergyRatio;
         private double _AlphaRatio;
         private double _Horizon;
         private bool _IsTorsionalRelease;
+        private double _PercentDiff;
 
         #endregion
 
@@ -37,6 +39,8 @@ namespace Solver
         public double AlphaRatio { get => _AlphaRatio; set => _AlphaRatio = value; }
         public double Horizon { get => _Horizon; set => _Horizon = value; }
         public bool IsTorsionalRelease { get => _IsTorsionalRelease; set => _IsTorsionalRelease = value; }
+        public Node MinControlNode { get => _MinControlNode; set => _MinControlNode = value; }
+        public double PercentDiff { get => _PercentDiff; set => _PercentDiff = value; }
         #endregion
 
 
