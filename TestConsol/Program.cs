@@ -21,8 +21,8 @@ namespace TestConsol
 
             var gapInstPt = new Point(6, 6, 0);
             double gapSize = 2;
-            double meshSize = 0.5;
-            double memberDim = 4;
+            double meshSize =0.5;
+            double memberDim = 5;
 
             var listOfNodes = new List<Node>();
 
@@ -133,33 +133,41 @@ namespace TestConsol
 
             var listOfControlValues = new List<double>();
 
-            var minRunDataList = new List<RunData>();
+            var minRunDataList = new Dictionary<int, RunData>();
 
             for (int i = 0; i < listOfNodes.Count; i++)
             {
                 var controlNode = listOfNodes[i];
 
 
-                var minValue = listOfRunData.Min(x => Math.Abs(x.NodeCompareData.FirstOrDefault(n => n.Node.ID == controlNode.ID).PercentDiff));
+                var minValue = listOfRunData.Min(x => Math.Abs(x.NodeCompareData[controlNode.ID].PercentDiff));
 
                 if (Double.IsNaN(minValue))
                     continue;
 
 
-                var minValueRun = listOfRunData.FirstOrDefault(x => Math.Abs(x.NodeCompareData.FirstOrDefault(n => n.Node.ID == controlNode.ID).PercentDiff) == minValue);
-                minValueRun.PercentDiff = minValue;
-                minValueRun.MinControlNode = controlNode;
-                minRunDataList.Add(minValueRun);
+                var minValueRunRef = listOfRunData.FirstOrDefault(x => Math.Abs(x.NodeCompareData[controlNode.ID].PercentDiff) == minValue);
+                var minvalueRun = new RunData();
+
+                minvalueRun.PercentDiff = minValue;
+                minvalueRun.ShellThickness = minValueRunRef.ShellThickness;
+                minvalueRun.Horizon = minValueRunRef.Horizon;
+                minvalueRun.IsTorsionalRelease = minValueRunRef.IsTorsionalRelease;
+                minvalueRun.AlphaRatio = minValueRunRef.AlphaRatio;
+                minvalueRun.EnergyRatio = minValueRunRef.EnergyRatio;
+                minvalueRun.MinControlNode = null;
+                minvalueRun.MinControlNode = controlNode;
+                minRunDataList.Add(controlNode.ID, minvalueRun);
             }
 
             Console.Clear();
             Console.WriteLine("Node ID" + ";" + "X" + ";" + "Y" + ";" + "Percent Diff" + ";" + "Shell Thickness" + ";" + "Horizon" + ";" + "Torsional Release" + ";" + "Alpha Ratio" + ";" + "Enegy Ratio");
-            minRunDataList.OrderBy(x => x.MinControlNode.ID).ToList();
+            //minRunDataList.OrderBy(x => x.MinControlNode.ID).ToList();
 
 
             for (int i = 0; i < minRunDataList.Count; i++)
             {
-                var runData = minRunDataList[i];
+                var runData = minRunDataList.Values.ElementAt(i);
 
                 var node = runData.MinControlNode;
                 var strNodeId = node.ID.ToString();

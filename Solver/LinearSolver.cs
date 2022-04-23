@@ -231,7 +231,7 @@ namespace Solver
             var latticeNodeRes = newLatticeRes.NodeResults;
             var shellNodeRes = shellModelRes.NodeResults;
             Console.WriteLine("Lattice/Shell Node Vertical Deflections");
-            var nodeCompareList = new List<NodeCompareData>();
+            var nodeCompareList = new Dictionary<int, NodeCompareData>();
 
             for (int i = 0; i < latticeNodeRes.Count; i++)
             {
@@ -253,7 +253,7 @@ namespace Solver
 
                 Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString() + " ; " + verticalDefShell.ToString() + " ; " + percentDiff.ToString());
 
-                nodeCompareList.Add(nodeCompareData);
+                nodeCompareList.Add(nodeID,nodeCompareData);
             }
             resultData.NodeCompareData = nodeCompareList;
 
