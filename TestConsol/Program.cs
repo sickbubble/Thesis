@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ThesisProject.Structural_Members;
+using System.Text.Json;
+using System.IO;
 
 namespace TestConsol
 {
@@ -22,19 +24,19 @@ namespace TestConsol
             var gapInstPt = new Point(6, 6, 0);
             double gapSize = 2;
             double meshSize =0.5;
-            double memberDim = 5;
+            double memberDim = 6;
 
             var listOfNodes = new List<Node>();
 
 
             var listOfRunData = new List<RunData>();
-            var isTorsionalRelase = new List<bool>() { true, false };
+            //var isTorsionalRelase = new List<bool>() { true, false };
 
             var horizonList = new List<double>() { 1.5, 3.01 };
 
-            for (int t = 0; t < isTorsionalRelase.Count; t++)
-            {
-                var isTorsionalRelease = isTorsionalRelase[t];
+            //for (int t = 0; t < isTorsionalRelase.Count; t++)
+            //{
+                //var isTorsionalRelease = isTorsionalRelase[t];
 
                 for (int h = 0; h < horizonList.Count; h++)
                 {
@@ -46,9 +48,6 @@ namespace TestConsol
                         double alphaRatio = 0.2;
                         for (int i = 0; i < 20; i++)
                         {
-
-
-
                             var latticeModelData = new LatticeModelData();
                             latticeModelData.Width = memberDim;
                             latticeModelData.Height = memberDim;
@@ -107,7 +106,7 @@ namespace TestConsol
                             runData.ShellThickness = thickness;
                             runData.AlphaRatio = alphaRatio;
                             runData.Horizon = horizon;
-                            runData.IsTorsionalRelease = isTorsionalRelease;
+                            //runData.IsTorsionalRelease = isTorsionalRelease;
                             var ratio = runData.EnergyRatio;
 
                             var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
@@ -127,7 +126,7 @@ namespace TestConsol
                         thickness += thicknessIncr;
                     }
                 }
-            }
+            //}
 
 
 
@@ -135,18 +134,33 @@ namespace TestConsol
 
             var minRunDataList = new Dictionary<int, RunData>();
 
+
+            string path = "C:\\Users\\Burak T\\Desktop\\ders\\Tez\\Analiz Results";
+
+            string fileName = "\\ListOFRunData.json";
+
+            path = path + fileName;
+
+            string jsonString = JsonSerializer.Serialize(listOfRunData);
+            File.WriteAllText(path, jsonString);
+
+            Console.WriteLine(jsonString);
+
+
+            var listOfRunDataDeserialized = JsonSerializer.Deserialize<List<RunData>>(jsonString);
+
             for (int i = 0; i < listOfNodes.Count; i++)
             {
                 var controlNode = listOfNodes[i];
 
 
-                var minValue = listOfRunData.Min(x => Math.Abs(x.NodeCompareData[controlNode.ID].PercentDiff));
+                var minValue = listOfRunData.Min(x => Math.Abs(x.NodeCompareData.FirstOrDefault(n=> n.NodeID==controlNode.ID).PercentDiff));
 
                 if (Double.IsNaN(minValue))
                     continue;
 
 
-                var minValueRunRef = listOfRunData.FirstOrDefault(x => Math.Abs(x.NodeCompareData[controlNode.ID].PercentDiff) == minValue);
+                var minValueRunRef = listOfRunData.FirstOrDefault(x => Math.Abs(x.NodeCompareData.FirstOrDefault(n => n.NodeID == controlNode.ID).PercentDiff) == minValue);
                 var minvalueRun = new RunData();
 
                 minvalueRun.PercentDiff = minValue;

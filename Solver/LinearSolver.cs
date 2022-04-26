@@ -196,6 +196,17 @@ namespace Solver
 
             var resultData = new RunData();
 
+            resultData.LatticePeriods = new List<double>();
+            resultData.ShellPeriods = new List<double>();
+
+            for (int i = 0; i < 3; i++)
+            {
+            resultData.LatticePeriods.Add(latticeEigenValues[i]);
+            resultData.ShellPeriods.Add(shellEigenValues[i]);
+
+            }
+
+
             var ratio = latticeInternalEnergy / shellInternalEnergy;
             resultData.EnergyRatio = ratio;
             resultData.AlphaRatio = alphaRatio;
@@ -231,7 +242,7 @@ namespace Solver
             var latticeNodeRes = newLatticeRes.NodeResults;
             var shellNodeRes = shellModelRes.NodeResults;
             Console.WriteLine("Lattice/Shell Node Vertical Deflections");
-            var nodeCompareList = new Dictionary<int, NodeCompareData>();
+            var nodeCompareList = new List<NodeCompareData>();
 
             for (int i = 0; i < latticeNodeRes.Count; i++)
             {
@@ -240,12 +251,17 @@ namespace Solver
                 var nodeRes = latticeNodeRes[nodeID];
                 var nodeResShell = shellNodeRes[nodeID];
                 var node = latticeModel.ListOfNodes.FirstOrDefault(x => x.ID == nodeID);
-                nodeCompareData.Node = node;
+                nodeCompareData.NodeID = node.ID;
                 var nodePoint = node.Point;
                 var verticalDef = nodeRes[2];
                 var verticalDefShell = nodeResShell[2];
 
                 var percentDiff = (verticalDef - verticalDefShell) / verticalDefShell * 100;
+
+                if (double.IsNaN(percentDiff))
+                {
+                    percentDiff = 0;
+                }
 
                 nodeCompareData.PercentDiff = percentDiff;
                 nodeCompareData.LatticeVerticalDisp = verticalDef;
@@ -253,7 +269,7 @@ namespace Solver
 
                 Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString() + " ; " + verticalDefShell.ToString() + " ; " + percentDiff.ToString());
 
-                nodeCompareList.Add(nodeID,nodeCompareData);
+                nodeCompareList.Add(nodeCompareData);
             }
             resultData.NodeCompareData = nodeCompareList;
 

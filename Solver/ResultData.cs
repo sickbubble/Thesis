@@ -8,6 +8,18 @@ using ThesisProject.Structural_Members;
 
 namespace Solver
 {
+    public class RunDataList
+    {
+        public RunDataList()
+        {
+
+        }
+
+
+
+        public List<RunData> ListOfRunData { get  ; set  ; }
+    }
+
     public class RunData : ICloneable
     {
         #region Ctor
@@ -21,7 +33,9 @@ namespace Solver
         #region Private Fields
 
         private Node _MinControlNode; 
-        private Dictionary<int, NodeCompareData> _NodeCompareData;
+        private List<NodeCompareData> _NodeCompareData;
+        private List<double> _ShellPeriods;
+        private List<double> _LatticePeriods;
         private double _ShellThickness;
         private double _EnergyRatio;
         private double _AlphaRatio;
@@ -33,7 +47,7 @@ namespace Solver
 
 
         #region Public Properties
-        public Dictionary<int,NodeCompareData> NodeCompareData { get => _NodeCompareData; set => _NodeCompareData = value; }
+        public List<NodeCompareData> NodeCompareData { get => _NodeCompareData; set => _NodeCompareData = value; }
         public double ShellThickness { get => _ShellThickness; set => _ShellThickness = value; }
         public double EnergyRatio { get => _EnergyRatio; set => _EnergyRatio = value; }
         public double AlphaRatio { get => _AlphaRatio; set => _AlphaRatio = value; }
@@ -41,6 +55,8 @@ namespace Solver
         public bool IsTorsionalRelease { get => _IsTorsionalRelease; set => _IsTorsionalRelease = value; }
         public Node MinControlNode { get => _MinControlNode; set => _MinControlNode = value; }
         public double PercentDiff { get => _PercentDiff; set => _PercentDiff = value; }
+        public List<double> ShellPeriods { get => _ShellPeriods; set => _ShellPeriods = value; }
+        public List<double> LatticePeriods { get => _LatticePeriods; set => _LatticePeriods = value; }
 
         public object Clone()
         {
@@ -63,7 +79,9 @@ namespace Solver
 
         #region Private Fields
 
-        private Node _Node;
+        private int _NodeID;
+
+
         private double _ShellVerticalDisp;
         private double _LatticeVerticalDisp;
         private double _PercentDiff;
@@ -75,7 +93,7 @@ namespace Solver
 
 
         #region Public Properties
-        public Node Node { get => _Node; set => _Node = value; }
+        public int NodeID { get => _NodeID; set => _NodeID = value; }
         public double ShellVerticalDisp { get => _ShellVerticalDisp; set => _ShellVerticalDisp = value; }
         public double LatticeVerticalDisp { get => _LatticeVerticalDisp; set => _LatticeVerticalDisp = value; }
         public double PercentDiff { get => _PercentDiff; set => _PercentDiff = value; }
