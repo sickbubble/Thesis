@@ -18,6 +18,16 @@ namespace ThesisProject.Sections
             SetDefaultMaterial();
         }
 
+
+        public FrameSection(double b, double h)
+        {
+
+
+            SetForGivenDimensions(b, h);
+
+            SetDefaultMaterial();
+        }
+
         #endregion
 
         #region Private Fields
@@ -30,6 +40,8 @@ namespace ThesisProject.Sections
         private double _I22;
         private double _J;
         private double _Area;
+        private double _b;
+        private double _h;
 
 
         #endregion
@@ -49,6 +61,8 @@ namespace ThesisProject.Sections
         public string Label { get => _Label; set => _Label = value; }
         public eSectionType SectionStype { get => _SectionType; set => _SectionType = value; }
         public Material Material { get => _Material; set => _Material= value; }
+        public double B { get => _b; set => _b = value; }
+        public double H { get => _h; set => _h = value; }
 
 
         #endregion
@@ -57,7 +71,21 @@ namespace ThesisProject.Sections
 
 
         #region Public Methods
-        
+        public void SetForGivenDimensions(double b, double h)
+        {
+            _SectionType = eSectionType.Frame;
+
+            _b = b;
+            _h = h;
+
+            double oneOverTw = 1.0 / 12;
+
+            _Area = b * h;
+            _I11 = oneOverTw * b * h * h * h;
+            _I22 = oneOverTw * h * b * b * b;
+            _J = _I11 + _I22;
+        }
+
 
         public void SetDefaultParameters()
         {

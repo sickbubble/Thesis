@@ -37,7 +37,7 @@ namespace Data
         /// <summary>
         /// // Node ID and ListOfResults
         /// </summary>
-        public Dictionary<int, List<double>> NodeResults { get  ; set ; }
+        public Dictionary<ModelInfo.Point, List<double>> NodeResults { get  ; set ; }
         public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
         public List<double> ListOfPeriods { get => _ListOfPeriods; set => _ListOfPeriods = value; }
 

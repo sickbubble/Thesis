@@ -24,7 +24,7 @@ namespace Data
 
         #region Private Fields
 
-        private Dictionary<int, List<double>> _NodeResults; 
+        private Dictionary<ModelInfo.Point ,List<double>> _NodeResults; 
         private Dictionary<int, FrameMemberResults> _FrameResults;
         private MatrixCS _DispRes;
         private List<double> _ListOfPeriods;
@@ -42,7 +42,7 @@ namespace Data
         /// <summary>
         /// // Node ID and ListOfResults
         /// </summary>
-        public Dictionary<int, List<double>> NodeResults { get => _NodeResults; set => _NodeResults = value; }
+        public Dictionary<ModelInfo.Point, List<double>> NodeResults { get => _NodeResults; set => _NodeResults = value; }
         /// <summary>
         /// Frame ID and FrameMemberResults
         /// </summary>

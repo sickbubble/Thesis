@@ -167,10 +167,10 @@ namespace Solver
             dispResMatrix.Matrix = dispResAsArray;
 
             latticeModelResultData.DispRes = dispResMatrix;
-            latticeModelResultData.NodeResults = new Dictionary<int, List<double>>();
+            latticeModelResultData.NodeResults = new Dictionary<ModelInfo.Point, List<double>>();
             latticeModelResultData.FrameResults = new Dictionary<int, FrameMemberResults>();
 
-            GetNodeResults(dispResAsArray,latticeModelResultData.NodeResults);
+            GetNodeResults(dispResAsArray,latticeModelResultData.NodeResults, latticemodeldata.ListOfNodes);
             FillFrameMemberResults(latticeModelResultData);
 
            
@@ -181,7 +181,7 @@ namespace Solver
 
     
 
-        public RunData EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel,double alphaRatio)
+        public RunData EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel,ShellModelData shellModalData,double alphaRatio)
         {
             var shellInternalEnergy = GetShellModelInternalEnergy(shellModelRes.DispRes);
             var latticeInternalEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
@@ -191,8 +191,8 @@ namespace Solver
             var massShell = GetMassMatrix_Shell();
             double eigenLattice = 0;
             double eigenShell = 0;
-            var latticeEigenValues = GetPeriodsOfTheSystem(kgLattice, massLattice,ref eigenLattice);
-            var shellEigenValues = GetPeriodsOfTheSystem(kgShell, massShell,ref eigenShell);
+            var latticeEigenValues = GetPeriodsOfTheSystem(kgLattice, massLattice, ref eigenLattice);
+            var shellEigenValues = GetPeriodsOfTheSystem(kgShell, massShell, ref eigenShell);
 
             var resultData = new RunData();
 
@@ -201,8 +201,8 @@ namespace Solver
 
             for (int i = 0; i < 3; i++)
             {
-            resultData.LatticePeriods.Add(latticeEigenValues[i]);
-            resultData.ShellPeriods.Add(shellEigenValues[i]);
+                resultData.LatticePeriods.Add(latticeEigenValues[i]);
+                resultData.ShellPeriods.Add(shellEigenValues[i]);
 
             }
 
@@ -244,16 +244,20 @@ namespace Solver
             Console.WriteLine("Lattice/Shell Node Vertical Deflections");
             var nodeCompareList = new List<NodeCompareData>();
 
-            for (int i = 0; i < latticeNodeRes.Count; i++)
+            for (int i = 0; i < shellNodeRes.Count; i++)
             {
                 var nodeCompareData = new NodeCompareData();
-                var nodeID = latticeNodeRes.Keys.ElementAt(i);
-                var nodeRes = latticeNodeRes[nodeID];
-                var nodeResShell = shellNodeRes[nodeID];
-                var node = latticeModel.ListOfNodes.FirstOrDefault(x => x.ID == nodeID);
+                var nodePt = shellNodeRes.Keys.ElementAt(i);
+                var nodeResShell = shellNodeRes[nodePt];
+
+                var key =  latticeNodeRes.Keys.FirstOrDefault(pt => pt.X == nodePt.X &&
+                                                        pt.Y == nodePt.Y);
+                var nodeResLattice = latticeNodeRes[key];
+                var node = shellModalData.ListOfNodes.FirstOrDefault(x => x.Point == nodePt);
+                var nodeID = node.ID;
                 nodeCompareData.NodeID = node.ID;
-                var nodePoint = node.Point;
-                var verticalDef = nodeRes[2];
+                var nodePoint = nodePt;
+                var verticalDef = nodeResLattice[2];
                 var verticalDefShell = nodeResShell[2];
 
                 var percentDiff = (verticalDef - verticalDefShell) / verticalDefShell * 100;
@@ -266,6 +270,7 @@ namespace Solver
                 nodeCompareData.PercentDiff = percentDiff;
                 nodeCompareData.LatticeVerticalDisp = verticalDef;
                 nodeCompareData.ShellVerticalDisp = verticalDefShell;
+                nodeCompareData.Point = nodePoint;
 
                 Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString() + " ; " + verticalDefShell.ToString() + " ; " + percentDiff.ToString());
 
@@ -330,9 +335,9 @@ namespace Solver
 
 
             shellModelResultData.DispRes = dispResMatrix;
-            shellModelResultData.NodeResults = new Dictionary<int, List<double>>();
+            shellModelResultData.NodeResults = new Dictionary<ModelInfo.Point, List<double>>();
 
-            GetNodeResults(dispResAsArray,shellModelResultData.NodeResults);
+            GetNodeResults(dispResAsArray,shellModelResultData.NodeResults, shellModelData.ListOfNodes);
 
 
 
@@ -378,8 +383,7 @@ namespace Solver
             var numOfUnknowns = _AssemblyData.NumberOfUnknowns;
             MatrixCS rightHandSide = new MatrixCS(numOfUnknowns, 1);
 
-            var listOfLoads  = _LatticeModelData!= null ? _LatticeModelData.ListOfLoads : _ShellModelData.ListOfLoads;
-            listOfLoads = loads;
+            var listOfLoads = loads;
 
             for (int i = 0; i < listOfLoads.Count; i++)
             {
@@ -619,10 +623,9 @@ namespace Solver
             return assemblyData;
         }
 
-        private void GetNodeResults(double [,] nodeDisps, Dictionary<int,List<double>> nodeResultsDict)
+        private void GetNodeResults(double [,] nodeDisps, Dictionary<ModelInfo.Point,List<double>> nodeResultsDict, List<Node> listOfNodes)
         {
             // Get node results
-            var listOfNodes = _LatticeModelData != null ? _LatticeModelData.ListOfNodes : _ShellModelData.ListOfNodes;
             int counter = 0;
 
             for (int i = 0; i < listOfNodes.Count; i++)
@@ -645,7 +648,7 @@ namespace Solver
 
                     nodeResults.Add(dofResult);
                 }
-                nodeResultsDict.Add(node.ID, nodeResults);
+                nodeResultsDict.Add(node.Point, nodeResults);
 
             }
 
@@ -662,8 +665,8 @@ namespace Solver
             {
                 var frm = listOfFrames[i];
                 var frameResults = new FrameMemberResults();
-                frameResults.INodeDisplacements_Global = nodeResults[frm.IEndNode.ID];
-                frameResults.JNodeDisplacements_Global = nodeResults[frm.JEndNode.ID];
+                frameResults.INodeDisplacements_Global = nodeResults[frm.IEndNode.Point];
+                frameResults.JNodeDisplacements_Global = nodeResults[frm.JEndNode.Point];
 
 
 

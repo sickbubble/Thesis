@@ -200,7 +200,7 @@ namespace Data
 
         }
 
-        public void FillMemberInfoList(double horizon)
+        public void FillMemberInfo(double horizon, double sectionHeight)
         {
             var labelCounter = 1;
             for (int i = 0; i < _ListOfNodes.Count; i++)
@@ -217,7 +217,7 @@ namespace Data
                         if (_ListOfMembers.Any(x => x.IEndNode == frameMember.JEndNode && x.JEndNode == frameMember.IEndNode))
                             continue;
 
-                        frameMember.Section = new FrameSection();
+                        frameMember.Section = new FrameSection(1,1);
                         _ListOfMembers.Add(frameMember);
                         labelCounter ++;
                     }

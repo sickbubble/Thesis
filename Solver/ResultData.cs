@@ -42,13 +42,16 @@ namespace Solver
         private double _Horizon;
         private bool _IsTorsionalRelease;
         private double _PercentDiff;
+        private double _LatticeMeshSize;
+        private double _ShellMeshSize;
+        private int _ID;
 
         #endregion
 
 
         #region Public Properties
         public List<NodeCompareData> NodeCompareData { get => _NodeCompareData; set => _NodeCompareData = value; }
-        public double ShellThickness { get => _ShellThickness; set => _ShellThickness = value; }
+        public double FrameHeight { get => _ShellThickness; set => _ShellThickness = value; }
         public double EnergyRatio { get => _EnergyRatio; set => _EnergyRatio = value; }
         public double AlphaRatio { get => _AlphaRatio; set => _AlphaRatio = value; }
         public double Horizon { get => _Horizon; set => _Horizon = value; }
@@ -57,6 +60,9 @@ namespace Solver
         public double PercentDiff { get => _PercentDiff; set => _PercentDiff = value; }
         public List<double> ShellPeriods { get => _ShellPeriods; set => _ShellPeriods = value; }
         public List<double> LatticePeriods { get => _LatticePeriods; set => _LatticePeriods = value; }
+        public double LatticeMeshSize { get => _LatticeMeshSize; set => _LatticeMeshSize = value; }
+        public double ShellMeshSize { get => _ShellMeshSize; set => _ShellMeshSize = value; }
+        public int ID { get => _ID; set => _ID = value; }
 
         public object Clone()
         {
@@ -80,6 +86,7 @@ namespace Solver
         #region Private Fields
 
         private int _NodeID;
+        private ModelInfo.Point _Point;
 
 
         private double _ShellVerticalDisp;
@@ -97,6 +104,7 @@ namespace Solver
         public double ShellVerticalDisp { get => _ShellVerticalDisp; set => _ShellVerticalDisp = value; }
         public double LatticeVerticalDisp { get => _LatticeVerticalDisp; set => _LatticeVerticalDisp = value; }
         public double PercentDiff { get => _PercentDiff; set => _PercentDiff = value; }
+        public Point Point { get => _Point; set => _Point = value; }
 
         #endregion
 
