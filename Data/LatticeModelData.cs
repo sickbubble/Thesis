@@ -217,7 +217,7 @@ namespace Data
                         if (_ListOfMembers.Any(x => x.IEndNode == frameMember.JEndNode && x.JEndNode == frameMember.IEndNode))
                             continue;
 
-                        frameMember.Section = new FrameSection(1,1);
+                        frameMember.Section = new FrameSection(1, sectionHeight);
                         _ListOfMembers.Add(frameMember);
                         labelCounter ++;
                     }

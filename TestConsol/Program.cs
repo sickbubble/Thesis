@@ -16,11 +16,124 @@ namespace TestConsol
     {
         static void Main(string[] args)
         {
-            
-            RunAndSaveProcess();
+
+            //RunAndSaveProcess();
+
+            var runInfo = new RunData();
+            runInfo.IsTorsionalRelease = true;
+            runInfo.Horizon = 1.51;
+            runInfo.MemberDim = 6;
+            runInfo.LatticeMeshSize = 0.5;
+            runInfo.ShellMeshSize = 1;
+            runInfo.FrameHeight = 0.5;
+            runInfo.AlphaRatio = 0.6;
+
+            var incr = 0.1;
+
+            for (int i = 0; i < 10; i++)
+            {
+
+            RunAnalysis(runInfo, 1);
+
+                runInfo.FrameHeight += incr; 
+            }
+
+
 
             ReadResultsFromFile();
         }
+
+        static void RunAnalysis(RunData runInfo,double shellThickness )
+        {
+
+            var memberDim = runInfo.MemberDim;
+            var latticeMeshSize = runInfo.LatticeMeshSize;
+            var horizon = runInfo.Horizon;
+            var latticeFrameHeight = runInfo.FrameHeight;
+            
+
+
+            var latticeModelData = new LatticeModelData();
+            latticeModelData.Width = memberDim;
+            latticeModelData.Height = memberDim;
+            latticeModelData.MeshSize = latticeMeshSize;
+            latticeModelData.FillNodeInfo();
+            latticeModelData.FillMemberInfo(horizon, latticeFrameHeight);
+
+            latticeModelData.SetModelGeometryType(eModelGeometryType.Rectangular);
+
+
+
+            latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
+            latticeModelData.AssignLoadToMiddle();
+            latticeModelData.SetTorsionalReleaseToAllMembers();
+            var listOfNodes = latticeModelData.ListOfNodes;
+            var latticeMass = latticeModelData.GetTotalMass();
+
+
+            var shellMeshSize = runInfo.ShellMeshSize;
+
+            var shellModelData = new ShellModelData();
+            shellModelData.IsOnlyPlate = false;
+            shellModelData.Width = memberDim;
+            shellModelData.Height = memberDim;
+            shellModelData.MeshSize = shellMeshSize;
+            shellModelData.FillNodeInfo();
+            shellModelData.FillMemberInfoList();
+
+            var shellMemberCount = shellModelData.ListOfMembers.Count;
+            var singleMemberMass = latticeMass / shellMemberCount;
+            var shellUw = singleMemberMass / (shellMeshSize * shellMeshSize * shellThickness);
+
+
+
+
+
+            shellModelData.SetModelGeometryType(eModelGeometryType.Rectangular);
+
+            shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
+            shellModelData.AssignLoadToMiddle();
+
+            foreach (var item in shellModelData.ListOfMembers)
+            {
+                item.Thickness = shellThickness;
+                item.Section.Material.Uw = shellUw;
+            }
+
+
+            var linearSolver = new LinearSolver();
+            var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
+
+            var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
+            var kg_Shell = linearSolver.GetGlobalStiffness_Shell();
+            var shellMassMatrix = linearSolver.GetMassMatrix_Shell();
+
+
+            var alphaRatio = runInfo.AlphaRatio;
+            var isTorsionalRelease = runInfo.IsTorsionalRelease;
+
+            var runData = linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData, shellModelData, alphaRatio);
+            runData.FrameHeight = latticeFrameHeight;
+            runData.AlphaRatio = alphaRatio;
+            runData.Horizon = horizon;
+            runData.LatticeMeshSize = latticeMeshSize;
+            runData.ShellMeshSize = shellMeshSize;
+            runData.IsTorsionalRelease = isTorsionalRelease;
+            var ratio = runData.EnergyRatio;
+
+            var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
+            var latticeMassMatrix = linearSolver.GetMassMatrix_Latttice();
+
+            //double lastEigen = 0;
+
+            //var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_LatticeNew, latticeMassMatrix, ref lastEigen);
+            //var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix, ref lastEigen);
+            runData.ID = 1;
+            //listOfRunData.Add(runData);
+
+            //Console.Clear();
+        }
+
 
         static void ReadResultsFromFile()
         {
@@ -42,9 +155,35 @@ namespace TestConsol
 
             foreach (Point item in nPointList)
             {
-                var listOfAccaptableRes = listOfRunDataDeserialized.Where(x => x.NodeCompareData.FirstOrDefault(p => p.Point.X == item.X && p.Point.Y == item.Y).PercentDiff < 5).ToList();
+                var pointAccaptableRuns = new List<RunData>();
+                foreach (var res in listOfRunDataDeserialized)
+                {
+                    if (res.NodeCompareData.FirstOrDefault(p => p.Point.X == item.X && p.Point.Y == item.Y).PercentDiff<3)
+                        pointAccaptableRuns.Add(res);
+                    
+                }
+                accaptableResultRUns.Add(item, pointAccaptableRuns);
 
-                accaptableResultRUns.Add(item, listOfAccaptableRes);
+            }
+
+            var nodeMeshSize = new Dictionary<Point, List<double>>();
+            var nodeAlphaRatio = new Dictionary<Point, List<double>>();
+
+
+            foreach (var item in accaptableResultRUns)
+            {
+                var meshSizeList = new List<double>();
+                var alphaList = new List<double>();
+                for (int i = 0; i < item.Value.Count; i++)
+                {
+                    var meshSize =  item.Value[i].LatticeMeshSize;
+                    var alphaRatio= item.Value[i].AlphaRatio;
+                    meshSizeList.Add(meshSize);
+                    alphaList.Add(alphaRatio);
+                }
+                nodeMeshSize.Add(item.Key, meshSizeList);
+                nodeAlphaRatio.Add(item.Key, alphaList);
+
             }
 
 
@@ -203,7 +342,17 @@ namespace TestConsol
 
             var minRunDataList = new Dictionary<int, RunData>();
 
-
+            foreach (var item in listOfRunData)
+            {
+                var shellPeriods = item.ShellPeriods;
+                for (int i = 0; i < shellPeriods.Count; i++)
+                {
+                    if (Double.IsNaN(shellPeriods[i]))
+                    {
+                        shellPeriods[i] = 0;
+                    }
+                }
+            }
 
             var path = GetFilePath();
             string jsonString = JsonSerializer.Serialize(listOfRunData);
@@ -232,7 +381,7 @@ namespace TestConsol
 
             foreach (Point item in nPointList)
             {
-                var listOfAccaptableRes = listOfRunData.Where(x => x.NodeCompareData.FirstOrDefault(p => p.Point.X == item.X && p.Point.Y == item.Y).PercentDiff < 5).ToList();
+                var listOfAccaptableRes = listOfRunData.Where(x => Math.Abs(x.NodeCompareData.FirstOrDefault(p => p.Point.X == item.X && p.Point.Y == item.Y ).PercentDiff)<3 ).ToList();
 
                 accaptableResultRUns.Add(item, listOfAccaptableRes);
             }

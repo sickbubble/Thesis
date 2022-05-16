@@ -44,7 +44,8 @@ namespace Solver
         private double _PercentDiff;
         private double _LatticeMeshSize;
         private double _ShellMeshSize;
-        private int _ID;
+        private double _MemberDim;
+        private int _ID ;
 
         #endregion
 
@@ -63,6 +64,7 @@ namespace Solver
         public double LatticeMeshSize { get => _LatticeMeshSize; set => _LatticeMeshSize = value; }
         public double ShellMeshSize { get => _ShellMeshSize; set => _ShellMeshSize = value; }
         public int ID { get => _ID; set => _ID = value; }
+        public double MemberDim { get => _MemberDim; set => _MemberDim = value; }
 
         public object Clone()
         {
