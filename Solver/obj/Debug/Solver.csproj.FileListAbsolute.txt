@@ -10,6 +10,7 @@ C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ILNumerics.Core.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ILNumerics.Core.Platforms.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ILNumerics.Core.Runtime.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\MathNet.Numerics.dll
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.CodeAnalysis.CSharp.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.CodeAnalysis.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.Win32.Registry.dll
@@ -26,7 +27,10 @@ C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Security.AccessControl.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Security.Permissions.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Security.Principal.Windows.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Encoding.CodePages.dll
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Encodings.Web.dll
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Json.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.ValueTuple.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ThesisProject.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Data.pdb
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Data.dll.config
@@ -39,6 +43,7 @@ C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ILNumerics.Core.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ILNumerics.Core.Platforms.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ILNumerics.Core.Runtime.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\MathNet.Numerics.xml
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.CodeAnalysis.pdb
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.CodeAnalysis.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.CodeAnalysis.CSharp.pdb
@@ -55,7 +60,10 @@ C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Runtime.CompilerServices.Un
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Security.AccessControl.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Security.Permissions.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Security.Principal.Windows.xml
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Encodings.Web.xml
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Json.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.ValueTuple.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\cs\Microsoft.CodeAnalysis.resources.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\de\Microsoft.CodeAnalysis.resources.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\es\Microsoft.CodeAnalysis.resources.dll
@@ -82,17 +90,9 @@ C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ru\Microsoft.CodeAnalysis.CSharp.r
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
+C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.AssemblyReference.cache
+C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.GeneratedMSBuildEditorConfig.editorconfig
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.CoreCompileInputs.cache
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.CopyComplete
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.dll
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.pdb
-C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
-C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Encodings.Web.dll
-C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Json.dll
-C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.ValueTuple.dll
-C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
-C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Encodings.Web.xml
-C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Json.xml
-C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.ValueTuple.xml
-C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.AssemblyReference.cache
-C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.GeneratedMSBuildEditorConfig.editorconfig
