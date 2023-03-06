@@ -10,7 +10,7 @@ using ThesisProject.Structural_Members;
 
 namespace Data
 {
-   public class LatticeModelData
+    public class LatticeModelData
     {
         #region Ctor
         public LatticeModelData()
@@ -24,7 +24,7 @@ namespace Data
 
         private List<Node> _ListOfNodes;
         private List<Support> _ListOfSupports;
-        
+
         private List<ILoad> _ListOfLoads = new List<ILoad>();
         private List<FrameMember> _ListOfMembers = new List<FrameMember>();
 
@@ -41,7 +41,7 @@ namespace Data
 
         public List<Node> ListOfNodes { get => _ListOfNodes; set => _ListOfNodes = value; }
         public List<Support> ListOfSupports { get => _ListOfSupports; set => _ListOfSupports = value; }
-        public List<FrameMember> ListOfMembers { get => _ListOfMembers; set => _ListOfMembers = value; } 
+        public List<FrameMember> ListOfMembers { get => _ListOfMembers; set => _ListOfMembers = value; }
         public double Width { get => _Width; set => _Width = value; }
         public double Height { get => _Height; set => _Height = value; }
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
@@ -84,36 +84,60 @@ namespace Data
         }
         public void AssignLoadToMiddle2()
         {
-            if (ListOfNodes != null )
+            if (ListOfNodes != null)
             {
-            for (int i = 0; i < ListOfNodes.Count; i++)
-            {
+                for (int i = 0; i < ListOfNodes.Count; i++)
+                {
                     var node = ListOfNodes[i];
-                    if (node.Point.X == Width/2 &&
-                        node.Point.Z == Height/ 2)
+                    if (node.Point.X == Width / 2 &&
+                        node.Point.Z == Height / 2)
                     {
-                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node,DofID = 1 });
+                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 1 });
                     }
-            }
+                }
             }
         }
         public void SetTorsionalReleaseToAllMembers()
         {
             if (this.ListOfMembers != null)
             {
-                
+
                 for (int i = 0; i < this.ListOfMembers.Count; i++)
                 {
                     var member = this.ListOfMembers[i];
+
                     member.IEndCondition.IsReleaseMx = true;
                     member.JEndCondition.IsReleaseMx = true;
-
                 }
 
             }
-            
+
         }
-        public void SetBorderNodesSupportCondition(eSupportType supportType,Point LShapeInstPt = null)
+
+        public void SetReleaseAllRotations()
+        {
+            if (this.ListOfMembers != null)
+            {
+
+                for (int i = 0; i < this.ListOfMembers.Count; i++)
+                {
+                    var member = this.ListOfMembers[i];
+
+                    member.IEndCondition.IsReleaseMx = true;
+                    member.JEndCondition.IsReleaseMx = true;
+
+                    member.IEndCondition.IsReleaseMy = true;
+                    member.JEndCondition.IsReleaseMy = true;
+
+                    member.IEndCondition.IsReleaseMz = true;
+                    member.JEndCondition.IsReleaseMz = true;
+                }
+
+            }
+
+        }
+
+        public void SetBorderNodesSupportCondition(eSupportType supportType, Point LShapeInstPt = null)
         {
             var borderNodes = GetBorderNodes();
             _ListOfSupports = new List<Support>();
@@ -181,7 +205,7 @@ namespace Data
 
         }
 
-        public void SetModelGeometryType(eModelGeometryType geometryType,Point pt = null,double gapSize = 0)
+        public void SetModelGeometryType(eModelGeometryType geometryType, Point pt = null, double gapSize = 0)
         {
 
             switch (geometryType)
@@ -192,7 +216,7 @@ namespace Data
                     SetModelShapeAsL(pt);
                     break;
                 case eModelGeometryType.WithOpening:
-                    SetModelShapeAsGapped(pt,gapSize);
+                    SetModelShapeAsGapped(pt, gapSize);
                     break;
                 default:
                     break;
@@ -205,7 +229,7 @@ namespace Data
             var labelCounter = 1;
             for (int i = 0; i < _ListOfNodes.Count; i++)
             {
-                for (int j = i+1; j < _ListOfNodes.Count; j++)
+                for (int j = i + 1; j < _ListOfNodes.Count; j++)
                 {
                     var lengthOfMember = Math.Sqrt(Math.Pow(_ListOfNodes[j].Point.X - _ListOfNodes[i].Point.X, 2) + Math.Pow(_ListOfNodes[j].Point.Y - _ListOfNodes[i].Point.Y, 2) + Math.Pow(_ListOfNodes[j].Point.Z - _ListOfNodes[i].Point.Z, 2));
 
@@ -219,13 +243,13 @@ namespace Data
 
                         frameMember.Section = new FrameSection(1, sectionHeight);
                         _ListOfMembers.Add(frameMember);
-                        labelCounter ++;
+                        labelCounter++;
                     }
                 }
             }
         }
 
-        public void FillNodeInfo() 
+        public void FillNodeInfo()
         {
             var listOfNodes = new List<Node>();
             var nx = (this.Width / this.MeshSize + 1);
@@ -295,11 +319,11 @@ namespace Data
 
             var limitX = pointToCut.X;
             var limitY = pointToCut.Y;
-            
+
             // Remove Nodes
-                var nodesToDelete = _ListOfNodes.Where(x => x.Point.X > limitX &&
-                                                            x.Point.Y > limitY).ToList();
-            if (nodesToDelete == null  )
+            var nodesToDelete = _ListOfNodes.Where(x => x.Point.X > limitX &&
+                                                        x.Point.Y > limitY).ToList();
+            if (nodesToDelete == null)
             {
                 return;
             }
@@ -327,7 +351,7 @@ namespace Data
 
         }
 
-        private void SetModelShapeAsGapped(Point instPoint,double gapSize)
+        private void SetModelShapeAsGapped(Point instPoint, double gapSize)
         {
             //  ______________________ 
             // |                      |
@@ -376,13 +400,13 @@ namespace Data
 
 
 
-        
+
 
 
         private List<Node> GetBorderNodes()
         {
             var ret = new List<Node>();
-            if (this.ListOfNodes !=null)
+            if (this.ListOfNodes != null)
             {
                 ret = this.ListOfNodes.Where(x => x.Point.X == 0 ||
                                             x.Point.X == _Width ||

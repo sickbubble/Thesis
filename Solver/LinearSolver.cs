@@ -10,6 +10,11 @@ using MathNet.Numerics.LinearAlgebra;
 using ThesisProject.Loads;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using Accord.Math.Decompositions;
+using MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double.Solvers;
+using MathNet.Numerics;
+using MathNet.Numerics.LinearAlgebra.Solvers;
+using Accord.Math;
 
 namespace Solver
 {
@@ -61,13 +66,17 @@ namespace Solver
 
         #region Public Methods
 
+
         public List<double> GetPeriodsOfTheSystem(MatrixCS kG, MatrixCS mass, ref double lastEigen)
         {
-            
-            var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix,mass.Matrix,false);
+
+            var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix, mass.Matrix,true);
+
+
+
             var w2 = solver.RealEigenvalues;
 
-            lastEigen = w2.LastOrDefault();
+            lastEigen = w2.FirstOrDefault();
 
             var w = new List<double>();
 
@@ -79,47 +88,105 @@ namespace Solver
             var T = new List<double>();
 
 
-            for (int i = w.Count - 1; i>=0; i--)
+            for (int i = 0; i < w.Count; i++)
             {
-                T.Add(2 * Math.PI / w[i]);
+                T.Add((2 * Math.PI )/ w[i]);
             }
 
 
 
-            //var eigen1 = Matrix<double>.Build.Diagonal(kG.NRows, kG.NRows);
-
-            //    eigen
-            //Evd<double> eigen = eigen1.Evd();
-
-            //generalizedeigensolver
-
-            //eigen.Solve(externalKG, externalMass);
-
-            ////Eigen::GeneralizedEigenSolver<Eigen::MatrixXd> ges;
-            ////ges.compute(K, M);
-            ////auto eigs = ges.eigenvalues().real();
-
-            ////for (int i = eigs.size() - 1; -1 < i; i--)
-            ////    t.push_back(2 * pi / sqrt(eigs(i)));
-
-
-
-            //var w2 = new List<double>();
-            
-            //for (int i = 0; i < res.RowCount -1 ; i++)
-            //{
-            //     w2.Add( Math.Sqrt(Convert.ToDouble(res[i, 0])));
-            //}
-            //w2.Sort();
-
-            //for (int i = 0; i < w.Count; i++)
-            //{
-            //    periods.Add(2 * Math.PI / w2[i]);
-            //}
-
-
-
             return T;
+
+        }
+
+       
+
+        public double[][] GetModeShapesOfSystem(MatrixCS kG, MatrixCS mass, int numberOfModes)
+        {
+            
+            var evd = new GeneralizedEigenvalueDecomposition(kG.Matrix,mass.Matrix,true);
+
+            // Extract the eigenvalues and eigenvectors
+            double[] eigenvalues = evd.RealEigenvalues;
+            double[,] eigenvectors = evd.Eigenvectors;
+
+
+            // Get the index of the first n eigenvalues of interest
+            double[] index = new double[2];
+            for (int i = 0; i < numberOfModes; i++)
+            {
+                index[i] = eigenvalues[i];
+            }
+
+
+
+
+            var modeShapes = new double[numberOfModes][];
+
+            for (int i = 0; i < numberOfModes; i++)
+            {
+                var modeShape = new double[eigenvectors.GetLength(0)];
+                for (int j = 0; j < modeShape.Length; j++)
+                {
+                    modeShape[j] = eigenvectors[j, i] / eigenvectors.GetColumn(i).Euclidean();
+                }
+                modeShapes[i] = modeShape;
+            }
+
+            return modeShapes;
+
+
+        }
+
+        public void EigenvalueAnalysis(double[,] _matrix)
+        {
+            var matrix = Matrix<double>.Build.DenseOfArray(_matrix);
+            var evd = matrix.Evd();
+            var eigenvalues = evd.EigenValues;
+            var eigenvectors = evd.EigenVectors;
+        }
+
+        public double[][] GetModeShapes(Evd<double> evd, double[,] _matrix)
+        {
+            var eigenvectors = evd.EigenVectors;
+            var numModes = eigenvectors.RowCount;
+            var modeShapes = new double[numModes][];
+
+            for (int i = 0; i < numModes; i++)
+            {
+                var modeShape = new double[_matrix.GetLength(0)];
+                for (int j = 0; j < modeShape.Length; j++)
+                {
+                    modeShape[j] = eigenvectors[j, i] / eigenvectors.Column(i).Norm(2);
+                }
+                modeShapes[i] = modeShape;
+            }
+
+            return modeShapes;
+        }
+
+
+        public void RunEigenValueAnalysis(LatticeModelData latticeModelData) 
+        {
+            _LatticeModelData = latticeModelData;
+            _AssemblyData = GetNodeAssemblyData(latticeModelData.ListOfNodes);
+            _AssemblyData.DataType = eAssemblyDataType.Lattice;
+
+            var KG = GetGlobalStiffness_Latttice();
+            //var RHS = GetRightHandSide(_LatticeModelData.ListOfLoads);
+
+            var mass = GetMassMatrix_Latttice();
+
+
+            //var externalKG =  Matrix<double>.Build.SparseOfArray(KG.Matrix);
+            var externalKG = DenseMatrix.OfArray(KG.Matrix);
+            //var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
+            var externalMass = DenseMatrix.OfArray(mass.Matrix);
+
+
+            
+            //var evd = externalKG.Evd(Symmetricity.Symmetric,externalMass);
+
 
         }
 
@@ -136,6 +203,10 @@ namespace Solver
 
 
             var mass = GetMassMatrix_Latttice();
+            
+            var modeShapesLattice = GetModeShapesOfSystem(KG, mass, 2);
+
+
             //var res = GetPeriodsOfTheSystem(KG, mass);
 
             //for (int i = 0; i < 6; i++)
@@ -155,6 +226,7 @@ namespace Solver
 
             var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
             var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
+            
 
             var dispRes = externalKG.Solve(externalRHS);
 
@@ -191,8 +263,8 @@ namespace Solver
             var massShell = GetMassMatrix_Shell();
             double eigenLattice = 0;
             double eigenShell = 0;
-            var latticeEigenValues = GetPeriodsOfTheSystem(kgLattice, massLattice, ref eigenLattice);
-            var shellEigenValues = GetPeriodsOfTheSystem(kgShell, massShell, ref eigenShell);
+            var latticePeriods = GetPeriodsOfTheSystem(kgLattice, massShell, ref eigenLattice);
+            var shellEigenPeriods = GetPeriodsOfTheSystem(kgShell, massShell, ref eigenShell);
 
             var resultData = new RunData();
 
@@ -201,16 +273,16 @@ namespace Solver
 
             for (int i = 0; i < 3; i++)
             {
-                resultData.LatticePeriods.Add(latticeEigenValues[i]);
-                resultData.ShellPeriods.Add(shellEigenValues[i]);
+                resultData.LatticePeriods.Add(latticePeriods[i]);
+                resultData.ShellPeriods.Add(shellEigenPeriods[i]);
 
             }
 
 
-            var ratio = latticeInternalEnergy / shellInternalEnergy;
+            var ratio = shellInternalEnergy /latticeInternalEnergy ;
             resultData.EnergyRatio = ratio;
             resultData.AlphaRatio = alphaRatio;
-            var ratio2 = eigenShell / eigenLattice ;
+            var ratio2 = eigenLattice / eigenShell   ;
 
             var shortMemberLength = latticeModel.ListOfMembers.Min(x => x.GetLength());
 
@@ -234,8 +306,14 @@ namespace Solver
             var latticeInternalEnergyNew = GetLatticeModelInternalEnergy(newLatticeRes.DispRes, latticeModel);
 
             var latticeMidPoint = latticeModel.ListOfNodes.FirstOrDefault(x => x.Point.X == latticeModel.Width / 2 && x.Point.Y == latticeModel.Height / 2);
-            
-        
+
+
+            var kgLattice2 = GetGlobalStiffness_Latttice();
+            var massLattice2 = GetMassMatrix_Latttice();
+            double eigenLattice2 = 0;
+            var latticePeriods2 = GetPeriodsOfTheSystem(kgLattice2, massShell, ref eigenLattice2);
+
+
             //shellModelRes.DispRes.Print();
             //newLatticeRes.DispRes.Print();
 
@@ -368,7 +446,7 @@ namespace Solver
             ret = firstPart.Multiply(dispMatrix).Matrix[0, 0];
 
 
-            return ret;
+            return Math.Abs(ret);
         }
 
 

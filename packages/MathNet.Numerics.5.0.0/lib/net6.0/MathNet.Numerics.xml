@@ -49992,6 +49992,14 @@
             This may cause the calculations to overflow.
             </remarks>
         </member>
+        <member name="M:MathNet.Numerics.Statistics.DescriptiveStatistics.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:MathNet.Numerics.Statistics.DescriptiveStatistics"/> class.
+            </summary>
+            <remarks>
+            Used for Json serialization
+            </remarks>
+        </member>
         <member name="P:MathNet.Numerics.Statistics.DescriptiveStatistics.Count">
             <summary>
             Gets the size of the sample.
@@ -53072,6 +53080,14 @@
             <remarks>
             Don't use increased accuracy for data sets containing large values (in absolute value).
             This may cause the calculations to overflow.
+            </remarks>
+        </member>
+        <member name="M:MathNet.Numerics.Statistics.WeightedDescriptiveStatistics.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:MathNet.Numerics.Statistics.DescriptiveStatistics"/> class.
+            </summary>
+            <remarks>
+            Used for Json serialization
             </remarks>
         </member>
         <member name="P:MathNet.Numerics.Statistics.WeightedDescriptiveStatistics.Count">

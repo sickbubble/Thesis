@@ -87,7 +87,6 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\ru\Microsoft.CodeAnalysis.CSha
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
-C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csprojAssemblyReference.cache
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csproj.CoreCompileInputs.cache
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csproj.CopyComplete
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.exe
@@ -100,3 +99,5 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Microsoft.Bcl.AsyncInterfaces.
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\System.Text.Encodings.Web.xml
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\System.Text.Json.xml
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\System.ValueTuple.xml
+C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csproj.AssemblyReference.cache
+C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.GeneratedMSBuildEditorConfig.editorconfig

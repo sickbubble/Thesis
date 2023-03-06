@@ -81,8 +81,8 @@ namespace ThesisProject.Sections
             double oneOverTw = 1.0 / 12;
 
             _Area = b * h;
-            _I11 = oneOverTw * b * h * h * h;
-            _I22 = oneOverTw * h * b * b * b;
+            _I22 = oneOverTw * b * h * h * h;
+            _I11 = oneOverTw * h * b * b * b;
             _J = _I11 + _I22;
         }
 

@@ -22,22 +22,27 @@ namespace TestConsol
             var runInfo = new RunData();
             runInfo.IsTorsionalRelease = true;
             runInfo.Horizon = 1.51;
-            runInfo.MemberDim = 6;
-            runInfo.LatticeMeshSize = 0.5;
+            runInfo.MemberDim = 10;
+            runInfo.LatticeMeshSize = 1;
             runInfo.ShellMeshSize = 1;
             runInfo.FrameHeight = 0.5;
             runInfo.AlphaRatio = 0.6;
 
             var incr = 0.1;
+            //var horizonList = new List<double>() { 1.51, 3, 01 };
+            var horizonList = new List<double>() { 3};
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < horizonList.Count; i++)
             {
-
-            RunAnalysis(runInfo, 1);
-
+                RunAnalysis(runInfo, 1);
                 runInfo.FrameHeight += incr; 
             }
+            for (int i = 0; i < horizonList.Count; i++)
+            {
 
+                RunAnalysis(runInfo, 1);
+                runInfo.Horizon = horizonList[i];
+            }
 
 
             ReadResultsFromFile();
@@ -66,7 +71,12 @@ namespace TestConsol
 
             latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
             latticeModelData.AssignLoadToMiddle();
+            if (runInfo.IsTorsionalRelease)
+            {
             latticeModelData.SetTorsionalReleaseToAllMembers();
+                //latticeModelData.SetReleaseAllRotations();
+            }
+
             var listOfNodes = latticeModelData.ListOfNodes;
             var latticeMass = latticeModelData.GetTotalMass();
 
@@ -108,6 +118,7 @@ namespace TestConsol
             var kg_Shell = linearSolver.GetGlobalStiffness_Shell();
             var shellMassMatrix = linearSolver.GetMassMatrix_Shell();
 
+            var modeShapesShell = linearSolver.GetModeShapesOfSystem(kg_Shell, shellMassMatrix, 2);
 
             var alphaRatio = runInfo.AlphaRatio;
             var isTorsionalRelease = runInfo.IsTorsionalRelease;

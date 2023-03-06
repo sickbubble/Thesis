@@ -49,6 +49,9 @@
     <Reference Include="ILNumerics.F2NET.LAPACK, Version=6.0.0.0, Culture=neutral, PublicKeyToken=003ce85f99479f88, processorArchitecture=MSIL">
       <HintPath>..\packages\ILNumerics.F2NET.LAPACK.6.0.127\lib\net461\ILNumerics.F2NET.LAPACK.dll</HintPath>
     </Reference>
+    <Reference Include="MathNet.Numerics, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.5.0.0\lib\net461\MathNet.Numerics.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.1.1.0\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
     </Reference>

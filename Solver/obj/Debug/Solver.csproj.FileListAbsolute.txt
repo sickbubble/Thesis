@@ -82,7 +82,6 @@ C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\ru\Microsoft.CodeAnalysis.CSharp.r
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\tr\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\zh-Hans\Microsoft.CodeAnalysis.CSharp.resources.dll
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\zh-Hant\Microsoft.CodeAnalysis.CSharp.resources.dll
-C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csprojAssemblyReference.cache
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.CoreCompileInputs.cache
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.CopyComplete
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.dll
@@ -95,3 +94,5 @@ C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Encodings.Web.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.Text.Json.xml
 C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\System.ValueTuple.xml
+C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.AssemblyReference.cache
+C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.GeneratedMSBuildEditorConfig.editorconfig
