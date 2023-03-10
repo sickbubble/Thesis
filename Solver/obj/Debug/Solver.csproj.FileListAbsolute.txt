@@ -96,3 +96,5 @@ C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.CoreCompileInputs.ca
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.csproj.CopyComplete
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.dll
 C:\Users\Burak T\Desktop\Tez\Solver\obj\Debug\Solver.pdb
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Adapters.dll
+C:\Users\Burak T\Desktop\Tez\Solver\bin\Debug\Adapters.pdb

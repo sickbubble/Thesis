@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Adapters;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -40,6 +41,11 @@ namespace Data
         public Dictionary<ModelInfo.Point, List<double>> NodeResults { get  ; set ; }
         public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
         public List<double> ListOfPeriods { get => _ListOfPeriods; set => _ListOfPeriods = value; }
+
+        public IOptimizationObject GetOptimizationObject()
+        {
+            throw new NotImplementedException();
+        }
 
 
         #endregion

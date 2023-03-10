@@ -1,0 +1,6 @@
+C:\Users\Burak T\Desktop\Tez\Adapters\bin\Debug\Adapters.dll
+C:\Users\Burak T\Desktop\Tez\Adapters\bin\Debug\Adapters.pdb
+C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.csproj.AssemblyReference.cache
+C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.csproj.CoreCompileInputs.cache
+C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.dll
+C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.pdb

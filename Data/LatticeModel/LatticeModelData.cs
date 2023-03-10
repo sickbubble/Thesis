@@ -4,13 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ThesisProject;
+using ThesisProject.AssemblyInfo;
 using ThesisProject.Loads;
 using ThesisProject.Sections;
 using ThesisProject.Structural_Members;
 
 namespace Data
 {
-    public class LatticeModelData
+   
+ 
+    public class LatticeModelData : FiniteElementModel
     {
         #region Ctor
         public LatticeModelData()
@@ -21,12 +25,6 @@ namespace Data
 
 
         #region Private Fields
-
-        private List<Node> _ListOfNodes;
-        private List<Support> _ListOfSupports;
-
-        private List<ILoad> _ListOfLoads = new List<ILoad>();
-        private List<FrameMember> _ListOfMembers = new List<FrameMember>();
 
         private double _Width;
         private double _Height;
@@ -39,14 +37,12 @@ namespace Data
 
         #region Public Properties
 
-        public List<Node> ListOfNodes { get => _ListOfNodes; set => _ListOfNodes = value; }
-        public List<Support> ListOfSupports { get => _ListOfSupports; set => _ListOfSupports = value; }
-        public List<FrameMember> ListOfMembers { get => _ListOfMembers; set => _ListOfMembers = value; }
+ 
         public double Width { get => _Width; set => _Width = value; }
         public double Height { get => _Height; set => _Height = value; }
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
         public double LatticeMeshRatio { get => _LatticeMeshRatio; set => _LatticeMeshRatio = value; }
-        public List<ILoad> ListOfLoads { get => _ListOfLoads; set => _ListOfLoads = value; }
+
 
         #endregion
 
@@ -56,15 +52,12 @@ namespace Data
 
         public double GetTotalMass()
         {
-            var members = this.ListOfMembers;
             double totalMass = 0;
-            for (int i = 0; i < members.Count; i++)
+            foreach (var mem in this.ListOfMembers)
             {
-                var member = members[i];
-
-                totalMass += member.GetMass();
-
+                totalMass += (mem as FrameMember).GetMass();
             }
+
             return totalMass;
         }
         public void AssignLoadToMiddle()
@@ -77,7 +70,7 @@ namespace Data
                     if (node.Point.X == Width / 2 &&
                         node.Point.Y == Height / 2)
                     {
-                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 2 });
+                        ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 2 });
                     }
                 }
             }
@@ -92,7 +85,7 @@ namespace Data
                     if (node.Point.X == Width / 2 &&
                         node.Point.Z == Height / 2)
                     {
-                        _ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 1 });
+                        this.ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 1 });
                     }
                 }
             }
@@ -104,7 +97,7 @@ namespace Data
 
                 for (int i = 0; i < this.ListOfMembers.Count; i++)
                 {
-                    var member = this.ListOfMembers[i];
+                    var member = (FrameMember)this.ListOfMembers[i];
 
                     member.IEndCondition.IsReleaseMx = true;
                     member.JEndCondition.IsReleaseMx = true;
@@ -114,6 +107,28 @@ namespace Data
 
         }
 
+        
+        public void AssignRatio(double ratio, double alphaRatio) 
+        {
+            
+            var shortMemberLength = this.ListOfMembers.Min(x => (x as FrameMember).GetLength());
+
+            for (int i = 0; i < this.ListOfMembers.Count; i++)
+            {
+                var mem = (FrameMember)this.ListOfMembers[i];
+                if (mem.GetLength() == shortMemberLength)
+                {
+                    mem.Section.Material.E *= ratio;
+                }
+                else
+                {
+                    mem.Section.Material.E *= (alphaRatio * ratio);
+
+                }
+            }
+        }
+
+        
         public void SetReleaseAllRotations()
         {
             if (this.ListOfMembers != null)
@@ -121,7 +136,7 @@ namespace Data
 
                 for (int i = 0; i < this.ListOfMembers.Count; i++)
                 {
-                    var member = this.ListOfMembers[i];
+                    var member = (FrameMember)this.ListOfMembers[i];
 
                     member.IEndCondition.IsReleaseMx = true;
                     member.JEndCondition.IsReleaseMx = true;
@@ -137,10 +152,79 @@ namespace Data
 
         }
 
+        public override MatrixCS GetGlobalStiffness()
+        {
+            MatrixCS KG = new MatrixCS(this.AssemblyData.NumberOfUnknowns, this.AssemblyData.NumberOfUnknowns);
+
+            var listOfFrameMembers = this.ListOfMembers;
+
+            for (int i = 0; i < listOfFrameMembers.Count; i++)
+            {
+                var frmMember = (FrameMember)listOfFrameMembers[i];
+                var K = frmMember.GetGlobalStiffnessMatrix();
+                var iNode = frmMember.IEndNode;
+                var jNode = frmMember.JEndNode;
+
+                var g = new List<int>();
+                g.AddRange(this.AssemblyData.NodeEquationData[iNode.ID]);
+                g.AddRange(this.AssemblyData.NodeEquationData[jNode.ID]);
+
+                var matrixLength = K.NRows;//should be 12 for frame
+
+                for (int k = 0; k < matrixLength; k++)
+                {
+                    for (int l = 0; l < matrixLength; l++)
+                    {
+                        var gk = g[k];
+                        var gl = g[l];
+                        if (gk != -1 && gl != -1) // -1 means free a.k.a unknown
+                        {
+                            KG.Matrix[gk, gl] = KG.Matrix[gk, gl] + K.Matrix[k, l];
+                        }
+                    }
+                }
+            }
+
+            return KG;
+        }
+
+
+        public override MatrixCS GetMassMatrix()
+        {
+            MatrixCS globalMass = new MatrixCS(AssemblyData.NumberOfUnknowns, AssemblyData.NumberOfUnknowns);
+            foreach (var mem in this.ListOfMembers)
+            {
+                var frmMember = (FrameMember)mem;
+                var m = frmMember.GetGlobalMassMatrix();
+                var iNode = frmMember.IEndNode;
+                var jNode = frmMember.JEndNode;
+
+                var g = new List<int>();
+                g.AddRange(AssemblyData.NodeEquationData[iNode.ID]);
+                g.AddRange(AssemblyData.NodeEquationData[jNode.ID]);
+
+                var matrixLength = m.NRows;//should be 12 for frame
+
+                for (int k = 0; k < matrixLength; k++)
+                {
+                    for (int l = 0; l < matrixLength; l++)
+                    {
+                        var gk = g[k];
+                        var gl = g[l];
+                        if (g[k] != -1 && g[l] != -1) // -1 means free a.k.a unknown
+                        {
+                            globalMass.Matrix[g[k], g[l]] = globalMass.Matrix[g[k], g[l]] + m.Matrix[k, l];
+                        }
+                    }
+                }
+            }
+            return globalMass;
+        }
+
         public void SetBorderNodesSupportCondition(eSupportType supportType, Point LShapeInstPt = null)
         {
             var borderNodes = GetBorderNodes();
-            _ListOfSupports = new List<Support>();
+            this.ListOfSupports = new List<Support>();
 
             for (int i = 0; i < borderNodes.Count; i++)
             {
@@ -153,7 +237,7 @@ namespace Data
             {
                 var limitX = LShapeInstPt.X;
                 var limitY = LShapeInstPt.Y;
-                var extraLNodes = _ListOfNodes.Where(n => (n.Point.X >= limitX && n.Point.Y == limitY) ||
+                var extraLNodes = this.ListOfNodes.Where(n => (n.Point.X >= limitX && n.Point.Y == limitY) ||
                                                          (n.Point.Y >= limitY && n.Point.X == limitX)).ToList();
 
                 if (extraLNodes != null)
@@ -174,7 +258,7 @@ namespace Data
         {
             var borderNodes = GetBorderNodes2();
             //var borderNodes = GetBorderNodes();
-            _ListOfSupports = new List<Support>();
+            this.ListOfSupports = new List<Support>();
 
             for (int i = 0; i < borderNodes.Count; i++)
             {
@@ -187,7 +271,7 @@ namespace Data
             {
                 var limitX = LShapeInstPt.X;
                 var limitY = LShapeInstPt.Y;
-                var extraLNodes = _ListOfNodes.Where(n => (n.Point.X >= limitX && n.Point.Y == limitY) ||
+                var extraLNodes = this.ListOfNodes.Where(n => (n.Point.X >= limitX && n.Point.Y == limitY) ||
                                                          (n.Point.Y >= limitY && n.Point.X == limitX)).ToList();
 
                 if (extraLNodes != null)
@@ -227,22 +311,22 @@ namespace Data
         public void FillMemberInfo(double horizon, double sectionHeight)
         {
             var labelCounter = 1;
-            for (int i = 0; i < _ListOfNodes.Count; i++)
+            for (int i = 0; i < ListOfNodes.Count; i++)
             {
-                for (int j = i + 1; j < _ListOfNodes.Count; j++)
+                for (int j = i + 1; j < ListOfNodes.Count; j++)
                 {
-                    var lengthOfMember = Math.Sqrt(Math.Pow(_ListOfNodes[j].Point.X - _ListOfNodes[i].Point.X, 2) + Math.Pow(_ListOfNodes[j].Point.Y - _ListOfNodes[i].Point.Y, 2) + Math.Pow(_ListOfNodes[j].Point.Z - _ListOfNodes[i].Point.Z, 2));
+                    var lengthOfMember = Math.Sqrt(Math.Pow(ListOfNodes[j].Point.X - ListOfNodes[i].Point.X, 2) + Math.Pow(ListOfNodes[j].Point.Y - ListOfNodes[i].Point.Y, 2) + Math.Pow(ListOfNodes[j].Point.Z - ListOfNodes[i].Point.Z, 2));
 
                     if (lengthOfMember < horizon * _MeshSize)
                     {
-                        var frameMember = new FrameMember() { IEndNode = _ListOfNodes[i], JEndNode = _ListOfNodes[j], ID = labelCounter };
+                        var frameMember = new FrameMember() { IEndNode = ListOfNodes[i], JEndNode = ListOfNodes[j], ID = labelCounter };
                         //frameMember.SetAsTrussMember();
 
-                        if (_ListOfMembers.Any(x => x.IEndNode == frameMember.JEndNode && x.JEndNode == frameMember.IEndNode))
+                        if (ListOfMembers.Any(x => (x as FrameMember).IEndNode == frameMember.JEndNode && (x as FrameMember).JEndNode == frameMember.IEndNode))
                             continue;
 
                         frameMember.Section = new FrameSection(1, sectionHeight);
-                        _ListOfMembers.Add(frameMember);
+                        ListOfMembers.Add(frameMember);
                         labelCounter++;
                     }
                 }
@@ -317,34 +401,34 @@ namespace Data
             // |      pt              |
             // |______________________|
 
-            var limitX = pointToCut.X;
-            var limitY = pointToCut.Y;
+            //var limitX = pointToCut.X;
+            //var limitY = pointToCut.Y;
 
-            // Remove Nodes
-            var nodesToDelete = _ListOfNodes.Where(x => x.Point.X > limitX &&
-                                                        x.Point.Y > limitY).ToList();
-            if (nodesToDelete == null)
-            {
-                return;
-            }
+            //// Remove Nodes
+            //var nodesToDelete = _ListOfNodes.Where(x => x.Point.X > limitX &&
+            //                                            x.Point.Y > limitY).ToList();
+            //if (nodesToDelete == null)
+            //{
+            //    return;
+            //}
 
-            for (int i = 0; i < nodesToDelete.Count; i++)
-            {
-                _ListOfNodes.Remove(nodesToDelete[i]);
-            }
+            //for (int i = 0; i < nodesToDelete.Count; i++)
+            //{
+            //    _ListOfNodes.Remove(nodesToDelete[i]);
+            //}
 
-            //Remove Members
+            ////Remove Members
 
-            var membersToDelete = _ListOfMembers.Where(m => (m.IEndNode.Point.X > limitX &&
-                                                            m.IEndNode.Point.Y > limitY) ||
-                                                            (m.JEndNode.Point.X > limitX &&
-                                                            m.JEndNode.Point.Y > limitY)).ToList();
+            //var membersToDelete = _ListOfMembers.Where(m => (m.IEndNode.Point.X > limitX &&
+            //                                                m.IEndNode.Point.Y > limitY) ||
+            //                                                (m.JEndNode.Point.X > limitX &&
+            //                                                m.JEndNode.Point.Y > limitY)).ToList();
 
 
-            for (int i = 0; i < membersToDelete.Count; i++)
-            {
-                _ListOfMembers.Remove(membersToDelete[i]);
-            }
+            //for (int i = 0; i < membersToDelete.Count; i++)
+            //{
+            //    _ListOfMembers.Remove(membersToDelete[i]);
+            //}
 
 
 
@@ -353,48 +437,48 @@ namespace Data
 
         private void SetModelShapeAsGapped(Point instPoint, double gapSize)
         {
-            //  ______________________ 
-            // |                      |
-            // |         ______       |
-            // |        |      |      |
-            // |        |______|      |
-            // |      pt              |
-            // |______________________|
+            ////  ______________________ 
+            //// |                      |
+            //// |         ______       |
+            //// |        |      |      |
+            //// |        |______|      |
+            //// |      pt              |
+            //// |______________________|
 
-            var limitBotX = instPoint.X;
-            var limitBotY = instPoint.Y;
-            var limitTopX = instPoint.X + gapSize;
-            var limitTopY = instPoint.Y + gapSize;
+            //var limitBotX = instPoint.X;
+            //var limitBotY = instPoint.Y;
+            //var limitTopX = instPoint.X + gapSize;
+            //var limitTopY = instPoint.Y + gapSize;
 
-            // Remove Nodes
-            var nodesToDelete = _ListOfNodes.Where(x => x.Point.X > limitBotX && x.Point.X < limitTopX &&
-                                                        x.Point.Y > limitBotY && x.Point.Y < limitTopY).ToList();
-            if (nodesToDelete == null)
-            {
-                return;
-            }
+            //// Remove Nodes
+            //var nodesToDelete = _ListOfNodes.Where(x => x.Point.X > limitBotX && x.Point.X < limitTopX &&
+            //                                            x.Point.Y > limitBotY && x.Point.Y < limitTopY).ToList();
+            //if (nodesToDelete == null)
+            //{
+            //    return;
+            //}
 
-            for (int i = 0; i < nodesToDelete.Count; i++)
-            {
-                _ListOfNodes.Remove(nodesToDelete[i]);
-            }
+            //for (int i = 0; i < nodesToDelete.Count; i++)
+            //{
+            //    _ListOfNodes.Remove(nodesToDelete[i]);
+            //}
 
-            //Remove Members
+            ////Remove Members
 
-            var membersToDelete = _ListOfMembers.Where(m => (m.IEndNode.Point.X > limitBotX &&
-                                                            m.IEndNode.Point.X < limitTopX &&
-                                                            m.IEndNode.Point.Y > limitBotY &&
-                                                            m.IEndNode.Point.Y < limitTopY) ||
-                                                            (m.JEndNode.Point.X > limitBotX &&
-                                                            m.JEndNode.Point.X < limitTopX &&
-                                                            m.JEndNode.Point.Y > limitBotY &&
-                                                            m.JEndNode.Point.Y < limitTopY)).ToList();
+            //var membersToDelete = _ListOfMembers.Where(m => (m.IEndNode.Point.X > limitBotX &&
+            //                                                m.IEndNode.Point.X < limitTopX &&
+            //                                                m.IEndNode.Point.Y > limitBotY &&
+            //                                                m.IEndNode.Point.Y < limitTopY) ||
+            //                                                (m.JEndNode.Point.X > limitBotX &&
+            //                                                m.JEndNode.Point.X < limitTopX &&
+            //                                                m.JEndNode.Point.Y > limitBotY &&
+            //                                                m.JEndNode.Point.Y < limitTopY)).ToList();
 
 
-            for (int i = 0; i < membersToDelete.Count; i++)
-            {
-                _ListOfMembers.Remove(membersToDelete[i]);
-            }
+            //for (int i = 0; i < membersToDelete.Count; i++)
+            //{
+            //    _ListOfMembers.Remove(membersToDelete[i]);
+            //}
 
         }
 
@@ -430,6 +514,28 @@ namespace Data
             }
             return ret;
         }
+
+        public override bool SetModelData(RunData modelRunInfo)
+        {
+
+            this.Width = modelRunInfo.MemberDim;
+            this.Height = modelRunInfo.MemberDim;
+            this.MeshSize = modelRunInfo.LatticeMeshSize;
+            this.FillNodeInfo();
+            this.FillMemberInfo(modelRunInfo.Horizon, modelRunInfo.FrameHeight);
+            this.SetModelGeometryType(modelRunInfo.GeometryType);
+            this.SetBorderNodesSupportCondition(modelRunInfo.BorderSupportType);
+            if (modelRunInfo.IsTorsionalRelease)
+            {
+                this.SetTorsionalReleaseToAllMembers();
+            }
+
+
+            return true;
+        }
+
+
+
 
         #endregion
     }

@@ -9,3 +9,5 @@ C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.csproj.CoreCompileInputs.cache
 C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.csproj.CopyComplete
 C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.dll
 C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.pdb
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Adapters.dll
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Adapters.pdb

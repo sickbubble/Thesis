@@ -46,17 +46,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ShellModelResultData.cs" />
-    <Compile Include="ShellModelData.cs" />
-    <Compile Include="LatticeModelResultData.cs" />
-    <Compile Include="IAnlResultData.cs" />
-    <Compile Include="LatticeModelData.cs" />
+    <Compile Include="AnalysisData\RunData.cs" />
+    <Compile Include="FiniteElementData.cs" />
+    <Compile Include="ShellModelData\ShellModelResultData.cs" />
+    <Compile Include="ShellModelData\ShellModelData.cs" />
+    <Compile Include="LatticeModel\LatticeModelResultData.cs" />
+    <Compile Include="AnalysisData\IAnlResultData.cs" />
+    <Compile Include="LatticeModel\LatticeModelData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Adapters\Adapters.csproj">
+      <Project>{51C18839-5855-4930-8564-D3C527BF881F}</Project>
+      <Name>Adapters</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ThesisProject\Model Info.csproj">
       <Project>{89E85E82-9F1A-40C7-8E41-90F4320F82D5}</Project>
       <Name>Model Info</Name>

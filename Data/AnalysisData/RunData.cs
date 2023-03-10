@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using ModelInfo;
 using ThesisProject.Structural_Members;
 
-namespace Solver
+namespace Data
 {
     public class RunDataList
     {
@@ -47,6 +47,9 @@ namespace Solver
         private double _MemberDim;
         private int _ID ;
 
+        private eModelGeometryType _GeometryType;
+        private eSupportType _BorderSupportType;
+
         #endregion
 
 
@@ -65,11 +68,29 @@ namespace Solver
         public double ShellMeshSize { get => _ShellMeshSize; set => _ShellMeshSize = value; }
         public int ID { get => _ID; set => _ID = value; }
         public double MemberDim { get => _MemberDim; set => _MemberDim = value; }
+        public eModelGeometryType GeometryType { get => _GeometryType; set => _GeometryType = value; }
+        public eSupportType BorderSupportType { get => _BorderSupportType; set => _BorderSupportType = value; }
 
         public object Clone()
         {
             throw new NotImplementedException();
         }
+
+        public void FillByRunInfo(RunData runInfo) 
+        {
+            this.FrameHeight = runInfo.FrameHeight;
+            this.AlphaRatio = runInfo.AlphaRatio;
+            this.Horizon = runInfo.Horizon;
+            this.LatticeMeshSize = runInfo.LatticeMeshSize;
+            this.ShellMeshSize = runInfo.ShellMeshSize;
+            this.IsTorsionalRelease = runInfo.IsTorsionalRelease;
+
+        }
+
+
+
+
+
         #endregion
 
 

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Adapters;
 
 namespace Data
 {
@@ -11,11 +8,10 @@ namespace Data
         Lattice = 0,
         Shell = 1
     }
-    public interface IAnlResultData
+    public interface IAnlResultData : IOptimizationAdaptee<IOptimizationObject>
     {
         int AnalysisID { get; set; }
         eAnalysisModelType AnalysisModelType { get; set; }
-
 
 
     }
