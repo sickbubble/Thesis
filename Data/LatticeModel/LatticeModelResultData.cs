@@ -1,4 +1,6 @@
 ﻿using Adapters;
+using OptimizationAlgorithms.Particles;
+using OptimizationAlgorithms.PSOObjects.Particles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,10 +53,19 @@ namespace Data
         public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
         public List<double> ListOfPeriods { get => _ListOfPeriods; set => _ListOfPeriods = value; }
 
-        public IOptimizationObject GetOptimizationObject()
+        public IParticle GetOptimizationObject()
         {
-            throw new NotImplementedException();
-        }
+            var latticeModelParticle = new LatticeParticle(new double[6]);
+
+
+
+
+
+            return latticeModelParticle;
+}
+
+     
+
 
         #endregion
     }

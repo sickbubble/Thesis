@@ -1,4 +1,5 @@
 ﻿using Adapters;
+using OptimizationAlgorithms.Particles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +9,39 @@ using ThesisProject;
 
 namespace Data
 {
+  
+    /// <summary>
+    /// Implement singleton to have only one optimal model
+    /// </summary>
     public class ShellModelResultData : IAnlResultData
     {
         #region Ctor
-        public ShellModelResultData()
-        {
+        
 
+        #endregion
+
+        #region Singleton Implementation
+
+        private ShellModelResultData() { }
+        private static ShellModelResultData instance = null;
+        public static ShellModelResultData Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new ShellModelResultData();
+                }
+                return instance;
+            }
         }
+
+        public static bool IsInstanceValid() 
+        {
+            return (instance != null);
+        }
+
+
         #endregion
 
 
@@ -42,7 +69,7 @@ namespace Data
         public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
         public List<double> ListOfPeriods { get => _ListOfPeriods; set => _ListOfPeriods = value; }
 
-        public IOptimizationObject GetOptimizationObject()
+        public IParticle GetOptimizationObject()
         {
             throw new NotImplementedException();
         }

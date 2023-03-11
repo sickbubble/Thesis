@@ -56,18 +56,12 @@ namespace ThesisProject.Structural_Members
 
         public MatrixCS GetGlobalStiffnessMatrix()
         {
-            var globalStiffnessMatrix = new MatrixCS(12, 12);
-            var rotationMatrix = new MatrixCS(12, 12);
-            var transposedRotMatrix = new MatrixCS(12, 12);
-            var localStiffnessMatrix = new MatrixCS(12, 12);
-
-
-            rotationMatrix = this.GetRotationMatrix();
-            localStiffnessMatrix = this.GetLocalStiffnessMatrix();
-            transposedRotMatrix = rotationMatrix.Transpose();
+            var rotationMatrix = this.GetRotationMatrix();
+            var localStiffnessMatrix = this.GetLocalStiffnessMatrix();
+            var transposedRotMatrix = rotationMatrix.Transpose();
 
             var secondPartOfMultiplication = localStiffnessMatrix.Multiply(rotationMatrix);
-            globalStiffnessMatrix = transposedRotMatrix.Multiply(secondPartOfMultiplication);
+            var globalStiffnessMatrix = transposedRotMatrix.Multiply(secondPartOfMultiplication);
 
             return globalStiffnessMatrix;
         }
@@ -120,46 +114,6 @@ namespace ThesisProject.Structural_Members
 
         public MatrixCS GetRotationMatrix()
         {
-            //var L = GetLength();
-            //var Cx = (this.JEndNode.Point.X - this.IEndNode.Point.X) / L;
-            //var Cy = (this.JEndNode.Point.Y - this.IEndNode.Point.Y) / L;
-            //var Cz = (this.JEndNode.Point.Z - this.IEndNode.Point.Z) / L;
-            //var Cxy = Math.Sqrt(Cx * Cx + Cy * Cy);
-            //var alpha = 0;
-
-            //var Ri = new MatrixCS(3, 3);
-
-            //var rAlpha = new MatrixCS(3, 3);
-
-            //rAlpha.Matrix[0, 0] = 1; 
-            //rAlpha.Matrix[0, 1] = 0; 
-            //rAlpha.Matrix[0, 2] = 0;
-
-            //rAlpha.Matrix[1, 0] = 0;
-            //rAlpha.Matrix[1, 1] = Math.Cos(alpha);
-            //rAlpha.Matrix[1, 2] = Math.Sin(alpha);
-
-            //rAlpha.Matrix[2, 0] = 1;
-            //rAlpha.Matrix[2, 1] = -Math.Sin(alpha);
-            //rAlpha.Matrix[2, 2] = Math.Cos(alpha);
-
-
-            //Ri.Matrix[0, 0] = Cx;
-            //Ri.Matrix[0, 1] = Cz;
-            //Ri.Matrix[0, 2] = Cy;
-            //Ri.Matrix[1, 0] = (-Cz * Cx * Math.Cos(alpha)) - Cy * Math.Sin(alpha) / Cxy;
-            //Ri.Matrix[1, 1] = Cxy * Math.Cos(alpha);
-            //Ri.Matrix[1, 2] = (-Cz * Cy * Math.Cos(alpha)) + Cx * Math.Sin(alpha) / Cxy;
-            //Ri.Matrix[2, 0] = ((Cz * Cx * Math.Sin(alpha)) - Cy * Math.Cos(alpha)) / Cxy;
-            //Ri.Matrix[2, 1] = -Cxy * Math.Sin(alpha);
-            //Ri.Matrix[2, 2] = ((Cz * Cy * Math.Sin(alpha)) + Cx * Math.Cos(alpha)) / Cxy;
-
-
-            //var rotElm = new MatrixCS(12, 12); // 3 columns will be added by using InsertRange
-            //rotElm.InsertMatrix(Ri, 0, 0);
-            //rotElm.InsertMatrix(Ri, 3, 3);
-            //rotElm.InsertMatrix(Ri, 6, 6);
-            //rotElm.InsertMatrix(Ri, 9, 9);
 
             var L = GetLength();
             var cX = (this.JEndNode.Point.X - this.IEndNode.Point.X) / L;
@@ -234,7 +188,7 @@ namespace ThesisProject.Structural_Members
             //return rotElm;
         }
 
-        public MatrixCS GetLocalStiffnessMatrix()
+        public MatrixCS GetLocalStiffnessMatrix(bool useEI = false)
         {
             var section = (FrameSection)_Section;
             var kElm = new MatrixCS(12, 12);
@@ -249,44 +203,114 @@ namespace ThesisProject.Structural_Members
             var I22 = section.I22;
             var J = section.J;
 
+
+
+            var EI = section.EI;
+
             kElm.Matrix[0, 0] = E * A / L;
             kElm.Matrix[0, 6] = -1 * E * A / L;
 
+            if (useEI)
+            {
+                kElm.Matrix[1, 1] = 12 * EI / L3;
+                kElm.Matrix[1, 5] = 6 * EI / L2;
+                kElm.Matrix[1, 7] = -12 * EI / L3;
+                kElm.Matrix[1, 11] = 6 * EI / L2;
+            }
+            else
+            {
             kElm.Matrix[1, 1] = 12 * E * I22 / L3;
             kElm.Matrix[1, 5] = 6 * E * I22 / L2;
             kElm.Matrix[1, 7] = -12 * E * I22 / L3;
             kElm.Matrix[1, 11] = 6 * E * I22 / L2;
+            }
 
+            if (useEI)
+            {
+
+                kElm.Matrix[2, 2] = 12 * EI / L3;
+                kElm.Matrix[2, 4] = -6 * EI / L2;
+                kElm.Matrix[2, 8] = -12 * EI/ L3;
+                kElm.Matrix[2, 10] = -6 * EI / L2;
+
+            }
+            else
+            {
+                 
             kElm.Matrix[2, 2] = 12 * E * I11 / L3;
             kElm.Matrix[2, 4] = -6 * E * I11 / L2;
             kElm.Matrix[2, 8] = -12 * E * I11 / L3;
             kElm.Matrix[2, 10] = -6 * E * I11 / L2;
+            }
 
             kElm.Matrix[3, 3] = G * J / L;
             kElm.Matrix[3, 9] = -1 * G * J / L;
 
             kElm.Matrix[4, 2] = kElm.Matrix[2, 4];
+
+            if (useEI)
+            {
+                kElm.Matrix[4, 4] = 4 * EI / L;
+                kElm.Matrix[4, 8] = 6 * EI / L2;
+                kElm.Matrix[4, 10] = 2 * EI / L;
+
+            }
+            else
+            {
+
             kElm.Matrix[4, 4] = 4 * E * I22 / L;
             kElm.Matrix[4, 8] = 6 * E * I22 / L2;
             kElm.Matrix[4, 10] = 2 * E * I22 / L;
+            }
+
 
             kElm.Matrix[5, 1] = kElm.Matrix[1, 5];
-            kElm.Matrix[5, 5] = 4 * E * I11 / L;
-            kElm.Matrix[5, 7] = -6 * E * I11 / L2;
-            kElm.Matrix[5, 11] = 2 * E * I11 / L;
+            if (useEI)
+            {
+                kElm.Matrix[5, 5] = 4 * EI / L;
+                kElm.Matrix[5, 7] = -6 * EI / L2;
+                kElm.Matrix[5, 11] = 2 * EI / L;
+
+            }
+            else
+            {
+                kElm.Matrix[5, 5] = 4 * E * I11 / L;
+                kElm.Matrix[5, 7] = -6 * E * I11 / L2;
+                kElm.Matrix[5, 11] = 2 * E * I11 / L;
+            }
+
 
             kElm.Matrix[6, 0] = kElm.Matrix[0, 6];
             kElm.Matrix[6, 6] = E * A / L;
 
             kElm.Matrix[7, 1] = kElm.Matrix[1, 7];
             kElm.Matrix[7, 5] = kElm.Matrix[5, 7];
+
+            if (useEI)
+            {
+                kElm.Matrix[7, 7] = 12 * EI / L3;
+                kElm.Matrix[7, 11] = -6 * EI / L2;
+            }
+            else
+            {
             kElm.Matrix[7, 7] = 12 * E * I22 / L3;
             kElm.Matrix[7, 11] = -6 * E * I22 / L2;
+            }
 
             kElm.Matrix[8, 2] = kElm.Matrix[2, 8];
             kElm.Matrix[8, 4] = kElm.Matrix[4, 8];
+
+            if (useEI)
+            {
+                kElm.Matrix[8, 8] = 12 * EI / L3;
+                kElm.Matrix[8, 10] = 6 * EI / L2;
+            }
+            else
+            {
             kElm.Matrix[8, 8] = 12 * E * I11 / L3;
             kElm.Matrix[8, 10] = 6 * E * I11 / L2;
+
+            }
 
             kElm.Matrix[9, 3] = kElm.Matrix[3, 9];
             kElm.Matrix[9, 9] = G * J / L;
@@ -294,12 +318,13 @@ namespace ThesisProject.Structural_Members
             kElm.Matrix[10, 2] = kElm.Matrix[2, 10];
             kElm.Matrix[10, 4] = kElm.Matrix[4, 10];
             kElm.Matrix[10, 8] = kElm.Matrix[8, 10];
-            kElm.Matrix[10, 10] = 4 * E * I22 / L;
+            
+            kElm.Matrix[10, 10] =useEI? 4 * EI / L : 4 * E * I22 / L;
 
             kElm.Matrix[11, 1] = kElm.Matrix[1, 11];
             kElm.Matrix[11, 5] = kElm.Matrix[5, 11];
             kElm.Matrix[11, 7] = kElm.Matrix[7, 11];
-            kElm.Matrix[11, 11] = 4 * E * I11 / L;
+            kElm.Matrix[11, 11] = useEI? 4 * EI/ L : 4 * E * I11 / L;
 
 
             // Check I-End Releases
@@ -461,8 +486,10 @@ namespace ThesisProject.Structural_Members
             //this.IEndCondition
         }
 
+     
 
-        #endregion 
+
+        #endregion
 
     }
 

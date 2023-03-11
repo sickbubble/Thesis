@@ -62,7 +62,6 @@
     <Compile Include="StructuralMembers\Support.cs" />
     <Compile Include="StructuralMembers\Node.cs" />
     <Compile Include="StructuralMembers\IStructuralMember.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

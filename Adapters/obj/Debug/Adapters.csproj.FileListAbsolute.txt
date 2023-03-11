@@ -4,3 +4,7 @@ C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.csproj.AssemblyReferenc
 C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.csproj.CoreCompileInputs.cache
 C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.dll
 C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.pdb
+C:\Users\Burak T\Desktop\Tez\Adapters\bin\Debug\OptimizationAlgorithms.exe
+C:\Users\Burak T\Desktop\Tez\Adapters\bin\Debug\OptimizationAlgorithms.pdb
+C:\Users\Burak T\Desktop\Tez\Adapters\bin\Debug\OptimizationAlgorithms.exe.config
+C:\Users\Burak T\Desktop\Tez\Adapters\obj\Debug\Adapters.csproj.CopyComplete

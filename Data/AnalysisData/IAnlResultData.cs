@@ -1,5 +1,6 @@
 ﻿
 using Adapters;
+using OptimizationAlgorithms.Particles;
 
 namespace Data
 {
@@ -8,7 +9,7 @@ namespace Data
         Lattice = 0,
         Shell = 1
     }
-    public interface IAnlResultData : IOptimizationAdaptee<IOptimizationObject>
+    public interface IAnlResultData 
     {
         int AnalysisID { get; set; }
         eAnalysisModelType AnalysisModelType { get; set; }

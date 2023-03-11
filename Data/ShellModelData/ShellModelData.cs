@@ -18,14 +18,33 @@ namespace Data
         WithOpening =2
     }
 
+   
     public class ShellModelData : FiniteElementModel
     {
-        public ShellModelData()
-        {
+      
+        #region Singleton Implementation
 
+        private ShellModelData() { }
+        private static ShellModelData instance = null;
+        public static ShellModelData Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new ShellModelData();
+                }
+                return instance;
+            }
+        }
+
+        public static bool IsInstanceValid()
+        {
+            return (instance != null);
         }
 
 
+        #endregion
 
 
         #region Private Fields
@@ -397,8 +416,13 @@ namespace Data
 
         }
 
-        public override bool SetModelData(RunData modelRunInfo)
+        public override bool SetModelData(RunData runData)
         {
+
+            if (!(runData is RunInfo)) return false;
+
+            var modelRunInfo = runData as RunInfo;
+
             this.IsOnlyPlate = false;
             this.Width = modelRunInfo.MemberDim;
             this.Height = modelRunInfo.MemberDim;

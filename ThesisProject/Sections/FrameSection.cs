@@ -32,16 +32,18 @@ namespace ThesisProject.Sections
 
         #region Private Fields
 
-        private eSectionType _SectionType;
-        private string _Label;
-        private Material _Material;
+         eSectionType _SectionType;
+         string _Label;
+         Material _Material;
 
-        private double _I11;
-        private double _I22;
-        private double _J;
-        private double _Area;
-        private double _b;
-        private double _h;
+         double _I11;
+         double _EI;
+         double _I22;
+         double _J;
+         double _Area;
+         double _b;
+         double _h;
+        
 
 
         #endregion
@@ -63,8 +65,8 @@ namespace ThesisProject.Sections
         public Material Material { get => _Material; set => _Material= value; }
         public double B { get => _b; set => _b = value; }
         public double H { get => _h; set => _h = value; }
-
-
+        public double EI { get => _EI; set => _EI = value; }
+       
         #endregion
 
 

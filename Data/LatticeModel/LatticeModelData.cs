@@ -1,4 +1,7 @@
-﻿using ModelInfo;
+﻿using Adapters;
+using ModelInfo;
+using OptimizationAlgorithms.Particles;
+using OptimizationAlgorithms.PSOObjects.Particles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,8 +15,8 @@ using ThesisProject.Structural_Members;
 
 namespace Data
 {
-   
- 
+
+
     public class LatticeModelData : FiniteElementModel
     {
         #region Ctor
@@ -23,30 +26,29 @@ namespace Data
         }
         #endregion
 
-
         #region Private Fields
 
-        private double _Width;
-        private double _Height;
-        private double _MeshSize;
+         double _Width;
+         double _Height;
+         double _MeshSize;
 
-        private double _LatticeMeshRatio;
+         double _LatticeMeshRatio;
+        eHorizon _Horizon;
 
 
         #endregion
 
         #region Public Properties
 
- 
+
         public double Width { get => _Width; set => _Width = value; }
         public double Height { get => _Height; set => _Height = value; }
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
         public double LatticeMeshRatio { get => _LatticeMeshRatio; set => _LatticeMeshRatio = value; }
+        public eHorizon Horizon { get => _Horizon; set => _Horizon = value; }
 
 
         #endregion
-
-
 
         #region Public Methods
 
@@ -107,10 +109,46 @@ namespace Data
 
         }
 
-        
-        public void AssignRatio(double ratio, double alphaRatio) 
+        public void SetEndConditon(eEndConditionSet endCondition)
         {
-            
+            if (this.ListOfMembers != null)
+            {
+
+                for (int i = 0; i < this.ListOfMembers.Count; i++)
+                {
+                    var member = (FrameMember)this.ListOfMembers[i];
+
+                    switch (endCondition)
+                    {
+                        case eEndConditionSet.AllFixed:
+                            break;
+                        case eEndConditionSet.TorsionalRelease:
+                            member.IEndCondition.IsReleaseMx = true;
+                            member.JEndCondition.IsReleaseMx = true;
+                            break;
+                        case eEndConditionSet.WeakSideRotation:
+                            member.IEndCondition.IsReleaseMy = true;
+                            member.JEndCondition.IsReleaseMy = true;
+                            break;
+                        case eEndConditionSet.TorsionalReleaseAndWeakSide:
+                            member.IEndCondition.IsReleaseMy = true;
+                            member.JEndCondition.IsReleaseMy = true;
+                            member.IEndCondition.IsReleaseMx = true;
+                            member.JEndCondition.IsReleaseMx = true;
+                            break;
+                        
+                    }
+
+                }
+
+            }
+
+        }
+
+
+        public void AssignRatio(double ratio, double alphaRatio)
+        {
+
             var shortMemberLength = this.ListOfMembers.Min(x => (x as FrameMember).GetLength());
 
             for (int i = 0; i < this.ListOfMembers.Count; i++)
@@ -128,7 +166,7 @@ namespace Data
             }
         }
 
-        
+
         public void SetReleaseAllRotations()
         {
             if (this.ListOfMembers != null)
@@ -308,14 +346,16 @@ namespace Data
 
         }
 
-        public void FillMemberInfo(double horizon, double sectionHeight)
+        public void FillMemberInfo( double sectionHeight)
         {
             var labelCounter = 1;
+            var horizon = this.Horizon == eHorizon.DenseMesh ? 3.01 : 1.51;
             for (int i = 0; i < ListOfNodes.Count; i++)
             {
                 for (int j = i + 1; j < ListOfNodes.Count; j++)
                 {
                     var lengthOfMember = Math.Sqrt(Math.Pow(ListOfNodes[j].Point.X - ListOfNodes[i].Point.X, 2) + Math.Pow(ListOfNodes[j].Point.Y - ListOfNodes[i].Point.Y, 2) + Math.Pow(ListOfNodes[j].Point.Z - ListOfNodes[i].Point.Z, 2));
+
 
                     if (lengthOfMember < horizon * _MeshSize)
                     {
@@ -515,25 +555,48 @@ namespace Data
             return ret;
         }
 
-        public override bool SetModelData(RunData modelRunInfo)
+        public override bool SetModelData(RunData runData)
         {
+            if (!(runData is RunInfo)) return false;
+
+            var modelRunInfo = runData as RunInfo;
+               
 
             this.Width = modelRunInfo.MemberDim;
             this.Height = modelRunInfo.MemberDim;
             this.MeshSize = modelRunInfo.LatticeMeshSize;
             this.FillNodeInfo();
-            this.FillMemberInfo(modelRunInfo.Horizon, modelRunInfo.FrameHeight);
+            this.FillMemberInfo(modelRunInfo.FrameHeight);
             this.SetModelGeometryType(modelRunInfo.GeometryType);
             this.SetBorderNodesSupportCondition(modelRunInfo.BorderSupportType);
-            if (modelRunInfo.IsTorsionalRelease)
-            {
-                this.SetTorsionalReleaseToAllMembers();
-            }
+
+            this.SetEndConditon(modelRunInfo.EndConditionValue);
 
 
             return true;
         }
+        public bool UpdateModelForOptimization(eEndConditionSet eEndConditionSet,eHorizon horizon) 
+        {
+            if (horizon != _Horizon)
+            {
+            this.FillMemberInfo(this.Height);
+            }
 
+            this.SetEndConditon(eEndConditionSet);
+
+            return true;
+        }
+
+        public IParticle GetOptimizationObject()
+        {
+
+            var e = (this.ListOfMembers.FirstOrDefault() as FrameMember).Section.Material.E;
+
+            var latticeParticle = new LatticeParticle(new double[0]);
+
+
+            return latticeParticle;
+        }
 
 
 

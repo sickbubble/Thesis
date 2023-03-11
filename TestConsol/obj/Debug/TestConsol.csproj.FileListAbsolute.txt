@@ -103,3 +103,6 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.exe
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.pdb
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Adapters.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Adapters.pdb
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.exe
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.pdb
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.exe.config

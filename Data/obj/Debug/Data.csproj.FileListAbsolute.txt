@@ -11,3 +11,6 @@ C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.dll
 C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.pdb
 C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Adapters.dll
 C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Adapters.pdb
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.exe
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.pdb
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.exe.config

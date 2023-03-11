@@ -68,7 +68,8 @@ namespace ThesisProject.Structural_Members
         public int ID { get => _ID; set => _ID = value; }
         public bool IsOnlyPlate { get => _IsOnlyPlate; set => _IsOnlyPlate = value; }
 
-        public MatrixCS GetLocalStiffnessMatrix()
+   
+        public MatrixCS GetLocalStiffnessMatrix(bool useEI = false)
         {
             // Stiffness matrix is calculated at four Gauss points using Gauss Quadrature
             // It is assumed that nodes are oriented in counter-clock wise direction
@@ -861,7 +862,7 @@ namespace ThesisProject.Structural_Members
             return globalStiffnesMatrix;
         }
 
-        public MatrixCS GetLocalMassMatrix()
+        public MatrixCS GetLocalMassMatrix(bool useEI = false)
         {
             {
                 // Map coordinates of flat plane to 2-D surface
@@ -1081,6 +1082,8 @@ namespace ThesisProject.Structural_Members
             return im;
 
         }
+
+       
         #endregion
     }
 }

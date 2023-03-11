@@ -10,29 +10,42 @@ using Accord.Math.Decompositions;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Accord.Math;
 using ThesisProject.AssemblyInfo;
+using OptimizationAlgorithms.Types;
+using OptimizationAlgorithms.PSOObjects.Particles;
 
 namespace Solver
 {
+   
 
     public class LinearSolver
     {
 
 
-        #region Ctor
+       
 
-        public LinearSolver()
+        #region Singleton Implementation
+
+        private LinearSolver() { }
+        private static LinearSolver instance = null;
+        public static LinearSolver Instance
         {
-            
-
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new LinearSolver();
+                }
+                return instance;
+            }
         }
 
-       
+        public static bool IsInstanceValid()
+        {
+            return (instance != null);
+        }
+
+
         #endregion
-
-        #region Private Fields
-
-        #endregion
-
         #region Public Methods
 
 
@@ -212,7 +225,7 @@ namespace Solver
 
     
 
-        public RunData EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel,ShellModelData shellModalData,double alphaRatio)
+        public RunResult EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel,ShellModelData shellModalData,double alphaRatio)
         {
             //Calculate internal energies to have the ratio to equalize systems
             var shellInternalEnergy = GetShellModelInternalEnergy(shellModelRes.DispRes,shellModalData);
@@ -231,7 +244,7 @@ namespace Solver
             
             
             //Initialize result data
-            var resultData = new RunData();
+            var resultData = new RunResult();
             //TODO: Fill eigen value part of result data
             
             // Get node compare data
@@ -241,7 +254,7 @@ namespace Solver
         }
 
 
-        private List<NodeCompareData> GetNodeCompareDataList(ShellModelResultData shellModelRes, LatticeModelResultData newLatticeRes,ShellModelData shellModelData) 
+        public List<NodeCompareData> GetNodeCompareDataList(ShellModelResultData shellModelRes, LatticeModelResultData newLatticeRes,ShellModelData shellModelData) 
         {
             Console.WriteLine("Lattice/Shell Node Vertical Deflections");
             var nodeCompareList = new List<NodeCompareData>();
@@ -282,15 +295,15 @@ namespace Solver
             return nodeCompareList;
         }
 
-        public ShellModelResultData RunAnalysis_Shell(ShellModelData shellModelData)
+        public ShellModelResultData RunAnalysis_Shell( )
         {
-            var shellModelResultData = new ShellModelResultData();
-            
+            var shellModelResultData = ShellModelResultData.Instance;
 
-            shellModelData.SetNodeAssemblyData();
 
-            var KG = shellModelData.GetGlobalStiffness();
-            var RHS = shellModelData.GetRightHandSide();
+            ShellModelData.Instance.SetNodeAssemblyData();
+
+            var KG = ShellModelData.Instance.GetGlobalStiffness();
+            var RHS = ShellModelData.Instance.GetRightHandSide();
 
             var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
             var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
@@ -301,7 +314,7 @@ namespace Solver
             var dispResMatrix = new MatrixCS(dispResAsArray.Length, 1);
 
             dispResMatrix.Matrix = dispResAsArray;
-            var mass = shellModelData.GetMassMatrix();
+            var mass = ShellModelData.Instance.GetMassMatrix();
             //var res = GetPeriodsOfTheSystem(KG, mass);
 
 
@@ -319,13 +332,13 @@ namespace Solver
             //}
             //Console.WriteLine("--------------------------");
 
-            var internalEnergy = GetShellModelInternalEnergy(dispResMatrix,shellModelData);
+            var internalEnergy = GetShellModelInternalEnergy(dispResMatrix, ShellModelData.Instance);
 
 
             shellModelResultData.DispRes = dispResMatrix;
             shellModelResultData.NodeResults = new Dictionary<ModelInfo.Point, List<double>>();
 
-            GetNodeResults(dispResAsArray,shellModelResultData.NodeResults, shellModelData);
+            GetNodeResults(dispResAsArray,shellModelResultData.NodeResults, ShellModelData.Instance);
 
 
 

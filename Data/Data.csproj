@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AnalysisData\RunData.cs" />
+    <Compile Include="OptimizationSets.cs" />
     <Compile Include="FiniteElementData.cs" />
     <Compile Include="ShellModelData\ShellModelResultData.cs" />
     <Compile Include="ShellModelData\ShellModelData.cs" />
@@ -59,6 +60,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Masters Work\Optimization\OptimizationAlgorithms\OptimizationAlgorithms\OptimizationAlgorithms\OptimizationAlgorithms.csproj">
+      <Project>{D3AE5599-0FFF-4381-BAF8-EC6979E1DBC7}</Project>
+      <Name>OptimizationAlgorithms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Adapters\Adapters.csproj">
       <Project>{51C18839-5855-4930-8564-D3C527BF881F}</Project>
       <Name>Adapters</Name>

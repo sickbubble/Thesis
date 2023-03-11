@@ -17,7 +17,7 @@ namespace ThesisProject
         int ID { get; set; }
         eMemberType MemberType { get; set; }
 
-        MatrixCS GetLocalStiffnessMatrix();
+        MatrixCS GetLocalStiffnessMatrix(bool useEI = false);
 
         MatrixCS GetGlobalStiffnessMatrix();
 

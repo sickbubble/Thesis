@@ -143,6 +143,14 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Masters Work\Optimization\OptimizationAlgorithms\OptimizationAlgorithms\OptimizationAlgorithms\OptimizationAlgorithms.csproj">
+      <Project>{D3AE5599-0FFF-4381-BAF8-EC6979E1DBC7}</Project>
+      <Name>OptimizationAlgorithms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Adapters\Adapters.csproj">
+      <Project>{51C18839-5855-4930-8564-D3C527BF881F}</Project>
+      <Name>Adapters</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Data\Data.csproj">
       <Project>{C07CEA18-19C3-4B10-9E0E-53DA5A84A668}</Project>
       <Name>Data</Name>

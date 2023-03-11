@@ -3,11 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Adapters;
 using ModelInfo;
+using OptimizationAlgorithms;
+using OptimizationAlgorithms.Particles;
+using OptimizationAlgorithms.PSOObjects.Particles;
+using OptimizationAlgorithms.PSOObjects.Swarms;
+using OptimizationAlgorithms.Swarms;
 using ThesisProject.Structural_Members;
 
 namespace Data
 {
+ 
+
     public class RunDataList
     {
         public RunDataList()
@@ -17,13 +25,48 @@ namespace Data
 
 
 
-        public List<RunData> ListOfRunData { get  ; set  ; }
+        public List<RunData> ListOfRunData { get; set; }
     }
 
-    public class RunData : ICloneable
+    public abstract class RunData
+    {
+
+
+        #region Private Fields
+
+        private double _ShellThickness;
+        private double _AlphaRatio;
+
+        private eHorizon _Horizon;
+        private eEndConditionSet _EndConditionValue;
+
+
+        private double _LatticeMeshSize;
+        private double _ShellMeshSize;
+        private double _MemberDim;
+
+
+
+
+        #endregion
+
+
+        #region Public Properties
+        public double FrameHeight { get => _ShellThickness; set => _ShellThickness = value; }
+        public double AlphaRatio { get => _AlphaRatio; set => _AlphaRatio = value; }
+        public eHorizon Horizon { get => _Horizon; set => _Horizon = value; }
+        public eEndConditionSet EndConditionValue { get => _EndConditionValue; set => _EndConditionValue = value; }
+        public double LatticeMeshSize { get => _LatticeMeshSize; set => _LatticeMeshSize = value; }
+        public double ShellMeshSize { get => _ShellMeshSize; set => _ShellMeshSize = value; }
+        public double MemberDim { get => _MemberDim; set => _MemberDim = value; }
+
+        #endregion
+    }
+
+    public class RunResult : RunData, ICloneable, IParticleSwarmOptimizationAdaptee
     {
         #region Ctor
-        public RunData()
+        public RunResult()
         {
 
         }
@@ -32,42 +75,121 @@ namespace Data
 
         #region Private Fields
 
-        private Node _MinControlNode; 
+        private Node _MinControlNode;
         private List<NodeCompareData> _NodeCompareData;
         private List<double> _ShellPeriods;
         private List<double> _LatticePeriods;
-        private double _ShellThickness;
         private double _EnergyRatio;
-        private double _AlphaRatio;
-        private double _Horizon;
-        private bool _IsTorsionalRelease;
-        private double _PercentDiff;
-        private double _LatticeMeshSize;
-        private double _ShellMeshSize;
-        private double _MemberDim;
-        private int _ID ;
+        private double[] _LatticeDisplacements;
+        private double[] _ShellDisplacements;
 
-        private eModelGeometryType _GeometryType;
-        private eSupportType _BorderSupportType;
+        private double _PercentDiff;
+
+        private int _ID;
+
 
         #endregion
 
 
         #region Public Properties
         public List<NodeCompareData> NodeCompareData { get => _NodeCompareData; set => _NodeCompareData = value; }
-        public double FrameHeight { get => _ShellThickness; set => _ShellThickness = value; }
         public double EnergyRatio { get => _EnergyRatio; set => _EnergyRatio = value; }
-        public double AlphaRatio { get => _AlphaRatio; set => _AlphaRatio = value; }
-        public double Horizon { get => _Horizon; set => _Horizon = value; }
-        public bool IsTorsionalRelease { get => _IsTorsionalRelease; set => _IsTorsionalRelease = value; }
         public Node MinControlNode { get => _MinControlNode; set => _MinControlNode = value; }
         public double PercentDiff { get => _PercentDiff; set => _PercentDiff = value; }
         public List<double> ShellPeriods { get => _ShellPeriods; set => _ShellPeriods = value; }
         public List<double> LatticePeriods { get => _LatticePeriods; set => _LatticePeriods = value; }
-        public double LatticeMeshSize { get => _LatticeMeshSize; set => _LatticeMeshSize = value; }
-        public double ShellMeshSize { get => _ShellMeshSize; set => _ShellMeshSize = value; }
         public int ID { get => _ID; set => _ID = value; }
-        public double MemberDim { get => _MemberDim; set => _MemberDim = value; }
+
+        public object Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void FillByRunInfo(RunData runInfo)
+        {
+            this.FrameHeight = runInfo.FrameHeight;
+            this.AlphaRatio = runInfo.AlphaRatio;
+            this.Horizon = runInfo.Horizon;
+            this.LatticeMeshSize = runInfo.LatticeMeshSize;
+            this.ShellMeshSize = runInfo.ShellMeshSize;
+
+        }
+
+
+        public IParticle GetOptimizationObject()
+        {
+            for (int i = 0; i < this.NodeCompareData.Count; i++)
+            {
+                _LatticeDisplacements[i] = this.NodeCompareData[i].LatticeVerticalDisp;
+            }
+            IParticle particle = new LatticeParticle(_LatticeDisplacements);
+            return particle;
+        }
+
+        public double[] GetBestSolution()
+        {
+            for (int i = 0; i < this.NodeCompareData.Count; i++)
+            {
+                _ShellDisplacements[i] = this.NodeCompareData[i].LatticeVerticalDisp;
+            }
+            return _ShellDisplacements;
+        }
+
+        public double[] GetDisplacementProfile()
+        {
+            for (int i = 0; i < this.NodeCompareData.Count; i++)
+            {
+                _LatticeDisplacements[i] = this.NodeCompareData[i].LatticeVerticalDisp;
+            }
+            return _LatticeDisplacements;
+        }
+
+        ISwarm IOptimizationAdaptee<ISwarm>.GetOptimizationObject()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+
+
+        #endregion
+
+
+    }
+
+
+    public class RunInfo : RunData, ICloneable
+    {
+        #region Ctor
+        public RunInfo()
+        {
+
+        }
+
+        #endregion
+
+        #region Private Fields
+
+
+        private double _ShellThickness;
+        private double _AlphaRatio;
+
+
+        private eHorizon _Horizon;
+        private eEndConditionSet _EndConditionValue;
+        private eSupportType _BorderSupportType;
+
+        private double _LatticeMeshSize;
+        private double _ShellMeshSize;
+        private double _MemberDim;
+
+        private eModelGeometryType _GeometryType;
+
+        #endregion
+
+
+        #region Public Properties
         public eModelGeometryType GeometryType { get => _GeometryType; set => _GeometryType = value; }
         public eSupportType BorderSupportType { get => _BorderSupportType; set => _BorderSupportType = value; }
 
@@ -76,14 +198,14 @@ namespace Data
             throw new NotImplementedException();
         }
 
-        public void FillByRunInfo(RunData runInfo) 
+        public void FillByRunInfo(RunData runInfo)
         {
             this.FrameHeight = runInfo.FrameHeight;
             this.AlphaRatio = runInfo.AlphaRatio;
             this.Horizon = runInfo.Horizon;
             this.LatticeMeshSize = runInfo.LatticeMeshSize;
             this.ShellMeshSize = runInfo.ShellMeshSize;
-            this.IsTorsionalRelease = runInfo.IsTorsionalRelease;
+            this.EndConditionValue = runInfo.EndConditionValue;
 
         }
 
