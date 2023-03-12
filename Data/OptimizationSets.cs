@@ -6,6 +6,36 @@ using System.Threading.Tasks;
 
 namespace Data
 {
+    public class ThesisDataContainer
+    {
+
+        public  Dictionary<int, LatticeModelData> LatticeModels ;
+
+
+        #region Singleton Implementation
+
+        private ThesisDataContainer() { }
+        private static ThesisDataContainer instance = null;
+        public static ThesisDataContainer Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new ThesisDataContainer();
+                }
+                return instance;
+            }
+        }
+
+        public static bool IsInstanceValid()
+        {
+            return (instance != null);
+        }
+
+
+        #endregion
+    }
     public enum eEndConditionSet
     {
         AllFixed = 1,

@@ -34,7 +34,7 @@ namespace Data
 
         #region Private Fields
 
-        private double _ShellThickness;
+        private double _FrameHeight;
         private double _AlphaRatio;
 
         private eHorizon _Horizon;
@@ -52,7 +52,7 @@ namespace Data
 
 
         #region Public Properties
-        public double FrameHeight { get => _ShellThickness; set => _ShellThickness = value; }
+        public double FrameHeight { get => _FrameHeight; set => _FrameHeight = value; }
         public double AlphaRatio { get => _AlphaRatio; set => _AlphaRatio = value; }
         public eHorizon Horizon { get => _Horizon; set => _Horizon = value; }
         public eEndConditionSet EndConditionValue { get => _EndConditionValue; set => _EndConditionValue = value; }
@@ -128,6 +128,10 @@ namespace Data
 
         public double[] GetBestSolution()
         {
+            if (_ShellDisplacements == null)
+            {
+                _ShellDisplacements = new double[this.NodeCompareData.Count];
+            }
             for (int i = 0; i < this.NodeCompareData.Count; i++)
             {
                 _ShellDisplacements[i] = this.NodeCompareData[i].LatticeVerticalDisp;
@@ -137,6 +141,11 @@ namespace Data
 
         public double[] GetDisplacementProfile()
         {
+            if (_LatticeDisplacements == null)
+            {
+                _LatticeDisplacements = new double[this.NodeCompareData.Count];
+            }
+
             for (int i = 0; i < this.NodeCompareData.Count; i++)
             {
                 _LatticeDisplacements[i] = this.NodeCompareData[i].LatticeVerticalDisp;
@@ -172,24 +181,17 @@ namespace Data
         #region Private Fields
 
 
+
         private double _ShellThickness;
-        private double _AlphaRatio;
-
-
-        private eHorizon _Horizon;
-        private eEndConditionSet _EndConditionValue;
         private eSupportType _BorderSupportType;
-
-        private double _LatticeMeshSize;
-        private double _ShellMeshSize;
-        private double _MemberDim;
-
         private eModelGeometryType _GeometryType;
 
         #endregion
 
 
         #region Public Properties
+        public double ShellThickness { get => _ShellThickness; set => _ShellThickness = value; }
+
         public eModelGeometryType GeometryType { get => _GeometryType; set => _GeometryType = value; }
         public eSupportType BorderSupportType { get => _BorderSupportType; set => _BorderSupportType = value; }
 

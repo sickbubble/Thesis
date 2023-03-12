@@ -30,10 +30,12 @@ namespace Data
 
          double _Width;
          double _Height;
+         double _FrameHeight;
          double _MeshSize;
 
          double _LatticeMeshRatio;
         eHorizon _Horizon;
+        double _AlphaRatio;
 
 
         #endregion
@@ -43,9 +45,11 @@ namespace Data
 
         public double Width { get => _Width; set => _Width = value; }
         public double Height { get => _Height; set => _Height = value; }
+        public double FrameHeight { get => _FrameHeight; set => _FrameHeight = value; }
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
         public double LatticeMeshRatio { get => _LatticeMeshRatio; set => _LatticeMeshRatio = value; }
         public eHorizon Horizon { get => _Horizon; set => _Horizon = value; }
+        public double AlphaRatio { get => _AlphaRatio; set => _AlphaRatio = value; }
 
 
         #endregion
@@ -372,6 +376,16 @@ namespace Data
                 }
             }
         }
+        public void SetFramesUwByTotalMass(double totalMass) 
+        {
+            var singleFrameMass = totalMass / this.ListOfMembers.Count;
+
+            foreach (var frmMember in this.ListOfMembers)
+            {
+                (frmMember as FrameMember).SetUwByMass(singleFrameMass);
+            }
+
+        }
 
         public void FillNodeInfo()
         {
@@ -560,11 +574,12 @@ namespace Data
             if (!(runData is RunInfo)) return false;
 
             var modelRunInfo = runData as RunInfo;
-               
 
+            this.AlphaRatio = runData.AlphaRatio;
             this.Width = modelRunInfo.MemberDim;
             this.Height = modelRunInfo.MemberDim;
             this.MeshSize = modelRunInfo.LatticeMeshSize;
+            this.FrameHeight = modelRunInfo.FrameHeight;
             this.FillNodeInfo();
             this.FillMemberInfo(modelRunInfo.FrameHeight);
             this.SetModelGeometryType(modelRunInfo.GeometryType);
@@ -575,13 +590,12 @@ namespace Data
 
             return true;
         }
-        public bool UpdateModelForOptimization(eEndConditionSet eEndConditionSet,eHorizon horizon) 
+        public bool UpdateModelForOptimization(eEndConditionSet eEndConditionSet,eHorizon horizon,double alphaRatio) 
         {
-            if (horizon != _Horizon)
-            {
-            this.FillMemberInfo(this.Height);
-            }
+            if (horizon != _Horizon) this.FillMemberInfo(this.FrameHeight);
 
+            if (this.AlphaRatio != alphaRatio) this.AlphaRatio = alphaRatio;
+            
             this.SetEndConditon(eEndConditionSet);
 
             return true;

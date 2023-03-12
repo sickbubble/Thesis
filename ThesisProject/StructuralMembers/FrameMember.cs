@@ -68,7 +68,7 @@ namespace ThesisProject.Structural_Members
 
         public void SetAsTrussMember()
         {
-            var trussReleases= new EndCondition() ;
+            var trussReleases = new EndCondition();
             trussReleases.IsReleaseMx = true;
             trussReleases.IsReleaseMy = true;
             trussReleases.IsReleaseMz = true;
@@ -79,13 +79,14 @@ namespace ThesisProject.Structural_Members
             this.JEndCondition = trussReleases;
         }
 
-      public double GetMass()
+        public double GetMass()
         {
-            var A = this.Section.Area;
-            var rho = this.Section.Material.Uw * A;
-            double L = this.GetLength();
+            return this.Section.Material.Uw * this.Section.Area * this.GetLength();
+        }
 
-            return rho * L;
+        public void SetUwByMass(double totalMass)
+        {
+            this.Section.Material.Uw = totalMass / (this.Section.Area * this.GetLength());
         }
 
         public double GetLength()
@@ -181,7 +182,7 @@ namespace ThesisProject.Structural_Members
                 for (int j = 9; j < 12; j++)
                     rotElm.Matrix[i, j] = retVal.Matrix[i - 9, j - 9];
 
-    
+
 
             return rotElm;
 
@@ -219,10 +220,10 @@ namespace ThesisProject.Structural_Members
             }
             else
             {
-            kElm.Matrix[1, 1] = 12 * E * I22 / L3;
-            kElm.Matrix[1, 5] = 6 * E * I22 / L2;
-            kElm.Matrix[1, 7] = -12 * E * I22 / L3;
-            kElm.Matrix[1, 11] = 6 * E * I22 / L2;
+                kElm.Matrix[1, 1] = 12 * E * I22 / L3;
+                kElm.Matrix[1, 5] = 6 * E * I22 / L2;
+                kElm.Matrix[1, 7] = -12 * E * I22 / L3;
+                kElm.Matrix[1, 11] = 6 * E * I22 / L2;
             }
 
             if (useEI)
@@ -230,17 +231,17 @@ namespace ThesisProject.Structural_Members
 
                 kElm.Matrix[2, 2] = 12 * EI / L3;
                 kElm.Matrix[2, 4] = -6 * EI / L2;
-                kElm.Matrix[2, 8] = -12 * EI/ L3;
+                kElm.Matrix[2, 8] = -12 * EI / L3;
                 kElm.Matrix[2, 10] = -6 * EI / L2;
 
             }
             else
             {
-                 
-            kElm.Matrix[2, 2] = 12 * E * I11 / L3;
-            kElm.Matrix[2, 4] = -6 * E * I11 / L2;
-            kElm.Matrix[2, 8] = -12 * E * I11 / L3;
-            kElm.Matrix[2, 10] = -6 * E * I11 / L2;
+
+                kElm.Matrix[2, 2] = 12 * E * I11 / L3;
+                kElm.Matrix[2, 4] = -6 * E * I11 / L2;
+                kElm.Matrix[2, 8] = -12 * E * I11 / L3;
+                kElm.Matrix[2, 10] = -6 * E * I11 / L2;
             }
 
             kElm.Matrix[3, 3] = G * J / L;
@@ -258,9 +259,9 @@ namespace ThesisProject.Structural_Members
             else
             {
 
-            kElm.Matrix[4, 4] = 4 * E * I22 / L;
-            kElm.Matrix[4, 8] = 6 * E * I22 / L2;
-            kElm.Matrix[4, 10] = 2 * E * I22 / L;
+                kElm.Matrix[4, 4] = 4 * E * I22 / L;
+                kElm.Matrix[4, 8] = 6 * E * I22 / L2;
+                kElm.Matrix[4, 10] = 2 * E * I22 / L;
             }
 
 
@@ -293,8 +294,8 @@ namespace ThesisProject.Structural_Members
             }
             else
             {
-            kElm.Matrix[7, 7] = 12 * E * I22 / L3;
-            kElm.Matrix[7, 11] = -6 * E * I22 / L2;
+                kElm.Matrix[7, 7] = 12 * E * I22 / L3;
+                kElm.Matrix[7, 11] = -6 * E * I22 / L2;
             }
 
             kElm.Matrix[8, 2] = kElm.Matrix[2, 8];
@@ -307,8 +308,8 @@ namespace ThesisProject.Structural_Members
             }
             else
             {
-            kElm.Matrix[8, 8] = 12 * E * I11 / L3;
-            kElm.Matrix[8, 10] = 6 * E * I11 / L2;
+                kElm.Matrix[8, 8] = 12 * E * I11 / L3;
+                kElm.Matrix[8, 10] = 6 * E * I11 / L2;
 
             }
 
@@ -318,13 +319,13 @@ namespace ThesisProject.Structural_Members
             kElm.Matrix[10, 2] = kElm.Matrix[2, 10];
             kElm.Matrix[10, 4] = kElm.Matrix[4, 10];
             kElm.Matrix[10, 8] = kElm.Matrix[8, 10];
-            
-            kElm.Matrix[10, 10] =useEI? 4 * EI / L : 4 * E * I22 / L;
+
+            kElm.Matrix[10, 10] = useEI ? 4 * EI / L : 4 * E * I22 / L;
 
             kElm.Matrix[11, 1] = kElm.Matrix[1, 11];
             kElm.Matrix[11, 5] = kElm.Matrix[5, 11];
             kElm.Matrix[11, 7] = kElm.Matrix[7, 11];
-            kElm.Matrix[11, 11] = useEI? 4 * EI/ L : 4 * E * I11 / L;
+            kElm.Matrix[11, 11] = useEI ? 4 * EI / L : 4 * E * I11 / L;
 
 
             // Check I-End Releases
@@ -486,7 +487,7 @@ namespace ThesisProject.Structural_Members
             //this.IEndCondition
         }
 
-     
+
 
 
         #endregion

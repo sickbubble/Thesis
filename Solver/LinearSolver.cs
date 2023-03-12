@@ -12,12 +12,16 @@ using Accord.Math;
 using ThesisProject.AssemblyInfo;
 using OptimizationAlgorithms.Types;
 using OptimizationAlgorithms.PSOObjects.Particles;
+using OptimizationAlgorithms.Particles;
 
 namespace Solver
-{
-   
 
-    public class LinearSolver
+
+{
+
+
+
+    public class LinearSolver :  IObserver
     {
 
 
@@ -166,43 +170,26 @@ namespace Solver
 
         }
 
-        public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata)
+        public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata, bool equalizeSystems = false)
         {
             var latticeModelResultData = new LatticeModelResultData();
             latticemodeldata.SetNodeAssemblyData();
 
 
+
+            // Get Mode Shapes
+            //var mass = latticemodeldata.GetMassMatrix();
+            //var modeShapesLattice = GetModeShapesOfSystem(KG, mass, 2);
+
+
             var KG = latticemodeldata. GetGlobalStiffness();
             var RHS = latticemodeldata.GetRightHandSide();
-            var mass = latticemodeldata.GetMassMatrix();
-            
-            var modeShapesLattice = GetModeShapesOfSystem(KG, mass, 2);
-
-
-            //var res = GetPeriodsOfTheSystem(KG, mass);
-
-            //for (int i = 0; i < 6; i++)
-            //{
-            //    latticeModelResultData.ListOfPeriods.Add(res[i]);
-            //}
-            //Console.WriteLine("Lattice Model Periods");
-
-            //Console.WriteLine("--------------------------");
-            //for (int i = 0; i < res.Count; i++)
-            //{
-            //    Console.WriteLine("Mode No: " + (i + 1).ToString() + " Period:" + res[i].ToString());
-            //}
-            //Console.WriteLine("--------------------------");
-
-
 
             var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
             var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
             
 
             var dispRes = externalKG.Solve(externalRHS);
-
-
 
 
             var dispResAsArray = dispRes.ToArray();
@@ -217,6 +204,11 @@ namespace Solver
             GetNodeResults(dispResAsArray,latticeModelResultData.NodeResults, latticemodeldata);
             FillFrameMemberResults(latticeModelResultData,latticemodeldata);
 
+
+            if (equalizeSystems)
+            {
+            latticeModelResultData = EqualizeSystems(latticeModelResultData, latticemodeldata, latticemodeldata.AlphaRatio);
+            }
            
 
             return latticeModelResultData;
@@ -225,50 +217,34 @@ namespace Solver
 
     
 
-        public RunResult EqualizeSystems(ShellModelResultData shellModelRes,LatticeModelResultData latticeModelRes,LatticeModelData latticeModel,ShellModelData shellModalData,double alphaRatio)
+        public LatticeModelResultData EqualizeSystems(LatticeModelResultData latticeModelRes,LatticeModelData latticeModel ,double alphaRatio)
         {
             //Calculate internal energies to have the ratio to equalize systems
-            var shellInternalEnergy = GetShellModelInternalEnergy(shellModelRes.DispRes,shellModalData);
+            var shellInternalEnergy = GetShellModelInternalEnergy(ShellModelResultData.Instance.DispRes, ShellModelData.Instance);
             var latticeInternalEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
             
-            
-            //Assign ratio to equalize internal eneries
+                        //Assign ratio to equalize internal eneries
             latticeModel.AssignRatio(shellInternalEnergy / latticeInternalEnergy, alphaRatio);
-
-
-   
-            //shellModelRes.DispRes.Print();
-            //newLatticeRes.DispRes.Print();
-
-
-            
-            
-            //Initialize result data
-            var resultData = new RunResult();
-            //TODO: Fill eigen value part of result data
-            
-            // Get node compare data
-            resultData.NodeCompareData = GetNodeCompareDataList( shellModelRes, RunAnalysis_Lattice(latticeModel), shellModalData);
-
-            return resultData;
+           
+            return RunAnalysis_Lattice(latticeModel);
         }
 
 
-        public List<NodeCompareData> GetNodeCompareDataList(ShellModelResultData shellModelRes, LatticeModelResultData newLatticeRes,ShellModelData shellModelData) 
+        public List<NodeCompareData> GetNodeCompareDataList( LatticeModelResultData newLatticeRes) 
         {
             Console.WriteLine("Lattice/Shell Node Vertical Deflections");
             var nodeCompareList = new List<NodeCompareData>();
 
-            for (int i = 0; i < shellModelRes.NodeResults.Count; i++)
+            for (int i = 0; i < ShellModelResultData.Instance.NodeResults.Count; i++)
             {
                 var nodeCompareData = new NodeCompareData();
-                var nodePt = shellModelRes.NodeResults.Keys.ElementAt(i);
-                var nodeResShell = shellModelRes.NodeResults[nodePt];
+                var nodePt = ShellModelResultData.Instance.NodeResults.Keys.ElementAt(i);
+                var nodeResShell = ShellModelResultData.Instance.NodeResults[nodePt];
 
                 var key = newLatticeRes.NodeResults.Keys.FirstOrDefault(pt => pt.X == nodePt.X &&
                                                         pt.Y == nodePt.Y);
                 var nodeResLattice = newLatticeRes.NodeResults[key];
-                var node = shellModelData.ListOfNodes.FirstOrDefault(x => x.Point == nodePt);
+                var node = ShellModelData.Instance.ListOfNodes.FirstOrDefault(x => x.Point == nodePt);
                 var nodeID = node.ID;
                 nodeCompareData.NodeID = node.ID;
                 var nodePoint = nodePt;
@@ -472,6 +448,32 @@ namespace Solver
                 }
                 resultData.FrameResults.Add(frm.ID, frameResults);
             }
+        }
+
+        public void NotifyConvergence(double fitness)
+        {
+            
+            Console.WriteLine($"Converged at: {fitness}");
+
+        }
+
+        public void NotifyNewGlobalBest(double fitness, double[] position)
+        {
+            Console.WriteLine($"New Global Best At: {fitness}" );
+
+        }
+
+        public void UpdateResult(IParticle particle)
+        {
+            //LinearSolver
+
+            var latticeModel = ThesisDataContainer.Instance.LatticeModels[particle.ID];
+            latticeModel.UpdateModelForOptimization((eEndConditionSet)particle.Position[0], (eHorizon)particle.Position[1], particle.Position[2]);
+
+            var resultData = new RunResult();
+            // UpdateParticleResult
+            resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList(LinearSolver.Instance.RunAnalysis_Lattice(latticeModel, true));
+            particle.Result = resultData.GetDisplacementProfile();
         }
         #endregion
     }

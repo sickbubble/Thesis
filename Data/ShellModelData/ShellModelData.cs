@@ -53,6 +53,7 @@ namespace Data
         private double _Height;
         private double _MeshSize;
         private bool _IsOnlyPlate;
+        private double _ShellThickness;
 
         #endregion
 
@@ -61,6 +62,7 @@ namespace Data
         public double Height { get => _Height; set => _Height = value; }
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
         public bool IsOnlyPlate { get => _IsOnlyPlate; set => _IsOnlyPlate = value; }
+        public double ShellThickness { get => _ShellThickness; set => _ShellThickness = value; }
 
         #endregion
 
@@ -416,6 +418,35 @@ namespace Data
 
         }
 
+        public bool SetShellMemberUwByValue(double uwValue, double shellThickness)
+        {
+          
+
+            foreach (var item in this.ListOfMembers)
+            {
+                var shellMem = item as QuadShellMember;
+
+                shellMem.Thickness = shellThickness;
+                shellMem.Section.Material.Uw = uwValue;
+            }
+
+            return true;
+
+        }
+
+        public double GetTotalMass()
+        {
+            double ret = 0;
+            foreach (var item in this.ListOfMembers)
+            {
+                ret += (item as QuadShellMember).MemberMass;
+            }
+            
+            
+            return ret;
+
+        }
+
         public override bool SetModelData(RunData runData)
         {
 
@@ -427,6 +458,7 @@ namespace Data
             this.Width = modelRunInfo.MemberDim;
             this.Height = modelRunInfo.MemberDim;
             this.MeshSize = modelRunInfo.ShellMeshSize;
+            this.ShellThickness = modelRunInfo.ShellThickness;
             this.FillNodeInfo();
             this.FillMemberInfoList();
             SetModelGeometryType(modelRunInfo.GeometryType);

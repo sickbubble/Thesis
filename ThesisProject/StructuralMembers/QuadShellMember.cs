@@ -47,6 +47,8 @@ namespace ThesisProject.Structural_Members
         private ePlateType _PlateType;
         private bool _IsOnlyPlate;
 
+        private double _MemberMass;
+
         #endregion
 
         #region Public Properties
@@ -67,8 +69,8 @@ namespace ThesisProject.Structural_Members
         public ePlateType PlateType { get => _PlateType; set => _PlateType = value; }
         public int ID { get => _ID; set => _ID = value; }
         public bool IsOnlyPlate { get => _IsOnlyPlate; set => _IsOnlyPlate = value; }
+        public double MemberMass { get => _MemberMass; set => _MemberMass = value; }
 
-   
         public MatrixCS GetLocalStiffnessMatrix(bool useEI = false)
         {
             // Stiffness matrix is calculated at four Gauss points using Gauss Quadrature
@@ -903,6 +905,7 @@ namespace ThesisProject.Structural_Members
 
                 // Get total mass
                 var totalMass = area * this.Section.Thickness * this.Section.Material.Uw;
+                MemberMass = totalMass;
 
                 // Get nodal mass contribution
                 // TODO : Assumption is shell is rectangular. For non-rectangular shells (i.e. edges are not perpendicular), implement 

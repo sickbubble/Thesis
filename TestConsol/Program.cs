@@ -19,9 +19,8 @@ using Adapters;
 
 namespace TestConsol
 {
-    class Program : IObserver
+    class Program 
     {
-        public static Dictionary<int,LatticeModelData> LatticeModels;
 
         static void Main(string[] args)
         {
@@ -36,48 +35,44 @@ namespace TestConsol
             runInfo.ShellMeshSize = 1;
             runInfo.FrameHeight = 0.5;
             runInfo.AlphaRatio = 0.6;
+            runInfo.ShellThickness = 0.4;
 
-            var incr = 0.1;
-            var horizonList = new List<double>() { 1, 2};
+            //RunAnalysis(runInfo, 0.1); // shellThickness
+
+            RunNew(runInfo);
+
+
+
+
+            //var incr = 0.1;
+            //var horizonList = new List<double>() { 1, 2};
             //var horizonList = new List<double>() { 3};
 
-            for (int i = 0; i < horizonList.Count; i++)
-            {
-                RunAnalysis(runInfo, 1);
-                runInfo.FrameHeight += incr; 
-            }
-            for (int i = 0; i < horizonList.Count; i++)
-            {
+            //for (int i = 0; i < horizonList.Count; i++)
+            //{
+            //RunAnalysis(runInfo, 1);
+            //runInfo.FrameHeight += incr; 
+            //}
+            //for (int i = 0; i < horizonList.Count; i++)
+            //{
 
-                RunAnalysis(runInfo, 1);
-                runInfo.Horizon = (eHorizon)horizonList[i];
-            }
+            //RunAnalysis(runInfo, 1);
+            //runInfo.Horizon = (eHorizon)horizonList[i];
+            //}
 
 
             //ReadResultsFromFile();
         }
 
-        public void UpdateResult(IParticle particle)
-        {
-            //LinearSolver
-
-            var latticeModel = LatticeModels[particle.ID]; 
-            latticeModel.UpdateModelForOptimization((eEndConditionSet)particle.Position[0], (eHorizon)particle.Position[1]);
-            
-            var resultData = new RunResult();
-                        // UpdateParticleResult
-            resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList(ShellModelResultData.Instance, LinearSolver.Instance.RunAnalysis_Lattice(latticeModel), ShellModelData.Instance);
-            particle.Result = resultData.GetDisplacementProfile();
-
-        }
+ 
 
         
 
 
-        static void RunNew(RunResult shellResult,RunInfo runInfo) 
+        static void RunNew(RunInfo runInfo) 
         {
             int numParticles = 10;
-            int numDimensions = 2;
+            int numDimensions = 3;
 
             
 
@@ -87,46 +82,54 @@ namespace TestConsol
             ShellModelData.Instance.SetModelData(runInfo);
             ShellModelData.Instance.AssignLoadToMiddle();
             // Update Shell unit weight to have equal mass system
-            ShellModelData.Instance.SetShellMemberUw(latticeModelData.GetTotalMass(), ShellModelData.Instance.Height);
+            ShellModelData.Instance.SetShellMemberUwByValue(1, ShellModelData.Instance.ShellThickness);
             LinearSolver.Instance.RunAnalysis_Shell();
+            
+
+            var shellTotalMass = ShellModelData.Instance.GetTotalMass();
 
 
-       
             //var runData = LinearSolver.Instance.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData, shellModelData, runInfo.AlphaRatio);
             //runData.FillByRunInfo(runInfo);
             //runData.ID = 1;
 
 
-            LatticeModels = new Dictionary<int, LatticeModelData>();
+            ThesisDataContainer.Instance.LatticeModels = new Dictionary<int, LatticeModelData>();
 
           
             // Initialize the particles
             ParticleFactory particleFactory = new ParticleFactory();
             var particles = new List<IParticle>();
             Random rand = new Random();
+                var resultData = new RunResult();
             for (int i = 0; i < numParticles; i++)
             {
                 // Initialize lattice model
                 var latticeModelData = new LatticeModelData();
                 latticeModelData.SetModelData(runInfo);
+                latticeModelData.SetFramesUwByTotalMass(shellTotalMass);
+
                 latticeModelData.AssignLoadToMiddle();
 
                 
 
                 //Get first results
-                var resultData = new RunResult();
-                resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList(ShellModelResultData.Instance, LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData), ShellModelData.Instance);
+                resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList( LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData));
 
 
                 var position = new double[numDimensions];
-                position[0] = rand.Next((int)eEndConditionSet.AllFixed, (int)eEndConditionSet.WeakSideRotation);
-                position[1] = rand.Next((int)eHorizon.LightMesh, (int)eHorizon.DenseMesh); 
+                position[0] = rand.Next((int)eEndConditionSet.AllFixed, (int)eEndConditionSet.TorsionalRelease);
+                position[1] = rand.Next((int)eHorizon.LightMesh, (int)eHorizon.DenseMesh);
+                position[2] = rand.NextDouble();
                 var particle = particleFactory.CreateLatticleParticle(position); // check position
                 particle.Result = resultData.GetDisplacementProfile();
                 particle.ID = i + 1;
-                LatticeModels.Add(particle.ID, latticeModelData);
+                ThesisDataContainer.Instance.LatticeModels.Add(particle.ID, latticeModelData);
                 particles.Add(particle);
             }
+
+          
+
 
 
 
@@ -134,16 +137,30 @@ namespace TestConsol
             SwarmFactory swarmFactory = new SwarmFactory();
 
             // Initialize the Swarm
-            ISwarm swarm = swarmFactory.CreateLatticeModelSwarm(particles, shellResult.GetBestSolution());
+            ISwarm swarm = swarmFactory.CreateLatticeModelSwarm(particles, resultData.GetBestSolution());
 
 
             // Initialize the PSOAlgorithm
             IOptimizationAlgorithm<PSOAlgorithm> algorithm = new PSOAlgorithm();
             var instance = algorithm.GetInstance();
+            instance.RegisterObserver(LinearSolver.Instance);
             IFitnessFunction fitnessFunction = new SumofSquaredDeviations();
             instance.SetAlgorithmParams(fitnessFunction, swarm, 0.5, 2.0, 2.0);
             // Run the algorithm
             instance.Run();
+        }
+
+        static void RunShellAnalysis(RunData runInfo, double shellThickness) 
+        {
+            // Initialize shell model
+            var shellModelData = ShellModelData.Instance;
+            shellModelData.SetModelData(runInfo);
+            shellModelData.AssignLoadToMiddle();
+
+            // Update Shell unit weight to have equal mass system
+            shellModelData.SetShellMemberUwByValue(0.4, shellThickness);
+
+
         }
 
         static void RunAnalysis(RunData runInfo,double shellThickness )
@@ -155,24 +172,15 @@ namespace TestConsol
             latticeModelData.AssignLoadToMiddle();
             
 
-            // Initialize shell model
-            var shellModelData =  ShellModelData.Instance;
-            shellModelData.SetModelData(runInfo);
-            shellModelData.AssignLoadToMiddle();
-
-            // Update Shell unit weight to have equal mass system
-            shellModelData.SetShellMemberUw(latticeModelData.GetTotalMass(), shellThickness);
-
-
+         
             //Initialize linear solver
      
             var latticeModelResultData = LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData);
-            var shellModelResultData = LinearSolver.Instance.RunAnalysis_Shell();
             
             
-            var runData = LinearSolver.Instance.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData, shellModelData, runInfo.AlphaRatio);
-            runData.FillByRunInfo(runInfo);
-            runData.ID = 1;
+            //var runData = LinearSolver.Instance.EqualizeSystems( latticeModelResultData, latticeModelData,  runInfo.AlphaRatio);
+            //runData.FillByRunInfo(runInfo);
+            //runData.ID = 1;
 
             //listOfRunData.Add(runData);
             //Console.Clear();
