@@ -15,12 +15,7 @@ using OptimizationAlgorithms.PSOObjects.Particles;
 using OptimizationAlgorithms.Particles;
 
 namespace Solver
-
-
 {
-
-
-
     public class LinearSolver :  IObserver
     {
 
@@ -53,7 +48,7 @@ namespace Solver
         #region Public Methods
 
 
-        public List<double> GetPeriodsOfTheSystem(MatrixCS kG, MatrixCS mass, ref double lastEigen)
+        public List<double> GetPeriodsOfTheSystem(MatrixCS kG, MatrixCS mass)
         {
 
             var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix, mass.Matrix,true);
@@ -62,7 +57,6 @@ namespace Solver
 
             var w2 = solver.RealEigenvalues;
 
-            lastEigen = w2.FirstOrDefault();
 
             var w = new List<double>();
 
@@ -219,14 +213,25 @@ namespace Solver
 
         public LatticeModelResultData EqualizeSystems(LatticeModelResultData latticeModelRes,LatticeModelData latticeModel ,double alphaRatio)
         {
-            //Calculate internal energies to have the ratio to equalize systems
-            var shellInternalEnergy = GetShellModelInternalEnergy(ShellModelResultData.Instance.DispRes, ShellModelData.Instance);
-            var latticeInternalEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
+
+            //Assign ratio to equalize internal eneries
+
+            var shellIntEnergy = GetShellModelInternalEnergy();
+            var latticeEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
+            var eqRatio = shellIntEnergy > latticeEnergy ? shellIntEnergy / latticeEnergy : latticeEnergy / shellIntEnergy;
             
-                        //Assign ratio to equalize internal eneries
-            latticeModel.AssignRatio(shellInternalEnergy / latticeInternalEnergy, alphaRatio);
-           
-            return RunAnalysis_Lattice(latticeModel);
+            latticeModel.AssignRatio(eqRatio, alphaRatio);
+
+
+            var shellPeriods = GetPeriodsOfTheSystem(ShellModelData.Instance.GetGlobalStiffness(), ShellModelData.Instance.GetMassMatrix());
+            var latticePeriods = GetPeriodsOfTheSystem(latticeModel.GetGlobalStiffness(), latticeModel.GetMassMatrix());
+
+            var bb = latticeModel.GetMassMatrix();
+            var latticeRes = RunAnalysis_Lattice(latticeModel);
+
+            var nodeCompareData = GetNodeCompareDataList(latticeRes);
+            latticeRes.EqnRatio = eqRatio;
+            return latticeRes;
         }
 
 
@@ -234,6 +239,9 @@ namespace Solver
         {
             Console.WriteLine("Lattice/Shell Node Vertical Deflections");
             var nodeCompareList = new List<NodeCompareData>();
+
+            int percentMeanCounter = 0;
+            double percentMeanTotal = 0;
 
             for (int i = 0; i < ShellModelResultData.Instance.NodeResults.Count; i++)
             {
@@ -259,6 +267,14 @@ namespace Solver
                 }
 
                 nodeCompareData.PercentDiff = percentDiff;
+
+                if (percentDiff!= 0)
+                {
+                    percentMeanCounter++;
+                    percentMeanTotal += Math.Abs(percentDiff);
+                }
+
+
                 nodeCompareData.LatticeVerticalDisp = verticalDef;
                 nodeCompareData.ShellVerticalDisp = verticalDefShell;
                 nodeCompareData.Point = nodePoint;
@@ -267,6 +283,7 @@ namespace Solver
 
                 nodeCompareList.Add(nodeCompareData);
             }
+                Console.WriteLine($"Mean Percent Deviation: {percentMeanTotal/percentMeanCounter}");
 
             return nodeCompareList;
         }
@@ -290,26 +307,7 @@ namespace Solver
             var dispResMatrix = new MatrixCS(dispResAsArray.Length, 1);
 
             dispResMatrix.Matrix = dispResAsArray;
-            var mass = ShellModelData.Instance.GetMassMatrix();
-            //var res = GetPeriodsOfTheSystem(KG, mass);
-
-
-            //for (int i = 0; i < 6; i++)
-            //{
-            //    shellModelResultData.ListOfPeriods.Add(res[i]);
-            //}
-
-            //Console.WriteLine("Shell Model Periods");
-
-            //Console.WriteLine("--------------------------");
-            //for (int i = 0; i < res.Count; i++)
-            //{
-            //    Console.WriteLine("Mode No: " + (i + 1).ToString() + " Period:" + res[i].ToString());
-            //}
-            //Console.WriteLine("--------------------------");
-
-            var internalEnergy = GetShellModelInternalEnergy(dispResMatrix, ShellModelData.Instance);
-
+       
 
             shellModelResultData.DispRes = dispResMatrix;
             shellModelResultData.NodeResults = new Dictionary<ModelInfo.Point, List<double>>();
@@ -321,13 +319,14 @@ namespace Solver
             return shellModelResultData;
         }
 
-        public double GetShellModelInternalEnergy(MatrixCS dispMatrix,ShellModelData shellModelData)
+        public double GetShellModelInternalEnergy()
         {
+            
             double ret;
-            var KG = shellModelData.GetGlobalStiffness();
+            var KG = ShellModelData.Instance.GetGlobalStiffness();
 
-            var firstPart = (dispMatrix.Transpose()).Multiply(KG);
-            ret = firstPart.Multiply(dispMatrix).Matrix[0,0];
+            var firstPart = (ShellModelResultData.Instance.DispRes.Transpose()).Multiply(KG);
+            ret = firstPart.Multiply(ShellModelResultData.Instance.DispRes).Matrix[0,0];
 
 
             return ret;
@@ -391,7 +390,7 @@ namespace Solver
         private void FillFrameMemberResults(LatticeModelResultData resultData,LatticeModelData latticeModelData)
         {
             var nodeResults = resultData.NodeResults;
-
+            resultData.FrameResults.Clear();
             var listOfFrames = latticeModelData.ListOfMembers;
 
             for (int i = 0; i < listOfFrames.Count; i++)
@@ -446,7 +445,15 @@ namespace Solver
                     }
 
                 }
+                if (resultData.FrameResults.ContainsKey(frm.ID))
+                {
+
+                resultData.FrameResults[frm.ID] = frameResults;
+                }
+                else
+                {
                 resultData.FrameResults.Add(frm.ID, frameResults);
+                }
             }
         }
 
@@ -468,11 +475,12 @@ namespace Solver
             //LinearSolver
 
             var latticeModel = ThesisDataContainer.Instance.LatticeModels[particle.ID];
-            latticeModel.UpdateModelForOptimization((eEndConditionSet)particle.Position[0], (eHorizon)particle.Position[1], particle.Position[2]);
+            latticeModel.UpdateModelForOptimization(particle.Position[0], particle.Position[1]);
 
             var resultData = new RunResult();
             // UpdateParticleResult
             resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList(LinearSolver.Instance.RunAnalysis_Lattice(latticeModel, true));
+            Console.WriteLine($"Frame Heigth: {particle.Position[0]}  --------------      AlphaRatio = {particle.Position[1]} ");
             particle.Result = resultData.GetDisplacementProfile();
         }
         #endregion

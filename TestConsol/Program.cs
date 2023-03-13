@@ -19,7 +19,7 @@ using Adapters;
 
 namespace TestConsol
 {
-    class Program 
+    class Program
     {
 
         static void Main(string[] args)
@@ -33,75 +33,136 @@ namespace TestConsol
             runInfo.MemberDim = 10;
             runInfo.LatticeMeshSize = 1;
             runInfo.ShellMeshSize = 1;
-            runInfo.FrameHeight = 0.5;
-            runInfo.AlphaRatio = 0.6;
-            runInfo.ShellThickness = 0.4;
+            runInfo.FrameHeight = 0.2;
+            runInfo.AlphaRatio = 1.1;
+            runInfo.ShellThickness = 1.0;
+            runInfo.EndConditionValue = eEndConditionSet.TorsionalRelease;
 
             //RunAnalysis(runInfo, 0.1); // shellThickness
-
-            RunNew(runInfo);
-
-
+            //RunNew(runInfo);
+            RunAndEqualizeSystems(runInfo);
 
 
-            //var incr = 0.1;
-            //var horizonList = new List<double>() { 1, 2};
-            //var horizonList = new List<double>() { 3};
-
-            //for (int i = 0; i < horizonList.Count; i++)
-            //{
-            //RunAnalysis(runInfo, 1);
-            //runInfo.FrameHeight += incr; 
-            //}
-            //for (int i = 0; i < horizonList.Count; i++)
-            //{
-
-            //RunAnalysis(runInfo, 1);
-            //runInfo.Horizon = (eHorizon)horizonList[i];
-            //}
-
-
-            //ReadResultsFromFile();
         }
 
- 
-
-        
-
-
-        static void RunNew(RunInfo runInfo) 
+        /// <summary>
+        /// This method runs two models with given info and equalizes systems
+        /// </summary>
+        /// <param name="runInfo"></param>
+        static void RunAndEqualizeSystems(RunInfo runInfo)
         {
-            int numParticles = 10;
-            int numDimensions = 3;
-
-            
-
-
             // Initialize shell model
-            
+
             ShellModelData.Instance.SetModelData(runInfo);
             ShellModelData.Instance.AssignLoadToMiddle();
             // Update Shell unit weight to have equal mass system
-            ShellModelData.Instance.SetShellMemberUwByValue(1, ShellModelData.Instance.ShellThickness);
+            ShellModelData.Instance.SetShellMemberUwByValue(1);
+            //ShellModelData.Instance.setmass(1, ShellModelData.Instance.ShellThickness);
             LinearSolver.Instance.RunAnalysis_Shell();
-            
+            var shellTotalMass = ShellModelData.Instance.GetTotalMass();
+
+            // Initialize lattice model
+            var latticeModelData = new LatticeModelData();
+            latticeModelData.SetModelData(runInfo);
+            latticeModelData.SetFramesUwByTotalMass(shellTotalMass);
+            latticeModelData.AssignLoadToMiddle();
+            double eqnRatio = LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData, true).EqnRatio;
+            Console.WriteLine($"Alpha Ratio = {runInfo.AlphaRatio}");
+            Console.WriteLine($"Frame Thickness = {runInfo.FrameHeight}");
+            Console.WriteLine($"Shell Thickness = {runInfo.ShellThickness}");
+            Console.WriteLine($"Equalization Ratio = {eqnRatio}");
+
+
+            var aa = "0";
+
+        }
+
+
+
+        static void RunAndSaveProcess()
+        {
+            var res = new Dictionary<double, double>();
+
+            int runID = 1;
+
+            double increment = 0.1;
+            double heightIncr = 0.05;
+            var latticeMeshSizeList = new List<double>() { 0.5, 1 };
+            var listOfNodes = new List<Node>();
+
+
+            var listOfRunData = new List<RunData>();
+            var isTorsionalRelase = new List<bool>() { true, false };
+            var horizonList = new List<double>() { 1.5 ,3.01};
+            //var horizonList = new List<double>() { 1.5, 3.01 };
+            for (int m = 0; m < latticeMeshSizeList.Count; m++)
+            {
+                var latticeMeshSize = latticeMeshSizeList[m];
+                for (int t = 0; t < isTorsionalRelase.Count; t++)
+                {
+                    var isTorsionalRelease = isTorsionalRelase[t];
+
+                    for (int h = 0; h < horizonList.Count; h++)
+                    {
+                        var horizon = horizonList[h];
+                        double latticeFrameHeight = 0.3;
+                        for (int j = 0; j < 20; j++)
+                        {
+                            double alphaRatio = 0.2;
+                            for (int i = 0; i < 10; i++)
+                            {
+                              
+                                alphaRatio = alphaRatio + increment;
+                                runID++;
+                            }
+
+                            latticeFrameHeight += heightIncr;
+                        }
+                    }
+                }
+
+            }
+            var path = GetFilePath();
+            string jsonString = JsonSerializer.Serialize(listOfRunData);
+            File.WriteAllText(path, jsonString);
+            Console.WriteLine(jsonString);
+            var listOfRunDataDeserialized = JsonSerializer.Deserialize<List<RunData>>(jsonString);
+        }
+
+
+
+
+        /// <summary>
+        /// Run analyisis with PSO optimization algorithm
+        /// </summary>
+        /// <param name="runInfo"></param>
+        static void RunNew(RunInfo runInfo)
+        {
+            int numParticles = 10;
+            int numDimensions = 2;
+
+
+
+
+            // Initialize shell model
+
+            ShellModelData.Instance.SetModelData(runInfo);
+            ShellModelData.Instance.AssignLoadToMiddle();
+            // Update Shell unit weight to have equal mass system
+            ShellModelData.Instance.SetShellMemberUwByValue(1);
+            LinearSolver.Instance.RunAnalysis_Shell();
+
 
             var shellTotalMass = ShellModelData.Instance.GetTotalMass();
 
-
-            //var runData = LinearSolver.Instance.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData, shellModelData, runInfo.AlphaRatio);
-            //runData.FillByRunInfo(runInfo);
-            //runData.ID = 1;
-
-
             ThesisDataContainer.Instance.LatticeModels = new Dictionary<int, LatticeModelData>();
 
-          
+
             // Initialize the particles
             ParticleFactory particleFactory = new ParticleFactory();
             var particles = new List<IParticle>();
             Random rand = new Random();
-                var resultData = new RunResult();
+            var resultData = new RunResult();
             for (int i = 0; i < numParticles; i++)
             {
                 // Initialize lattice model
@@ -111,16 +172,15 @@ namespace TestConsol
 
                 latticeModelData.AssignLoadToMiddle();
 
-                
+
 
                 //Get first results
-                resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList( LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData));
+                resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList(LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData));
 
 
                 var position = new double[numDimensions];
-                position[0] = rand.Next((int)eEndConditionSet.AllFixed, (int)eEndConditionSet.TorsionalRelease);
-                position[1] = rand.Next((int)eHorizon.LightMesh, (int)eHorizon.DenseMesh);
-                position[2] = rand.NextDouble();
+                position[0] = 0.5 + rand.NextDouble();
+                position[1] = rand.NextDouble();
                 var particle = particleFactory.CreateLatticleParticle(position); // check position
                 particle.Result = resultData.GetDisplacementProfile();
                 particle.ID = i + 1;
@@ -128,7 +188,7 @@ namespace TestConsol
                 particles.Add(particle);
             }
 
-          
+
 
 
 
@@ -149,43 +209,6 @@ namespace TestConsol
             // Run the algorithm
             instance.Run();
         }
-
-        static void RunShellAnalysis(RunData runInfo, double shellThickness) 
-        {
-            // Initialize shell model
-            var shellModelData = ShellModelData.Instance;
-            shellModelData.SetModelData(runInfo);
-            shellModelData.AssignLoadToMiddle();
-
-            // Update Shell unit weight to have equal mass system
-            shellModelData.SetShellMemberUwByValue(0.4, shellThickness);
-
-
-        }
-
-        static void RunAnalysis(RunData runInfo,double shellThickness )
-        {
-
-            // Initialize lattice model
-            var latticeModelData = new LatticeModelData();
-            latticeModelData.SetModelData(runInfo);
-            latticeModelData.AssignLoadToMiddle();
-            
-
-         
-            //Initialize linear solver
-     
-            var latticeModelResultData = LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData);
-            
-            
-            //var runData = LinearSolver.Instance.EqualizeSystems( latticeModelResultData, latticeModelData,  runInfo.AlphaRatio);
-            //runData.FillByRunInfo(runInfo);
-            //runData.ID = 1;
-
-            //listOfRunData.Add(runData);
-            //Console.Clear();
-        }
-
 
         static void ReadResultsFromFile()
         {
@@ -210,9 +233,9 @@ namespace TestConsol
                 var pointAccaptableRuns = new List<RunResult>();
                 foreach (var res in listOfRunDataDeserialized)
                 {
-                    if (res.NodeCompareData.FirstOrDefault(p => p.Point.X == item.X && p.Point.Y == item.Y).PercentDiff<3)
+                    if (res.NodeCompareData.FirstOrDefault(p => p.Point.X == item.X && p.Point.Y == item.Y).PercentDiff < 3)
                         pointAccaptableRuns.Add(res);
-                    
+
                 }
                 accaptableResultRUns.Add(item, pointAccaptableRuns);
 
@@ -228,8 +251,8 @@ namespace TestConsol
                 var alphaList = new List<double>();
                 for (int i = 0; i < item.Value.Count; i++)
                 {
-                    var meshSize =  item.Value[i].LatticeMeshSize;
-                    var alphaRatio= item.Value[i].AlphaRatio;
+                    var meshSize = item.Value[i].LatticeMeshSize;
+                    var alphaRatio = item.Value[i].AlphaRatio;
                     meshSizeList.Add(meshSize);
                     alphaList.Add(alphaRatio);
                 }
@@ -251,7 +274,7 @@ namespace TestConsol
             return path + fileName;
         }
 
-        
+
         public void NotifyConvergence(double fitness)
         {
             //throw new NotImplementedException();
@@ -261,252 +284,5 @@ namespace TestConsol
         {
             //throw new NotImplementedException();
         }
-
-
-     
-
-
-
-
-        //static void RunAndSaveProcess()
-        //{
-        //    var res = new Dictionary<double, double>();
-
-        //    int runID = 1;
-
-        //    double increment = 0.1;
-        //    double heightIncr = 0.05;
-
-        //    var gapInstPt = new Point(6, 6, 0);
-        //    double gapSize = 2;
-        //    double shellMeshSize = 1;
-        //    var latticeMeshSizeList = new List<double>() { 0.5, 1 };
-        //    double memberDim = 6;
-
-        //    double shellThickness = 0.6;
-
-        //    var listOfNodes = new List<Node>();
-
-
-        //    var listOfRunData = new List<RunData>();
-        //    var isTorsionalRelase = new List<bool>() { true, false };
-
-        //    var horizonList = new List<double>() { 1.5 };
-        //    //var horizonList = new List<double>() { 1.5, 3.01 };
-        //    for (int m = 0; m < latticeMeshSizeList.Count; m++)
-        //    {
-        //        var latticeMeshSize = latticeMeshSizeList[m];
-        //        for (int t = 0; t < isTorsionalRelase.Count; t++)
-        //        {
-        //            var isTorsionalRelease = isTorsionalRelase[t];
-
-        //            for (int h = 0; h < horizonList.Count; h++)
-        //            {
-        //                var horizon = horizonList[h];
-        //                double latticeFrameHeight = 0.3;
-        //                for (int j = 0; j < 20; j++)
-        //                {
-        //                    double alphaRatio = 0.2;
-        //                    for (int i = 0; i < 20; i++)
-        //                    {
-        //                        var latticeModelData = new LatticeModelData();
-        //                        latticeModelData.Width = memberDim;
-        //                        latticeModelData.Height = memberDim;
-        //                        latticeModelData.MeshSize = latticeMeshSize;
-        //                        latticeModelData.FillNodeInfo();
-        //                        latticeModelData.FillMemberInfo(horizon, latticeFrameHeight);
-
-        //                        latticeModelData.SetModelGeometryType(eModelGeometryType.Rectangular, gapInstPt, gapSize);
-
-
-
-        //                        latticeModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
-        //                        latticeModelData.AssignLoadToMiddle();
-        //                        latticeModelData.SetTorsionalReleaseToAllMembers();
-        //                        listOfNodes = latticeModelData.ListOfNodes;
-
-
-        //                        var latticeMass = latticeModelData.GetTotalMass();
-
-        //                        var shellModelData = new ShellModelData();
-        //                        shellModelData.IsOnlyPlate = false;
-        //                        shellModelData.Width = memberDim;
-        //                        shellModelData.Height = memberDim;
-        //                        shellModelData.MeshSize = shellMeshSize;
-        //                        shellModelData.FillNodeInfo();
-        //                        shellModelData.FillMemberInfoList();
-
-        //                        var shellMemberCount = shellModelData.ListOfMembers.Count;
-        //                        var singleMemberMass = latticeMass / shellMemberCount;
-        //                        var shellUw = singleMemberMass / (shellMeshSize * shellMeshSize * shellThickness);
-
-
-
-
-
-        //                        shellModelData.SetModelGeometryType(eModelGeometryType.Rectangular, gapInstPt, gapSize);
-
-        //                        shellModelData.SetBorderNodesSupportCondition(eSupportType.Fixed);
-        //                        shellModelData.AssignLoadToMiddle();
-
-        //                        foreach (var item in shellModelData.ListOfMembers)
-        //                        {
-        //                            item.Thickness = shellThickness;
-        //                            item.Section.Material.Uw = shellUw;
-        //                        }
-
-
-        //                        var linearSolver = new LinearSolver();
-        //                        var latticeModelResultData = linearSolver.RunAnalysis_Lattice(latticeModelData);
-
-        //                        var shellModelResultData = linearSolver.RunAnalysis_Shell(shellModelData);
-        //                        var kg_Shell = linearSolver.GetGlobalStiffness_Shell();
-        //                        var shellMassMatrix = linearSolver.GetMassMatrix_Shell();
-
-        //                        var runData = linearSolver.EqualizeSystems(shellModelResultData, latticeModelResultData, latticeModelData, shellModelData, alphaRatio);
-        //                        runData.FrameHeight = latticeFrameHeight;
-        //                        runData.AlphaRatio = alphaRatio;
-        //                        runData.Horizon = horizon;
-        //                        runData.LatticeMeshSize = latticeMeshSize;
-        //                        runData.ShellMeshSize = shellMeshSize;
-        //                        runData.IsTorsionalRelease = isTorsionalRelease;
-        //                        var ratio = runData.EnergyRatio;
-
-        //                        var kg_LatticeNew = linearSolver.GetGlobalStiffness_Latttice();
-        //                        var latticeMassMatrix = linearSolver.GetMassMatrix_Latttice();
-
-        //                        //double lastEigen = 0;
-
-        //                        //var latticePeriods = linearSolver.GetPeriodsOfTheSystem(kg_LatticeNew, latticeMassMatrix, ref lastEigen);
-        //                        //var shellPeriods = linearSolver.GetPeriodsOfTheSystem(kg_Shell, shellMassMatrix, ref lastEigen);
-        //                        runData.ID = runID;
-        //                        listOfRunData.Add(runData);
-
-        //                        Console.Clear();
-        //                        alphaRatio = alphaRatio + increment;
-        //                        runID++;
-        //                    }
-
-        //                    latticeFrameHeight += heightIncr;
-        //                }
-        //            }
-        //        }
-
-        //    }
-
-
-        //    var listOfControlValues = new List<double>();
-
-        //    var minRunDataList = new Dictionary<int, RunData>();
-
-        //    foreach (var item in listOfRunData)
-        //    {
-        //        var shellPeriods = item.ShellPeriods;
-        //        for (int i = 0; i < shellPeriods.Count; i++)
-        //        {
-        //            if (Double.IsNaN(shellPeriods[i]))
-        //            {
-        //                shellPeriods[i] = 0;
-        //            }
-        //        }
-        //    }
-
-        //    var path = GetFilePath();
-        //    string jsonString = JsonSerializer.Serialize(listOfRunData);
-        //    File.WriteAllText(path, jsonString);
-
-        //    Console.WriteLine(jsonString);
-
-
-
-        //    var listOfRunDataDeserialized = JsonSerializer.Deserialize<List<RunData>>(jsonString);
-
-
-
-
-
-
-        //    var accaptableResultRUns = new Dictionary<Point, List<RunData>>();
-
-        //    var nCOmpData = listOfRunDataDeserialized.FirstOrDefault().NodeCompareData;
-        //    var nPointList = new List<Point>();
-
-
-
-
-        //    foreach (var item in nCOmpData) nPointList.Add(item.Point);
-
-        //    foreach (Point item in nPointList)
-        //    {
-        //        var listOfAccaptableRes = listOfRunData.Where(x => Math.Abs(x.NodeCompareData.FirstOrDefault(p => p.Point.X == item.X && p.Point.Y == item.Y ).PercentDiff)<3 ).ToList();
-
-        //        accaptableResultRUns.Add(item, listOfAccaptableRes);
-        //    }
-
-
-        //    for (int i = 0; i < listOfNodes.Count; i++)
-        //    {
-        //        var controlNode = listOfNodes[i];
-
-
-        //        var minValue = listOfRunData.Min(x => Math.Abs(x.NodeCompareData.FirstOrDefault(n => n.Point == controlNode.Point).PercentDiff));
-
-        //        if (Double.IsNaN(minValue))
-        //            continue;
-
-
-        //        var minValueRunRef = listOfRunData.FirstOrDefault(x => Math.Abs(x.NodeCompareData.FirstOrDefault(n => n.NodeID == controlNode.ID).PercentDiff) == minValue);
-        //        var minvalueRun = new RunData();
-
-        //        minvalueRun.PercentDiff = minValue;
-        //        minvalueRun.FrameHeight = minValueRunRef.FrameHeight;
-        //        minvalueRun.Horizon = minValueRunRef.Horizon;
-        //        minvalueRun.IsTorsionalRelease = minValueRunRef.IsTorsionalRelease;
-        //        minvalueRun.AlphaRatio = minValueRunRef.AlphaRatio;
-        //        minvalueRun.EnergyRatio = minValueRunRef.EnergyRatio;
-        //        minvalueRun.MinControlNode = null;
-        //        minvalueRun.MinControlNode = controlNode;
-        //        minRunDataList.Add(controlNode.ID, minvalueRun);
-        //    }
-
-        //    Console.Clear();
-        //    Console.WriteLine("Node ID" + ";" + "X" + ";" + "Y" + ";" + "Percent Diff" + ";" + "Frame Height" + ";" + "Horizon" + ";" + "Torsional Release" + ";" + "Alpha Ratio" + ";" + "Enegy Ratio");
-        //    //minRunDataList.OrderBy(x => x.MinControlNode.ID).ToList();
-
-
-        //    for (int i = 0; i < minRunDataList.Count; i++)
-        //    {
-        //        var runData = minRunDataList.Values.ElementAt(i);
-
-        //        var node = runData.MinControlNode;
-        //        var strNodeId = node.ID.ToString();
-        //        var strPx = node.Point.X.ToString();
-        //        var strPy = node.Point.Y.ToString();
-        //        var strPercentDiff = runData.PercentDiff.ToString();
-        //        var strThickness = runData.FrameHeight.ToString();
-        //        var strHorizon = runData.Horizon.ToString();
-        //        var strRelease = runData.IsTorsionalRelease ? "Yes" : "No";
-        //        var strEnergyRatio = runData.EnergyRatio.ToString();
-        //        var strAlphaRatio = runData.AlphaRatio.ToString();
-
-
-        //        Console.WriteLine(strNodeId + ";" + strPx + ";" + strPy + ";" + strPercentDiff + ";" + strThickness + ";" + strHorizon + ";" + strRelease + ";" + strAlphaRatio + ";" + strEnergyRatio);
-
-        //    }
-
-        //    for (int i = 0; i < res.Count; i++)
-        //    {
-        //        listOfControlValues.Add(Math.Pow(res.Keys.ElementAt(i), 3) / res.Values.ElementAt(i));
-        //    }
-
-        //    for (int i = 0; i < res.Count; i++)
-        //    {
-        //        Console.WriteLine(res.Keys.ElementAt(i).ToString() + ", " + res.Values.ElementAt(i).ToString() + "," + listOfControlValues[i].ToString());
-        //    }
-
-        //    Console.ReadLine();
-
-        //}
-
     }
 }

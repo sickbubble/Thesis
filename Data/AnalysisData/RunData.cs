@@ -186,6 +186,7 @@ namespace Data
         private eSupportType _BorderSupportType;
         private eModelGeometryType _GeometryType;
 
+
         #endregion
 
 

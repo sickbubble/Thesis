@@ -13,17 +13,17 @@ namespace ThesisProject.Sections
         {
             _SectionType = eSectionType.Frame;
 
-            SetDefaultParameters();
+            //SetDefaultParameters();
 
             SetDefaultMaterial();
         }
 
 
         public FrameSection(double b, double h)
-        {
+        { 
+            //SetForGivenDimensions(b, h);
 
-
-            SetForGivenDimensions(b, h);
+            SetSymmetricSection(h);
 
             SetDefaultMaterial();
         }
@@ -85,6 +85,21 @@ namespace ThesisProject.Sections
             _Area = b * h;
             _I22 = oneOverTw * b * h * h * h;
             _I11 = oneOverTw * h * b * b * b;
+            _J = _I11 + _I22;
+        }
+
+        public void SetSymmetricSection(double b)
+        {
+            _SectionType = eSectionType.Frame;
+
+            _b = b;
+            _h = b;
+
+            double oneOverTw = 1.0 / 12;
+
+            _Area = b * b;
+            _I22 = oneOverTw * Math.Pow(b,4);
+            _I11 = oneOverTw * Math.Pow(b,4);
             _J = _I11 + _I22;
         }
 

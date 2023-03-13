@@ -1,7 +1,12 @@
 C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Data.dll.config
 C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Data.dll
 C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Data.pdb
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Adapters.dll
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.exe
 C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\ThesisProject.dll
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.pdb
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.exe.config
+C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Adapters.pdb
 C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\ThesisProject.pdb
 C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\ThesisProject.dll.config
 C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.csproj.AssemblyReference.cache
@@ -9,8 +14,3 @@ C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.csproj.CoreCompileInputs.cache
 C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.csproj.CopyComplete
 C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.dll
 C:\Users\Burak T\Desktop\Tez\Data\obj\Debug\Data.pdb
-C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Adapters.dll
-C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\Adapters.pdb
-C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.exe
-C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.pdb
-C:\Users\Burak T\Desktop\Tez\Data\bin\Debug\OptimizationAlgorithms.exe.config

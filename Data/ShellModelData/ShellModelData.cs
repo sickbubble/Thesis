@@ -308,7 +308,7 @@ namespace Data
                     int kNodeIdx = jNodeIdx + nx;
                     int lNodeIdx = kNodeIdx - 1;
                     var member = new QuadShellMember() { IEndNode = ListOfNodes[iNodeIdx], JEndNode = ListOfNodes[jNodeIdx], KEndNode = ListOfNodes[kNodeIdx], LEndNode = ListOfNodes[lNodeIdx], ID = idx,
-                    Section = new ShellSection(), Thickness = 0.1 };
+                    Section = new ShellSection() { Thickness = this.ShellThickness }};
                     member.IsOnlyPlate = this.IsOnlyPlate;
                     idx++;
 
@@ -319,14 +319,9 @@ namespace Data
 
         public override MatrixCS GetGlobalStiffness()
         {
-            
-            
+      
 
             MatrixCS KG = new MatrixCS(AssemblyData.NumberOfUnknowns, AssemblyData.NumberOfUnknowns);
-
-
-
-
             foreach (var mem in ListOfMembers)
             {
                 var shellMember = (QuadShellMember)mem;
@@ -357,6 +352,14 @@ namespace Data
                 }
             }
             return KG;
+        }
+
+        public void SetMemberMass(double mass) 
+        {
+            foreach (var item in this.ListOfMembers)
+            {
+                (item as QuadShellMember).SetMass();
+            }
         }
 
    
@@ -410,7 +413,7 @@ namespace Data
             {
                 var shellMem = item as QuadShellMember;
 
-                shellMem.Thickness = shellThickness;
+                shellMem.Section.Thickness = shellThickness;
                 shellMem.Section.Material.Uw = shellUw;
             }
 
@@ -418,16 +421,14 @@ namespace Data
 
         }
 
-        public bool SetShellMemberUwByValue(double uwValue, double shellThickness)
+        public bool SetShellMemberUwByValue(double uwValue)
         {
-          
-
+         
             foreach (var item in this.ListOfMembers)
             {
                 var shellMem = item as QuadShellMember;
-
-                shellMem.Thickness = shellThickness;
                 shellMem.Section.Material.Uw = uwValue;
+                shellMem.SetMass();
             }
 
             return true;

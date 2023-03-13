@@ -2,6 +2,7 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Accord.dll.config
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\TestConsol.exe.config
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\TestConsol.exe
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\TestConsol.pdb
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Adapters.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Data.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\ILNumerics.Core.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\ILNumerics.Core.Platforms.dll
@@ -12,6 +13,7 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Microsoft.Bcl.AsyncInterfaces.
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Microsoft.CodeAnalysis.CSharp.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Microsoft.CodeAnalysis.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Microsoft.Win32.Registry.dll
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.exe
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Solver.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\System.Buffers.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\System.Collections.Immutable.dll
@@ -34,6 +36,9 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\ThesisProject.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Accord.Math.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Accord.dll
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Accord.Math.Core.dll
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.pdb
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.exe.config
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Adapters.pdb
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Data.pdb
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Data.dll.config
 C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Solver.pdb
@@ -101,8 +106,3 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csproj.CoreCompileI
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csproj.CopyComplete
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.exe
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.pdb
-C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Adapters.dll
-C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\Adapters.pdb
-C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.exe
-C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.pdb
-C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OptimizationAlgorithms.exe.config

@@ -30,12 +30,16 @@ namespace ThesisProject.Structural_Members
         private int _ID;
         private EndCondition _IEndCondition;
         private EndCondition _JEndCondition;
-        private eFrameMemberType FrameType;
 
 
         private eMemberType _MemberType;
         private FrameSection _Section;
 
+        #endregion
+
+        #region Thesis Specific Fields
+
+        private eFrameMemberType _FrameType;
 
         #endregion
 
@@ -52,7 +56,7 @@ namespace ThesisProject.Structural_Members
         public FrameSection Section { get => _Section; set => _Section = value; }
         public EndCondition IEndCondition { get => _IEndCondition; set => _IEndCondition = value; }
         public EndCondition JEndCondition { get => _JEndCondition; set => _JEndCondition = value; }
-        public eFrameMemberType FrameType1 { get => FrameType; set => FrameType = value; }
+        public eFrameMemberType FrameType { get => _FrameType; set => _FrameType = value; }
 
         public MatrixCS GetGlobalStiffnessMatrix()
         {
@@ -77,6 +81,19 @@ namespace ThesisProject.Structural_Members
 
             this.IEndCondition = trussReleases;
             this.JEndCondition = trussReleases;
+        }
+
+        public void SetAllFixed()
+        {
+            this.IEndCondition.IsReleaseMx = false;
+            this.IEndCondition.IsReleaseMy = false;
+            this.IEndCondition.IsReleaseMz = false;
+
+            this.JEndCondition.IsReleaseMx = false;
+            this.JEndCondition.IsReleaseMy = false;
+            this.JEndCondition.IsReleaseMz = false;
+
+            ;
         }
 
         public double GetMass()

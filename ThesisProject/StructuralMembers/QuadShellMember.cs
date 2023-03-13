@@ -39,9 +39,7 @@ namespace ThesisProject.Structural_Members
         private Node _LEndNode;
         private eMemberType _MemberType;
         private ShellSection _Section;
-        private Material _Material;
         private int _ID;
-        private double _Thickness;
 
         private eMembraneType _MembraneType;
         private ePlateType _PlateType;
@@ -62,14 +60,12 @@ namespace ThesisProject.Structural_Members
 
         #region Interface Implementations
         public eMemberType MemberType { get => _MemberType; set => _MemberType = value; }
-        public Material Material { get => _Material; set => _Material = value; }
-        public double Thickness { get => _Thickness; set => _Thickness = value; }
         public eMembraneType MembraneType { get => _MembraneType; set => _MembraneType = value; }
         public eMembraneType MembraneType1 { get => _MembraneType; set => _MembraneType = value; }
         public ePlateType PlateType { get => _PlateType; set => _PlateType = value; }
         public int ID { get => _ID; set => _ID = value; }
         public bool IsOnlyPlate { get => _IsOnlyPlate; set => _IsOnlyPlate = value; }
-        public double MemberMass { get => _MemberMass; set => _MemberMass = value; }
+        public double MemberMass { get => _MemberMass; private set => _MemberMass = value; }
 
         public MatrixCS GetLocalStiffnessMatrix(bool useEI = false)
         {
@@ -90,7 +86,7 @@ namespace ThesisProject.Structural_Members
             eMat.Matrix[2, 2] = eMult * (1 - v) / 2;
 
             // Thickness
-            var thickness = _Thickness;
+            var thickness = this.Section.Thickness;
 
             // Map coordinates of flat plane to 2-D surface
             var d1 = this.IEndNode.Point.DistTo(JEndNode.Point);
@@ -507,7 +503,7 @@ namespace ThesisProject.Structural_Members
                         var flexuralRigidity = new MatrixCS(3, 3);
                         var elas = this.Section.Material.E;
                         var pois = this.Section.Material.Poissons;
-                        var thick = this.Thickness;
+                        var thick = this.Section.Thickness;
                         var fRMult = elas * (thick * thick * thick) / (12 * (1 - (pois * pois)));
                         flexuralRigidity.Matrix[0, 0] = fRMult * 1; flexuralRigidity.Matrix[0, 1] = fRMult * pois;
                         flexuralRigidity.Matrix[1, 0] = fRMult * pois; flexuralRigidity.Matrix[1, 1] = fRMult * 1;
@@ -580,7 +576,7 @@ namespace ThesisProject.Structural_Members
                         // Use bilinear shape functions for bending part
                         var kShear = new MatrixCS(12, 12);
                         var shearRigidity = new MatrixCS(2, 2);
-                        double sR = (5.0 / 6.0) * this.Section.Material.G * this.Thickness;
+                        double sR = (5.0 / 6.0) * this.Section.Material.G * this.Section.Thickness;
                         // Shear rigidity is multiplied by two since shear stifness is calculated at only midpoint
                         // and weight of midpoint is 2 for gauss-quadrature
                         shearRigidity.Matrix[0, 0] = 4.0 * sR; shearRigidity.Matrix[1, 1] = 4.0 * sR;
@@ -686,7 +682,7 @@ namespace ThesisProject.Structural_Members
                 var flexuralRigidity = new MatrixCS(3, 3);
                 var elas = this.Section.Material.E;
                 var pois = this.Section.Material.Poissons;
-                var thick = this.Thickness;
+                var thick = this.Section.Thickness;
                 var fRMult = elas * (thick * thick * thick) / (12 * (1 - (pois * pois)));
                 flexuralRigidity.Matrix[0, 0] = fRMult * 1; flexuralRigidity.Matrix[0, 1] = fRMult * pois;
                 flexuralRigidity.Matrix[1, 0] = fRMult * pois; flexuralRigidity.Matrix[1, 1] = fRMult * 1;
@@ -762,7 +758,7 @@ namespace ThesisProject.Structural_Members
                 // Use bilinear shape functions for bending part
                 var kShear = new MatrixCS(12, 12);
                 var shearRigidity = new MatrixCS(2, 2);
-                double sR = (5.0 / 6.0) * this.Section.Material.G * this.Thickness;
+                double sR = (5.0 / 6.0) * this.Section.Material.G * this.Section.Thickness;
                 // Shear rigidity is multiplied by two since shear stifness is calculated at only midpoint
                 // and weight of midpoint is 2 for gauss-quadrature
                 shearRigidity.Matrix[0, 0] = 4.0 * sR; shearRigidity.Matrix[1, 1] = 4.0 * sR;
@@ -864,53 +860,56 @@ namespace ThesisProject.Structural_Members
             return globalStiffnesMatrix;
         }
 
+        public void SetMass() 
+        {
+            // Map coordinates of flat plane to 2-D surface
+            var d1 = this.IEndNode.Point.DistTo(this.JEndNode.Point);
+            var d2 = this.JEndNode.Point.DistTo(this.KEndNode.Point);
+            var d3 = this.KEndNode.Point.DistTo(this.LEndNode.Point);
+            var d4 = this.LEndNode.Point.DistTo(this.IEndNode.Point);
+
+            Vector p1V = new Vector(this.IEndNode.Point);
+            Vector p2V = new Vector(this.JEndNode.Point);
+            Vector p3V = new Vector(this.KEndNode.Point);
+            Vector p4V = new Vector(this.LEndNode.Point);
+
+            // Angle between first line and fourth line
+            var firstVector0 = p2V.Extract(p1V);
+            var secondVector0 = p4V.Extract(p1V);
+            var alpha0 = firstVector0.AngleTo(secondVector0);
+
+            // Angle between first line and second line
+            var firstVector1 = p1V.Extract(p2V);
+            var secondVector1 = p3V.Extract(p2V);
+            var alpha1 = firstVector1.AngleTo(secondVector1);
+
+            // Angle between second line and third line
+            var firstVector2 = p2V.Extract(p3V);
+            var secondVector2 = p4V.Extract(p3V);
+            var alpha2 = firstVector2.AngleTo(secondVector2);
+
+            // Map 3D coordinates to 2D plane using angles and length found above to be able to
+            // use natural coordinates
+            var x1 = 0.0; var y1 = 0.0;
+            var x2 = d1; var y2 = 0.0;
+            var x3 = x2 - (d2 * Math.Cos(alpha1)); var y3 = d2 * Math.Sin(alpha1);
+            var x4 = d4 * Math.Cos(alpha0); var y4 = d4 * Math.Sin(alpha0);
+
+            // Calculate area of the polygon
+            var area = Math.Abs(((x1 * y2) - (x2 * y1)) + ((x2 * y3) - (x3 * y2)) + ((x3 * y4) - (x4 * y3)) + ((x4 * y1) - (x1 * y4))) * 0.5;
+
+            // Get total mass
+            var totalMass = area * this.Section.Thickness * this.Section.Material.Uw;
+            _MemberMass = totalMass;
+        }
+
         public MatrixCS GetLocalMassMatrix(bool useEI = false)
         {
             {
-                // Map coordinates of flat plane to 2-D surface
-                var d1 = this.IEndNode.Point.DistTo(this.JEndNode.Point);
-                var d2 = this.JEndNode.Point.DistTo(this.KEndNode.Point);
-                var d3 = this.KEndNode.Point.DistTo(this.LEndNode.Point);
-                var d4 = this.LEndNode.Point.DistTo(this.IEndNode.Point);
-
-                Vector p1V = new Vector(this.IEndNode.Point);
-                Vector p2V = new Vector(this.JEndNode.Point);
-                Vector p3V = new Vector(this.KEndNode.Point);
-                Vector p4V = new Vector(this.LEndNode.Point);
-
-                // Angle between first line and fourth line
-                var firstVector0 = p2V.Extract(p1V);
-                var secondVector0 = p4V.Extract(p1V);
-                var alpha0 = firstVector0.AngleTo(secondVector0);
-
-                // Angle between first line and second line
-                var firstVector1 = p1V.Extract(p2V);
-                var secondVector1 = p3V.Extract(p2V);
-                var alpha1 = firstVector1.AngleTo(secondVector1);
-
-                // Angle between second line and third line
-                var firstVector2 = p2V.Extract(p3V);
-                var secondVector2 = p4V.Extract(p3V);
-                var alpha2 = firstVector2.AngleTo(secondVector2);
-
-                // Map 3D coordinates to 2D plane using angles and length found above to be able to
-                // use natural coordinates
-                var x1 = 0.0; var y1 = 0.0;
-                var x2 = d1; var y2 = 0.0;
-                var x3 = x2 - (d2 * Math.Cos(alpha1)); var y3 = d2 * Math.Sin(alpha1);
-                var x4 = d4 * Math.Cos(alpha0); var y4 = d4 * Math.Sin(alpha0);
-
-                // Calculate area of the polygon
-                var area = Math.Abs(((x1 * y2) - (x2 * y1)) + ((x2 * y3) - (x3 * y2)) + ((x3 * y4) - (x4 * y3)) + ((x4 * y1) - (x1 * y4))) * 0.5;
-
-                // Get total mass
-                var totalMass = area * this.Section.Thickness * this.Section.Material.Uw;
-                MemberMass = totalMass;
-
                 // Get nodal mass contribution
                 // TODO : Assumption is shell is rectangular. For non-rectangular shells (i.e. edges are not perpendicular), implement 
                 // mass matrix with shape functions and Gauss integration.
-                var lM = totalMass / 4.0;
+                var lM = this.MemberMass / 4.0;
 
                 // Fill mass matrix
                 MatrixCS m = new MatrixCS(24, 24);

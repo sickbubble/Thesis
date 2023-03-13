@@ -11,9 +11,7 @@ namespace ThesisProject.Sections
         #region Ctor
         public ShellSection()
         {
-            _SectionType = eSectionType.Frame;
-
-            SetDefaultParameters();
+            _SectionType = eSectionType.QuadShell;
 
             SetDefaultMaterial();
         }
@@ -45,10 +43,7 @@ namespace ThesisProject.Sections
 
 
         #region Public Methods
-        public void SetDefaultParameters()
-        {
-            this.Thickness = 0.1;
-        }
+  
 
 
         public void SetDefaultMaterial()

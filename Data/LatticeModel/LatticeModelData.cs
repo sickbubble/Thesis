@@ -121,7 +121,7 @@ namespace Data
                 for (int i = 0; i < this.ListOfMembers.Count; i++)
                 {
                     var member = (FrameMember)this.ListOfMembers[i];
-
+                     member.SetAllFixed();
                     switch (endCondition)
                     {
                         case eEndConditionSet.AllFixed:
@@ -131,16 +131,16 @@ namespace Data
                             member.JEndCondition.IsReleaseMx = true;
                             break;
                         case eEndConditionSet.WeakSideRotation:
-                            member.IEndCondition.IsReleaseMy = true;
-                            member.JEndCondition.IsReleaseMy = true;
+                            member.IEndCondition.IsReleaseMz = true;
+                            member.JEndCondition.IsReleaseMz = true;
                             break;
                         case eEndConditionSet.TorsionalReleaseAndWeakSide:
-                            member.IEndCondition.IsReleaseMy = true;
-                            member.JEndCondition.IsReleaseMy = true;
+                            member.IEndCondition.IsReleaseMz = true;
+                            member.JEndCondition.IsReleaseMz = true;
                             member.IEndCondition.IsReleaseMx = true;
                             member.JEndCondition.IsReleaseMx = true;
                             break;
-                        
+
                     }
 
                 }
@@ -153,20 +153,17 @@ namespace Data
         public void AssignRatio(double ratio, double alphaRatio)
         {
 
-            var shortMemberLength = this.ListOfMembers.Min(x => (x as FrameMember).GetLength());
 
             for (int i = 0; i < this.ListOfMembers.Count; i++)
             {
                 var mem = (FrameMember)this.ListOfMembers[i];
-                if (mem.GetLength() == shortMemberLength)
-                {
-                    mem.Section.Material.E *= ratio;
-                }
-                else
-                {
-                    mem.Section.Material.E *= (alphaRatio * ratio);
 
-                }
+                mem.Section.Material.SetBaseE();
+
+                mem.Section.Material.SetE(mem.Section.Material.E * (mem.FrameType == eFrameMemberType.Rectangle ? ratio : (alphaRatio * ratio)));
+
+                
+
             }
         }
 
@@ -353,6 +350,7 @@ namespace Data
         public void FillMemberInfo( double sectionHeight)
         {
             var labelCounter = 1;
+            ListOfMembers.Clear();
             var horizon = this.Horizon == eHorizon.DenseMesh ? 3.01 : 1.51;
             for (int i = 0; i < ListOfNodes.Count; i++)
             {
@@ -364,10 +362,9 @@ namespace Data
                     if (lengthOfMember < horizon * _MeshSize)
                     {
                         var frameMember = new FrameMember() { IEndNode = ListOfNodes[i], JEndNode = ListOfNodes[j], ID = labelCounter };
-                        //frameMember.SetAsTrussMember();
+                        frameMember.FrameType = lengthOfMember == _MeshSize ? eFrameMemberType.Rectangle : eFrameMemberType.DiagonalFirst;
 
-                        if (ListOfMembers.Any(x => (x as FrameMember).IEndNode == frameMember.JEndNode && (x as FrameMember).JEndNode == frameMember.IEndNode))
-                            continue;
+                        if (ListOfMembers.Any(x => (x as FrameMember).IEndNode == frameMember.JEndNode && (x as FrameMember).JEndNode == frameMember.IEndNode)) continue;
 
                         frameMember.Section = new FrameSection(1, sectionHeight);
                         ListOfMembers.Add(frameMember);
@@ -590,13 +587,12 @@ namespace Data
 
             return true;
         }
-        public bool UpdateModelForOptimization(eEndConditionSet eEndConditionSet,eHorizon horizon,double alphaRatio) 
+        public bool UpdateModelForOptimization(double frameHeight,double alphaRatio) 
         {
-            if (horizon != _Horizon) this.FillMemberInfo(this.FrameHeight);
-
-            if (this.AlphaRatio != alphaRatio) this.AlphaRatio = alphaRatio;
-            
-            this.SetEndConditon(eEndConditionSet);
+            this.FrameHeight = Math.Abs(frameHeight);
+            this.FillMemberInfo(this.FrameHeight);
+            this.AlphaRatio = Math.Abs(alphaRatio) ;
+            //this.SetEndConditon(eEndConditionSet);
 
             return true;
         }
