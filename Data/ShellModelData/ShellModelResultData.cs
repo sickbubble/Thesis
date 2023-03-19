@@ -52,7 +52,8 @@ namespace Data
 
         #region Private Fields
         private MatrixCS _DispRes;
-        private List<double> _ListOfPeriods;
+
+        private double _InternalEnergy;
 
 
         #endregion
@@ -67,7 +68,7 @@ namespace Data
         /// </summary>
         public Dictionary<ModelInfo.Point, List<double>> NodeResults { get  ; set ; }
         public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
-        public List<double> ListOfPeriods { get => _ListOfPeriods; set => _ListOfPeriods = value; }
+        public double InternalEnergy { get => _InternalEnergy; set => _InternalEnergy = value; }
 
         public IParticle GetOptimizationObject()
         {

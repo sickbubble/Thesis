@@ -15,7 +15,11 @@ using OptimizationAlgorithms.Swarms;
 using OptimizationAlgorithms.Types;
 using OptimizationAlgorithms;
 using OptimizationAlgorithms.FitnessFunction;
-using Adapters;
+using System.Diagnostics;
+using OxyPlot;
+using OxyPlot.Series;
+using OxyPlot.Series;
+
 
 namespace TestConsol
 {
@@ -25,7 +29,124 @@ namespace TestConsol
         static void Main(string[] args)
         {
 
+
+
+            //var runInfo = new RunInfo();
+            //runInfo.EndConditionValue = 0;
+            //runInfo.Horizon = eHorizon.LightMesh;
+            //runInfo.MemberDim = 20;
+            //runInfo.LatticeMeshSize = 1;
+            //runInfo.ShellMeshSize = 1;
+            //runInfo.FrameHeight = 0.85;
+            //runInfo.AlphaRatio = 0.77;
+            //runInfo.ShellThickness = 1.0;
+            //runInfo.EndConditionValue = eEndConditionSet.TorsionalRelease;
+            //runInfo.ShelllUnitWeigth = 1.0;
+
+            ////RunAndSaveProcess();
+
+
+            ////RunAnalysis(runInfo, 0.1); // shellThickness
+            ////RunNew(runInfo);
+            //RunAndEqualizeSystems(runInfo);
+
+            //ReadResults();
+            ReadResults();
             //RunAndSaveProcess();
+
+
+        }
+
+
+        static RunResult RunAndEqualizeSystems(RunInfo runInfo)
+        {
+            // Initialize shell model
+            //ShellModelData.Instance.SetModelData(runInfo);
+            //ShellModelData.Instance.AssignLoadToMiddle();
+            //// Update Shell unit weight to have equal mass system
+            ////ShellModelData.Instance.setmass(1, ShellModelData.Instance.ShellThickness);
+            //LinearSolver.Instance.RunAnalysis_Shell();
+
+
+            var shellTotalMass = ShellModelData.Instance.GetTotalMass();
+
+            // Initialize lattice model
+            var latticeModelData = new LatticeModelData();
+            latticeModelData.SetModelData(runInfo);
+            latticeModelData.SetFramesUwByTotalMass(shellTotalMass);
+            latticeModelData.AssignLoadToMiddle();
+            var latticeResults = LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData);
+
+            var runResult = LinearSolver.Instance.EqualizeSystems(latticeResults, latticeModelData, runInfo); ;
+
+            Console.WriteLine($"Alpha Ratio = {runResult.AlphaRatio}");
+            Console.WriteLine($"Frame Thickness = {runResult.FrameHeight}");
+            Console.WriteLine($"Shell Thickness = {runInfo.ShellThickness}");
+            Console.WriteLine($"Equalization Ratio = {runResult.EqualizationRatio}");
+
+
+            return runResult;
+
+        }
+
+
+        static void ReadResults()
+        {
+            var path = GetFilePath();
+            string jsonString = File.ReadAllText(path);
+            //Console.WriteLine(jsonString);
+            var listOfRunDataDeserialized = JsonSerializer.Deserialize<List<RunResult>>(jsonString);
+
+            foreach (var item in listOfRunDataDeserialized)
+            {
+                double totalPercentDiff = 0;
+                int percentDiffCounter = 0;
+                foreach (var compData in item.NodeCompareData)
+                {
+                    if (compData.PercentDiff != 0)
+                    {
+                        totalPercentDiff += Math.Abs(compData.PercentDiff);
+                        percentDiffCounter++;
+                    }
+                }
+
+                item.PercentDiff = totalPercentDiff / percentDiffCounter;
+            }
+
+            var validResults = listOfRunDataDeserialized.Where(x => x.PercentDiff < 10);
+
+            validResults.FirstOrDefault().PrepareCSVFilesForGnuplot();
+
+            var horizonGroups = validResults.GroupBy(x => x.Horizon);
+
+            var alphaRatioGroups = validResults.GroupBy(x => x.AlphaRatio);
+            var latticeMeshSize = validResults.GroupBy(x => x.LatticeMeshSize);
+
+            var minMeanPercentDiff = listOfRunDataDeserialized.Min(x => x.PercentDiff);
+            var minPercentDiffRuns = listOfRunDataDeserialized.Where(x => x.PercentDiff == minMeanPercentDiff);
+
+            (minPercentDiffRuns.ElementAt(0) as RunResult).PrepareCSVFilesForGnuplot();
+
+
+        }
+
+
+
+        /// <summary>
+        /// Runs analysis for given values and save results
+        /// </summary>
+        static void RunAndSaveProcess()
+        {
+
+            int runID = 1;
+
+            double increment = 0.05;
+            double heightIncr = 0.05;
+
+            var listOfRunData = new List<RunResult>();
+
+            var latticeMeshSizeList = new List<double>() { 0.5, 1 };
+            var horizonList = new List<int>() { (int)eHorizon.LightMesh, (int)eHorizon.DenseMesh };
 
             var runInfo = new RunInfo();
             runInfo.EndConditionValue = 0;
@@ -37,99 +158,58 @@ namespace TestConsol
             runInfo.AlphaRatio = 1.1;
             runInfo.ShellThickness = 1.0;
             runInfo.EndConditionValue = eEndConditionSet.TorsionalRelease;
+            runInfo.ShelllUnitWeigth = 1.0;
 
-            //RunAnalysis(runInfo, 0.1); // shellThickness
-            //RunNew(runInfo);
-            RunAndEqualizeSystems(runInfo);
-
-
-        }
-
-        /// <summary>
-        /// This method runs two models with given info and equalizes systems
-        /// </summary>
-        /// <param name="runInfo"></param>
-        static void RunAndEqualizeSystems(RunInfo runInfo)
-        {
             // Initialize shell model
 
             ShellModelData.Instance.SetModelData(runInfo);
             ShellModelData.Instance.AssignLoadToMiddle();
-            // Update Shell unit weight to have equal mass system
-            ShellModelData.Instance.SetShellMemberUwByValue(1);
-            //ShellModelData.Instance.setmass(1, ShellModelData.Instance.ShellThickness);
             LinearSolver.Instance.RunAnalysis_Shell();
-            var shellTotalMass = ShellModelData.Instance.GetTotalMass();
 
-            // Initialize lattice model
-            var latticeModelData = new LatticeModelData();
-            latticeModelData.SetModelData(runInfo);
-            latticeModelData.SetFramesUwByTotalMass(shellTotalMass);
-            latticeModelData.AssignLoadToMiddle();
-            double eqnRatio = LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData, true).EqnRatio;
-            Console.WriteLine($"Alpha Ratio = {runInfo.AlphaRatio}");
-            Console.WriteLine($"Frame Thickness = {runInfo.FrameHeight}");
-            Console.WriteLine($"Shell Thickness = {runInfo.ShellThickness}");
-            Console.WriteLine($"Equalization Ratio = {eqnRatio}");
+            var stopWatch = new Stopwatch();
 
-
-            var aa = "0";
-
-        }
-
-
-
-        static void RunAndSaveProcess()
-        {
-            var res = new Dictionary<double, double>();
-
-            int runID = 1;
-
-            double increment = 0.1;
-            double heightIncr = 0.05;
-            var latticeMeshSizeList = new List<double>() { 0.5, 1 };
-            var listOfNodes = new List<Node>();
-
-
-            var listOfRunData = new List<RunData>();
-            var isTorsionalRelase = new List<bool>() { true, false };
-            var horizonList = new List<double>() { 1.5 ,3.01};
-            //var horizonList = new List<double>() { 1.5, 3.01 };
             for (int m = 0; m < latticeMeshSizeList.Count; m++)
             {
                 var latticeMeshSize = latticeMeshSizeList[m];
-                for (int t = 0; t < isTorsionalRelase.Count; t++)
+
+                runInfo.LatticeMeshSize = latticeMeshSize;
+
+                for (int h = 0; h < horizonList.Count; h++)
                 {
-                    var isTorsionalRelease = isTorsionalRelase[t];
-
-                    for (int h = 0; h < horizonList.Count; h++)
+                    runInfo.Horizon = (eHorizon)horizonList[h];
+                    double latticeFrameHeight = 0.5;
+                    for (int j = 0; j < 10; j++)
                     {
-                        var horizon = horizonList[h];
-                        double latticeFrameHeight = 0.3;
-                        for (int j = 0; j < 20; j++)
+                        runInfo.FrameHeight = latticeFrameHeight;
+                        runInfo.AlphaRatio = 0.7; // set inital value again for every loop
+                        for (int i = 0; i < 8; i++)
                         {
-                            double alphaRatio = 0.2;
-                            for (int i = 0; i < 10; i++)
-                            {
-                              
-                                alphaRatio = alphaRatio + increment;
-                                runID++;
-                            }
+                            stopWatch.Start();
 
-                            latticeFrameHeight += heightIncr;
+                            var runResult = RunAndEqualizeSystems(runInfo);
+                            runResult.ID = runID;
+                            listOfRunData.Add(runResult);
+                            stopWatch.Stop();
+
+                            Console.WriteLine(stopWatch.Elapsed.TotalSeconds) ;
+                            stopWatch.Reset();
+                            runInfo.AlphaRatio += increment;
+                            runID++;
                         }
+                        latticeFrameHeight += heightIncr;
                     }
                 }
-
             }
             var path = GetFilePath();
             string jsonString = JsonSerializer.Serialize(listOfRunData);
             File.WriteAllText(path, jsonString);
-            Console.WriteLine(jsonString);
-            var listOfRunDataDeserialized = JsonSerializer.Deserialize<List<RunData>>(jsonString);
+            //Console.WriteLine(jsonString);
+            var listOfRunDataDeserialized = JsonSerializer.Deserialize<List<RunResult>>(jsonString);
         }
 
-
+        #region data
+        
+        #endregion
 
 
         /// <summary>
@@ -141,15 +221,9 @@ namespace TestConsol
             int numParticles = 10;
             int numDimensions = 2;
 
-
-
-
             // Initialize shell model
-
             ShellModelData.Instance.SetModelData(runInfo);
             ShellModelData.Instance.AssignLoadToMiddle();
-            // Update Shell unit weight to have equal mass system
-            ShellModelData.Instance.SetShellMemberUwByValue(1);
             LinearSolver.Instance.RunAnalysis_Shell();
 
 
@@ -273,7 +347,6 @@ namespace TestConsol
 
             return path + fileName;
         }
-
 
         public void NotifyConvergence(double fitness)
         {

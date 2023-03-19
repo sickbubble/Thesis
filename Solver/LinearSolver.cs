@@ -14,6 +14,7 @@ using OptimizationAlgorithms.Types;
 using OptimizationAlgorithms.PSOObjects.Particles;
 using OptimizationAlgorithms.Particles;
 
+
 namespace Solver
 {
     public class LinearSolver :  IObserver
@@ -52,30 +53,12 @@ namespace Solver
         {
 
             var solver = new GeneralizedEigenvalueDecomposition(kG.Matrix, mass.Matrix,true);
-
-
-
-            var w2 = solver.RealEigenvalues;
-
-
             var w = new List<double>();
-
-            for (int i = 0; i < w2.Length; i++)
-            {
-                w.Add(Math.Sqrt(w2[i]));
-            }
+            for (int i = 0; i < solver.RealEigenvalues.Length; i++) w.Add(Math.Sqrt(solver.RealEigenvalues[i]));
 
             var T = new List<double>();
-
-
-            for (int i = 0; i < w.Count; i++)
-            {
-                T.Add((2 * Math.PI )/ w[i]);
-            }
-
-
-
-            return T;
+            for (int i = 0; i < w.Count; i++) T.Add((2 * Math.PI) / w[i]);
+            return T.Take(6).ToList();
 
         }
        
@@ -164,24 +147,17 @@ namespace Solver
 
         }
 
-        public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata, bool equalizeSystems = false)
+        public LatticeModelResultData RunAnalysis_Lattice(LatticeModelData latticemodeldata )
         {
+            
             var latticeModelResultData = new LatticeModelResultData();
             latticemodeldata.SetNodeAssemblyData();
-
-
-
-            // Get Mode Shapes
-            //var mass = latticemodeldata.GetMassMatrix();
-            //var modeShapesLattice = GetModeShapesOfSystem(KG, mass, 2);
-
 
             var KG = latticemodeldata. GetGlobalStiffness();
             var RHS = latticemodeldata.GetRightHandSide();
 
             var externalKG = Matrix<double>.Build.SparseOfArray(KG.Matrix);
             var externalRHS = Matrix<double>.Build.SparseOfArray(RHS.Matrix);
-            
 
             var dispRes = externalKG.Solve(externalRHS);
 
@@ -199,40 +175,33 @@ namespace Solver
             FillFrameMemberResults(latticeModelResultData,latticemodeldata);
 
 
-            if (equalizeSystems)
-            {
-            latticeModelResultData = EqualizeSystems(latticeModelResultData, latticemodeldata, latticemodeldata.AlphaRatio);
-            }
            
 
             return latticeModelResultData;
         }
 
-
-    
-
-        public LatticeModelResultData EqualizeSystems(LatticeModelResultData latticeModelRes,LatticeModelData latticeModel ,double alphaRatio)
+      public RunResult EqualizeSystems(LatticeModelResultData latticeModelRes,LatticeModelData latticeModel ,RunInfo runInfo)
         {
 
             //Assign ratio to equalize internal eneries
-
+            var runResult = new RunResult(runInfo);
             var shellIntEnergy = GetShellModelInternalEnergy();
             var latticeEnergy = GetLatticeModelInternalEnergy(latticeModelRes.DispRes, latticeModel);
-            var eqRatio = shellIntEnergy > latticeEnergy ? shellIntEnergy / latticeEnergy : latticeEnergy / shellIntEnergy;
+            runResult.EqualizationRatio = shellIntEnergy > latticeEnergy ? shellIntEnergy / latticeEnergy : latticeEnergy / shellIntEnergy;
+            latticeModel.AssignRatio(runResult.EqualizationRatio, runInfo.AlphaRatio);
+
+            //runResult.ShellPeriods = GetPeriodsOfTheSystem(ShellModelData.Instance.GetGlobalStiffness(), ShellModelData.Instance.GetMassMatrix());
+            //runResult.LatticePeriods = GetPeriodsOfTheSystem(latticeModel.GetGlobalStiffness(), latticeModel.GetMassMatrix());
             
-            latticeModel.AssignRatio(eqRatio, alphaRatio);
-
-
-            var shellPeriods = GetPeriodsOfTheSystem(ShellModelData.Instance.GetGlobalStiffness(), ShellModelData.Instance.GetMassMatrix());
-            var latticePeriods = GetPeriodsOfTheSystem(latticeModel.GetGlobalStiffness(), latticeModel.GetMassMatrix());
-
-            var bb = latticeModel.GetMassMatrix();
             var latticeRes = RunAnalysis_Lattice(latticeModel);
 
-            var nodeCompareData = GetNodeCompareDataList(latticeRes);
-            latticeRes.EqnRatio = eqRatio;
-            return latticeRes;
+            runResult.NodeCompareData = GetNodeCompareDataList(latticeRes);
+
+            return runResult;
         }
+
+
+
 
 
         public List<NodeCompareData> GetNodeCompareDataList( LatticeModelResultData newLatticeRes) 
@@ -327,6 +296,19 @@ namespace Solver
 
             var firstPart = (ShellModelResultData.Instance.DispRes.Transpose()).Multiply(KG);
             ret = firstPart.Multiply(ShellModelResultData.Instance.DispRes).Matrix[0,0];
+
+
+            return ret;
+        }
+
+        private double SetShellModelInternalEnergy()
+        {
+
+            double ret;
+            var KG = ShellModelData.Instance.GetGlobalStiffness();
+
+            var firstPart = (ShellModelResultData.Instance.DispRes.Transpose()).Multiply(KG);
+            ret = firstPart.Multiply(ShellModelResultData.Instance.DispRes).Matrix[0, 0];
 
 
             return ret;
@@ -479,7 +461,7 @@ namespace Solver
 
             var resultData = new RunResult();
             // UpdateParticleResult
-            resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList(LinearSolver.Instance.RunAnalysis_Lattice(latticeModel, true));
+            resultData.NodeCompareData = LinearSolver.Instance.GetNodeCompareDataList(LinearSolver.Instance.RunAnalysis_Lattice(latticeModel));
             Console.WriteLine($"Frame Heigth: {particle.Position[0]}  --------------      AlphaRatio = {particle.Position[1]} ");
             particle.Result = resultData.GetDisplacementProfile();
         }

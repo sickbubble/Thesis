@@ -106,3 +106,6 @@ C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csproj.CoreCompileI
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.csproj.CopyComplete
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.exe
 C:\Users\Burak T\Desktop\Tez\TestConsol\obj\Debug\TestConsol.pdb
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OxyPlot.dll
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OxyPlot.pdb
+C:\Users\Burak T\Desktop\Tez\TestConsol\bin\Debug\OxyPlot.xml

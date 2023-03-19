@@ -36,6 +36,7 @@ namespace Data
 
 
 
+
         #endregion
 
 
@@ -54,6 +55,7 @@ namespace Data
         public MatrixCS DispRes { get => _DispRes; set => _DispRes = value; }
         public List<double> ListOfPeriods { get => _ListOfPeriods; set => _ListOfPeriods = value; }
         public double EqnRatio { get => _EqnRatio; set => _EqnRatio = value; }
+
 
         public IParticle GetOptimizationObject()
         {

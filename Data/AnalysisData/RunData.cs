@@ -11,10 +11,12 @@ using OptimizationAlgorithms.PSOObjects.Particles;
 using OptimizationAlgorithms.PSOObjects.Swarms;
 using OptimizationAlgorithms.Swarms;
 using ThesisProject.Structural_Members;
+using System.IO;
+using System.Globalization;
 
 namespace Data
 {
- 
+
 
     public class RunDataList
     {
@@ -71,6 +73,11 @@ namespace Data
 
         }
 
+        public RunResult(RunInfo runInfo)
+        {
+            FillByRunInfo(runInfo);
+        }
+
         #endregion
 
         #region Private Fields
@@ -79,9 +86,9 @@ namespace Data
         private List<NodeCompareData> _NodeCompareData;
         private List<double> _ShellPeriods;
         private List<double> _LatticePeriods;
-        private double _EnergyRatio;
         private double[] _LatticeDisplacements;
         private double[] _ShellDisplacements;
+        private double _EqualizationRatio;
 
         private double _PercentDiff;
 
@@ -93,12 +100,12 @@ namespace Data
 
         #region Public Properties
         public List<NodeCompareData> NodeCompareData { get => _NodeCompareData; set => _NodeCompareData = value; }
-        public double EnergyRatio { get => _EnergyRatio; set => _EnergyRatio = value; }
         public Node MinControlNode { get => _MinControlNode; set => _MinControlNode = value; }
         public double PercentDiff { get => _PercentDiff; set => _PercentDiff = value; }
         public List<double> ShellPeriods { get => _ShellPeriods; set => _ShellPeriods = value; }
         public List<double> LatticePeriods { get => _LatticePeriods; set => _LatticePeriods = value; }
         public int ID { get => _ID; set => _ID = value; }
+        public double EqualizationRatio { get => _EqualizationRatio; set => _EqualizationRatio = value; }
 
         public object Clone()
         {
@@ -158,6 +165,37 @@ namespace Data
             throw new NotImplementedException();
         }
 
+        public void PrepareCSVFilesForGnuplot()
+        {
+
+            // Define the file path and name
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            string lattice_fp = desktop + "\\RunResults\\latticeRes2.csv";
+            string shell_fp = desktop + "\\RunResults\\shellRes2.csv";
+
+
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sb_Lattice = new StringBuilder();
+
+            foreach (var data in NodeCompareData)
+            {
+                sb.AppendLine($"{data.Point.X  } ;{data.Point.Y}; {data.ShellVerticalDisp }");
+                sb_Lattice.AppendLine($"{data.Point.X } ;{data.Point.Y}; {data.LatticeVerticalDisp}");
+
+            }
+
+            // Write the data to the CSV file
+            using (StreamWriter writer = new StreamWriter(lattice_fp))
+            {
+                writer.Write(sb_Lattice.ToString());
+            }
+            using (StreamWriter writer = new StreamWriter(shell_fp))
+            {
+                writer.Write(sb.ToString());
+            }
+
+        }
+
 
 
 
@@ -185,6 +223,7 @@ namespace Data
         private double _ShellThickness;
         private eSupportType _BorderSupportType;
         private eModelGeometryType _GeometryType;
+        private double _ShelllUnitWeigth;
 
 
         #endregion
@@ -195,6 +234,7 @@ namespace Data
 
         public eModelGeometryType GeometryType { get => _GeometryType; set => _GeometryType = value; }
         public eSupportType BorderSupportType { get => _BorderSupportType; set => _BorderSupportType = value; }
+        public double ShelllUnitWeigth { get => _ShelllUnitWeigth; set => _ShelllUnitWeigth = value; }
 
         public object Clone()
         {

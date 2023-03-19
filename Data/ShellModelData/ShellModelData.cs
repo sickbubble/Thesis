@@ -9,6 +9,8 @@ using ThesisProject.Loads;
 using ThesisProject.Sections;
 using ThesisProject.Structural_Members;
 
+
+
 namespace Data
 {
     public enum eModelGeometryType
@@ -55,6 +57,11 @@ namespace Data
         private bool _IsOnlyPlate;
         private double _ShellThickness;
 
+        private MatrixCS _GlobalStiffness;
+        private MatrixCS _MassMatrix;
+        private double _TotalMass;
+
+
         #endregion
 
         #region Public Properties
@@ -63,6 +70,7 @@ namespace Data
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
         public bool IsOnlyPlate { get => _IsOnlyPlate; set => _IsOnlyPlate = value; }
         public double ShellThickness { get => _ShellThickness; set => _ShellThickness = value; }
+
 
         #endregion
 
@@ -319,8 +327,12 @@ namespace Data
 
         public override MatrixCS GetGlobalStiffness()
         {
-      
+            if (_GlobalStiffness == null) SetGlobalStiffness(); 
+            return _GlobalStiffness;
+        }
 
+        private  void SetGlobalStiffness()
+        {
             MatrixCS KG = new MatrixCS(AssemblyData.NumberOfUnknowns, AssemblyData.NumberOfUnknowns);
             foreach (var mem in ListOfMembers)
             {
@@ -351,7 +363,7 @@ namespace Data
                     }
                 }
             }
-            return KG;
+            _GlobalStiffness =  KG;
         }
 
         public void SetMemberMass(double mass) 
@@ -362,14 +374,10 @@ namespace Data
             }
         }
 
-   
-
-        public override MatrixCS GetMassMatrix()
+    private void SetMassMatrix()
         {
           
-
             MatrixCS massMatrix = new MatrixCS(AssemblyData.NumberOfUnknowns, AssemblyData.NumberOfUnknowns);
-
             foreach (var mem in ListOfMembers)
             {
                 var shellMember = mem as QuadShellMember;
@@ -400,26 +408,16 @@ namespace Data
                 }
             }
 
-                       return massMatrix;
+            _MassMatrix = massMatrix;
         }
 
-        public bool SetShellMemberUw(double latticeModelTotalMass,double shellThickness)
+        public override MatrixCS GetMassMatrix()
         {
-            var shellMemberCount = this.ListOfMembers.Count;
-            var singleMemberMass = latticeModelTotalMass / shellMemberCount;
-            var shellUw = singleMemberMass /  (MeshSize * MeshSize * shellThickness);
-
-            foreach (var item in this.ListOfMembers)
-            {
-                var shellMem = item as QuadShellMember;
-
-                shellMem.Section.Thickness = shellThickness;
-                shellMem.Section.Material.Uw = shellUw;
-            }
-
-            return true;
-
+            if (_MassMatrix == null) SetMassMatrix();
+            return _MassMatrix;
         }
+
+      
 
         public bool SetShellMemberUwByValue(double uwValue)
         {
@@ -437,16 +435,20 @@ namespace Data
 
         public double GetTotalMass()
         {
-            double ret = 0;
+            if (_TotalMass == 0) SetTotalMass();
+            return _TotalMass;
+        }
+
+        public void SetTotalMass()
+        {
+            double totalMass = 0;
             foreach (var item in this.ListOfMembers)
             {
-                ret += (item as QuadShellMember).MemberMass;
+                totalMass += (item as QuadShellMember).MemberMass;
             }
-            
-            
-            return ret;
-
+            _TotalMass = totalMass;
         }
+
 
         public override bool SetModelData(RunData runData)
         {
@@ -463,6 +465,7 @@ namespace Data
             this.FillNodeInfo();
             this.FillMemberInfoList();
             SetModelGeometryType(modelRunInfo.GeometryType);
+            SetShellMemberUwByValue(modelRunInfo.ShelllUnitWeigth);
 
             this.SetBorderNodesSupportCondition(modelRunInfo.BorderSupportType);
 
