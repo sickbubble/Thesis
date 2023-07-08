@@ -1,6 +1,7 @@
 # Exclude build output
 bin/
 obj/
+packages/
 
 # Exclude NuGet packages
 *.nupkg
