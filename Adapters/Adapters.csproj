@@ -45,11 +45,5 @@
     <Compile Include="IAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Masters Work\Optimization\OptimizationAlgorithms\OptimizationAlgorithms\OptimizationAlgorithms\OptimizationAlgorithms.csproj">
-      <Project>{D3AE5599-0FFF-4381-BAF8-EC6979E1DBC7}</Project>
-      <Name>OptimizationAlgorithms</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
