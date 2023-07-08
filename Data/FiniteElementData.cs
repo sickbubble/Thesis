@@ -84,6 +84,7 @@ namespace Data
             return rightHandSide;
         }
 
+
         public abstract MatrixCS GetMassMatrix();
 
         public void SetNodeAssemblyData()

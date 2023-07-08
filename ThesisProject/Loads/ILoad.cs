@@ -12,6 +12,11 @@ namespace ThesisProject.Loads
         Distributed = 1,
         Area = 2
     }
+    public enum eLoadingType
+    {
+        PointLoad,
+        FullAreaLoad
+    }
     public interface ILoad
     {
         eLoadType LoadType { get; set; }

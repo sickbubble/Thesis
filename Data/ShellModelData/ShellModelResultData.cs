@@ -35,6 +35,10 @@ namespace Data
                 return instance;
             }
         }
+        public static void KillInstance()
+        {
+            instance = null;
+        }
 
         public static bool IsInstanceValid() 
         {

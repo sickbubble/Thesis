@@ -16,6 +16,14 @@ namespace ThesisProject.Sections
             SetDefaultMaterial();
         }
 
+        public ShellSection(double poissons, double E)
+        {
+            _SectionType = eSectionType.QuadShell;
+
+            this.Material = new Material(E, poissons);
+        }
+
+
         #endregion
 
         #region Private Fields

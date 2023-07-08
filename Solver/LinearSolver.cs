@@ -212,16 +212,19 @@ namespace Solver
             int percentMeanCounter = 0;
             double percentMeanTotal = 0;
 
-            for (int i = 0; i < ShellModelResultData.Instance.NodeResults.Count; i++)
+            for (int i = 0; i < newLatticeRes.NodeResults.Count; i++)
             {
                 var nodeCompareData = new NodeCompareData();
-                var nodePt = ShellModelResultData.Instance.NodeResults.Keys.ElementAt(i);
-                var nodeResShell = ShellModelResultData.Instance.NodeResults[nodePt];
+                var nodePt = newLatticeRes.NodeResults.Keys.ElementAt(i);
+                //var nodeResShell = ShellModelResultData.Instance.NodeResults[nodePt];
+                var shellKey = ShellModelResultData.Instance.NodeResults.Keys.FirstOrDefault(pt => pt.X == nodePt.X &&
+                                                        pt.Y == nodePt.Y);
+                var nodeResShell = ShellModelResultData.Instance.NodeResults[shellKey];
 
                 var key = newLatticeRes.NodeResults.Keys.FirstOrDefault(pt => pt.X == nodePt.X &&
                                                         pt.Y == nodePt.Y);
-                var nodeResLattice = newLatticeRes.NodeResults[key];
-                var node = ShellModelData.Instance.ListOfNodes.FirstOrDefault(x => x.Point == nodePt);
+                var nodeResLattice = newLatticeRes.NodeResults.Values.ElementAt(i);
+                var node = ShellModelData.Instance.ListOfNodes.FirstOrDefault(x => x.Point.X == nodePt.X && x.Point.Y == nodePt.Y);
                 var nodeID = node.ID;
                 nodeCompareData.NodeID = node.ID;
                 var nodePoint = nodePt;
@@ -237,7 +240,7 @@ namespace Solver
 
                 nodeCompareData.PercentDiff = percentDiff;
 
-                if (percentDiff!= 0)
+                if (percentDiff != 0)
                 {
                     percentMeanCounter++;
                     percentMeanTotal += Math.Abs(percentDiff);
@@ -252,7 +255,49 @@ namespace Solver
 
                 nodeCompareList.Add(nodeCompareData);
             }
-                Console.WriteLine($"Mean Percent Deviation: {percentMeanTotal/percentMeanCounter}");
+            Console.WriteLine($"Mean Percent Deviation: {percentMeanTotal / percentMeanCounter}");
+
+            //for (int i = 0; i < ShellModelResultData.Instance.NodeResults.Count; i++)
+            //{
+            //    var nodeCompareData = new NodeCompareData();
+            //    var nodePt = ShellModelResultData.Instance.NodeResults.Keys.ElementAt(i);
+            //    var nodeResShell = ShellModelResultData.Instance.NodeResults[nodePt];
+
+            //    var key = newLatticeRes.NodeResults.Keys.FirstOrDefault(pt => pt.X == nodePt.X &&
+            //                                            pt.Y == nodePt.Y);
+            //    var nodeResLattice = newLatticeRes.NodeResults[key];
+            //    var node = ShellModelData.Instance.ListOfNodes.FirstOrDefault(x => x.Point == nodePt);
+            //    var nodeID = node.ID;
+            //    nodeCompareData.NodeID = node.ID;
+            //    var nodePoint = nodePt;
+            //    var verticalDef = nodeResLattice[2];
+            //    var verticalDefShell = nodeResShell[2];
+
+            //    var percentDiff = (verticalDef - verticalDefShell) / verticalDefShell * 100;
+
+            //    if (double.IsNaN(percentDiff))
+            //    {
+            //        percentDiff = 0;
+            //    }
+
+            //    nodeCompareData.PercentDiff = percentDiff;
+
+            //    if (percentDiff!= 0)
+            //    {
+            //        percentMeanCounter++;
+            //        percentMeanTotal += Math.Abs(percentDiff);
+            //    }
+
+
+            //    nodeCompareData.LatticeVerticalDisp = verticalDef;
+            //    nodeCompareData.ShellVerticalDisp = verticalDefShell;
+            //    nodeCompareData.Point = nodePoint;
+
+            //    Console.WriteLine(nodeID.ToString() + "; " + nodePoint.X.ToString() + ";" + nodePoint.Y.ToString() + "  ;  " + verticalDef.ToString() + " ; " + verticalDefShell.ToString() + " ; " + percentDiff.ToString());
+
+            //    nodeCompareList.Add(nodeCompareData);
+            //}
+            //    Console.WriteLine($"Mean Percent Deviation: {percentMeanTotal/percentMeanCounter}");
 
             return nodeCompareList;
         }
@@ -356,8 +401,8 @@ namespace Solver
                     {
 
                         dofResult = nodeDisps[counter, 0];
-                        counter++;
 
+                        counter++;
                     }
 
                     nodeResults.Add(dofResult);

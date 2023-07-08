@@ -39,6 +39,10 @@ namespace Data
                 return instance;
             }
         }
+        public static void KillInstance()
+        {
+            instance = null;
+        }
 
         public static bool IsInstanceValid()
         {
@@ -60,6 +64,7 @@ namespace Data
         private MatrixCS _GlobalStiffness;
         private MatrixCS _MassMatrix;
         private double _TotalMass;
+        double _Area;
 
 
         #endregion
@@ -70,6 +75,7 @@ namespace Data
         public double MeshSize { get => _MeshSize; set => _MeshSize = value; }
         public bool IsOnlyPlate { get => _IsOnlyPlate; set => _IsOnlyPlate = value; }
         public double ShellThickness { get => _ShellThickness; set => _ShellThickness = value; }
+        public double Area { get => _Width * _Height; }
 
 
         #endregion
@@ -92,6 +98,10 @@ namespace Data
                     break;
             }
 
+        }
+        public void SetModelAsPlate()
+        {
+            foreach (var node in ListOfNodes) node.SupportCondition.SetAsPlate();
         }
         public void FillNodeInfo()
         {
@@ -234,19 +244,43 @@ namespace Data
             }
             return ret;
         }
-        public void AssignLoadToMiddle()
+        public void SetLoad(RunInfo runInfo) 
         {
-            if (ListOfNodes != null)
+            switch (runInfo.LoadingType)
             {
-                for (int i = 0; i < ListOfNodes.Count; i++)
+                case eLoadingType.PointLoad:
+                    AssignLoadToMiddle(runInfo.LoadMagnitude);
+                    break;
+                case eLoadingType.FullAreaLoad:
+                    AssignDistributedLoads(runInfo.LoadMagnitude);
+                    break;
+            }
+
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="magnitude">in per/m2</param>
+        private void AssignDistributedLoads(double magnitude)
+        {
+            var totalLoad = magnitude * this.Area;
+            var eachLoad = totalLoad / this.ListOfNodes.Count;
+
+            if (this.ListOfNodes != null)
+            {
+                foreach (var node in this.ListOfNodes) ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -eachLoad, Node = node, DofID = 2 });
+
+            }
+        }
+        private void AssignLoadToMiddle(double magnitude)
+        {
+
+            if(this.ListOfNodes != null)
+            {
+                var midNode = this.ListOfNodes.FirstOrDefault(x => x.Point.X == Width / 2 && x.Point.Y == Height / 2);
+                if (midNode !=null)
                 {
-                    var node = ListOfNodes[i];
-                    if (node.Point.X == Width / 2 &&
-                        node.Point.Y == Height / 2)
-                    {
-                        //TODO: Tolerance ekle
-                        ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 2 });
-                    }
+                    ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -magnitude, Node = midNode, DofID = 2 });
                 }
             }
         }
@@ -300,7 +334,7 @@ namespace Data
 
 
         }
-        public void FillMemberInfoList()
+        public void FillMemberInfoList(RunInfo runInfo)
         {
             int nElmX = (int)(this.Width / this.MeshSize);
             int nElmY = (int)(this.Height / this.MeshSize);
@@ -316,8 +350,8 @@ namespace Data
                     int kNodeIdx = jNodeIdx + nx;
                     int lNodeIdx = kNodeIdx - 1;
                     var member = new QuadShellMember() { IEndNode = ListOfNodes[iNodeIdx], JEndNode = ListOfNodes[jNodeIdx], KEndNode = ListOfNodes[kNodeIdx], LEndNode = ListOfNodes[lNodeIdx], ID = idx,
-                    Section = new ShellSection() { Thickness = this.ShellThickness }};
-                    member.IsOnlyPlate = this.IsOnlyPlate;
+                    Section = new ShellSection(runInfo.PoissonsRatio,runInfo.Shell_E) { Thickness = this.ShellThickness }};
+                    member.IsOnlyPlate = false;
                     idx++;
 
                     ListOfMembers.Add(member);
@@ -463,11 +497,12 @@ namespace Data
             this.MeshSize = modelRunInfo.ShellMeshSize;
             this.ShellThickness = modelRunInfo.ShellThickness;
             this.FillNodeInfo();
-            this.FillMemberInfoList();
+            this.FillMemberInfoList(modelRunInfo);
             SetModelGeometryType(modelRunInfo.GeometryType);
             SetShellMemberUwByValue(modelRunInfo.ShelllUnitWeigth);
 
             this.SetBorderNodesSupportCondition(modelRunInfo.BorderSupportType);
+            if (modelRunInfo.IsShellOnlyPlate) this.SetModelAsPlate();
 
 
             return true;

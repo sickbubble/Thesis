@@ -51,7 +51,7 @@ namespace PlotUI
         {
             // Initialize shell model
             ShellModelData.Instance.SetModelData(runInfo);
-            ShellModelData.Instance.AssignLoadToMiddle();
+            ShellModelData.Instance.AssignLoadToMiddle(runInfo.LoadMagnitude);
             // Update Shell unit weight to have equal mass system
             //ShellModelData.Instance.setmass(1, ShellModelData.Instance.ShellThickness);
             LinearSolver.Instance.RunAnalysis_Shell();
@@ -63,7 +63,7 @@ namespace PlotUI
             var latticeModelData = new LatticeModelData();
             latticeModelData.SetModelData(runInfo);
             latticeModelData.SetFramesUwByTotalMass(shellTotalMass);
-            latticeModelData.AssignLoadToMiddle();
+            latticeModelData.AssignLoadToMiddle(runInfo.LoadMagnitude);
             var latticeResults = LinearSolver.Instance.RunAnalysis_Lattice(latticeModelData);
 
             var runResult = LinearSolver.Instance.EqualizeSystems(latticeResults, latticeModelData, runInfo); ;

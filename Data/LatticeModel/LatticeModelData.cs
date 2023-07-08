@@ -36,6 +36,7 @@ namespace Data
          double _LatticeMeshRatio;
         eHorizon _Horizon;
         double _AlphaRatio;
+        double _Area;
 
 
         #endregion
@@ -50,6 +51,7 @@ namespace Data
         public double LatticeMeshRatio { get => _LatticeMeshRatio; set => _LatticeMeshRatio = value; }
         public eHorizon Horizon { get => _Horizon; set => _Horizon = value; }
         public double AlphaRatio { get => _AlphaRatio; set => _AlphaRatio = value; }
+        public double Area { get => _Width * _Height; }
 
 
         #endregion
@@ -66,21 +68,47 @@ namespace Data
 
             return totalMass;
         }
-        public void AssignLoadToMiddle()
+        private void AssignLoadToMiddle(double magnitude)
         {
-            if (ListOfNodes != null)
+            if (this.ListOfNodes != null)
             {
-                for (int i = 0; i < ListOfNodes.Count; i++)
+                var midNode = this.ListOfNodes.FirstOrDefault(x => x.Point.X == Width / 2 && x.Point.Y == Height / 2);
+                if (midNode != null)
                 {
-                    var node = ListOfNodes[i];
-                    if (node.Point.X == Width / 2 &&
-                        node.Point.Y == Height / 2)
-                    {
-                        ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -1, Node = node, DofID = 2 });
-                    }
+                    ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -magnitude, Node = midNode, DofID = 2 });
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="magnitude">in per/m2</param>
+        private void AssignDistributedLoads(double magnitude)
+        {
+            var totalLoad = magnitude * this.Area;
+            var eachLoad = totalLoad / this.ListOfNodes.Count;
+
+            if (this.ListOfNodes != null)
+            {
+                foreach (var node in this.ListOfNodes) ListOfLoads.Add(new PointLoad() { LoadType = eLoadType.Point, Magnitude = -eachLoad, Node = node, DofID = 2 });
+
+                }
+        }
+
+        public void SetLoad(RunInfo runInfo)
+        {
+            switch (runInfo.LoadingType)
+            {
+                case eLoadingType.PointLoad:
+                    AssignLoadToMiddle(runInfo.LoadMagnitude);
+                    break;
+                case eLoadingType.FullAreaLoad:
+                    AssignDistributedLoads(runInfo.LoadMagnitude);
+                    break;
+            }
+
+        }
+
         public void AssignLoadToMiddle2()
         {
             if (ListOfNodes != null)

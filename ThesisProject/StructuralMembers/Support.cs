@@ -92,6 +92,25 @@ namespace ThesisProject.Structural_Members
                 _Restraints.Add(i, eRestrainedCondition.NotRestrained);
             }
         }
+        public void SetAsPlate()
+        {
+            if (_Restraints.Count == 6)
+            {
+                _Restraints[0] = eRestrainedCondition.Restrained;
+                _Restraints[1] = eRestrainedCondition.Restrained;
+                _Restraints[5] = eRestrainedCondition.Restrained;
+                return;
+            }
+
+
+            _Restraints = new Dictionary<int, eRestrainedCondition>();
+            _Restraints.Add(0, eRestrainedCondition.Restrained);
+            _Restraints.Add(1, eRestrainedCondition.Restrained);
+            _Restraints.Add(0, eRestrainedCondition.NotRestrained);
+            _Restraints.Add(0, eRestrainedCondition.NotRestrained);
+            _Restraints.Add(0, eRestrainedCondition.NotRestrained);
+            _Restraints.Add(0, eRestrainedCondition.Restrained);
+        }
 
 
         #endregion

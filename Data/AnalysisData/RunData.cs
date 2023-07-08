@@ -13,6 +13,8 @@ using OptimizationAlgorithms.Swarms;
 using ThesisProject.Structural_Members;
 using System.IO;
 using System.Globalization;
+using System.Diagnostics;
+using ThesisProject.Loads;
 
 namespace Data
 {
@@ -47,6 +49,12 @@ namespace Data
         private double _ShellMeshSize;
         private double _MemberDim;
 
+        private double _ShellThickness;
+        private double _Shell_E;
+        private double _PoissonsRatio;
+        private double _LoadMagnitude;
+
+
 
 
 
@@ -61,6 +69,10 @@ namespace Data
         public double LatticeMeshSize { get => _LatticeMeshSize; set => _LatticeMeshSize = value; }
         public double ShellMeshSize { get => _ShellMeshSize; set => _ShellMeshSize = value; }
         public double MemberDim { get => _MemberDim; set => _MemberDim = value; }
+        public double ShellThickness { get => _ShellThickness; set => _ShellThickness = value; }
+        public double Shell_E { get => _Shell_E; set => _Shell_E = value; }
+        public double PoissonsRatio { get => _PoissonsRatio; set => _PoissonsRatio = value; }
+        public double LoadMagnitude { get => _LoadMagnitude; set => _LoadMagnitude = value; }
 
         #endregion
     }
@@ -119,6 +131,11 @@ namespace Data
             this.Horizon = runInfo.Horizon;
             this.LatticeMeshSize = runInfo.LatticeMeshSize;
             this.ShellMeshSize = runInfo.ShellMeshSize;
+            this.PoissonsRatio = runInfo.PoissonsRatio;
+            this.Shell_E = runInfo.Shell_E;
+            this.ShellThickness = runInfo.ShellThickness;
+            this.MemberDim = runInfo.MemberDim;
+            this.LoadMagnitude = runInfo.LoadMagnitude;
 
         }
 
@@ -132,6 +149,42 @@ namespace Data
             IParticle particle = new LatticeParticle(_LatticeDisplacements);
             return particle;
         }
+        public bool SetShellAnalyticalResults()
+        {
+
+
+            var D = (this.Shell_E * Math.Pow(this.ShellThickness, 3)) / (12 * (1 - Math.Pow(this.PoissonsRatio, 2)));
+            var G = this.Shell_E / (2 * (1 + this.PoissonsRatio));
+
+
+
+            foreach (var data in this.NodeCompareData)
+            {
+                if (data.ShellVerticalDisp == 0)
+                {
+
+                    data.ShellAnalyticalVerticalDisp = 0;
+                    continue;
+                }
+                var r = Math.Sqrt(Math.Pow(MemberDim / 2 - data.Point.X, 2) + Math.Pow(MemberDim / 2 - data.Point.Y, 2));
+
+
+
+                data.ShellAnalyticalVerticalDisp = -this.LoadMagnitude / (48 * D) * Math.Pow(1 - Math.Pow(r / this.MemberDim, 2), 2) * (1 + 2 * Math.Pow(r / this.MemberDim, 2));
+                //data.ShellAnalyticalVerticalDisp = -this.LoadMagnitude / ((64 * D * G) * ((Math.Pow(10,4) - Math.Pow(5,4))/((5*5 + 5*5)* (5 * 5 + 5 * 5))));
+                data.ShellAnalyticalVerticalDisp = -this.LoadMagnitude * 10 * 10 / (64 * D * G) ;
+
+                var ratio = data.ShellVerticalDisp / data.ShellAnalyticalVerticalDisp;
+
+                var percentDiff = Math.Abs(data.ShellAnalyticalVerticalDisp - data.ShellVerticalDisp) / Math.Abs(data.ShellVerticalDisp);
+
+            }
+
+
+            return false;
+        }
+
+
 
         public double[] GetBestSolution()
         {
@@ -172,27 +225,42 @@ namespace Data
             var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
             string lattice_fp = desktop + "\\RunResults\\latticeRes2.csv";
             string shell_fp = desktop + "\\RunResults\\shellRes2.csv";
+            string shellAnalytic_fp = desktop + "\\RunResults\\shellResAnalytic2.csv";
 
 
-            StringBuilder sb = new StringBuilder();
-            StringBuilder sb_Lattice = new StringBuilder();
+            StringBuilder sbShell = new StringBuilder();
+            StringBuilder sbLattice = new StringBuilder();
+            StringBuilder sbShellAnalytic = new StringBuilder();
 
             foreach (var data in NodeCompareData)
             {
-                sb.AppendLine($"{data.Point.X  } ;{data.Point.Y}; {data.ShellVerticalDisp }");
-                sb_Lattice.AppendLine($"{data.Point.X } ;{data.Point.Y}; {data.LatticeVerticalDisp}");
+                sbShell.AppendLine($"{data.Point.X  } ;{data.Point.Y}; {data.ShellVerticalDisp }");
+                sbLattice.AppendLine($"{data.Point.X } ;{data.Point.Y}; {data.LatticeVerticalDisp}");
+                sbShellAnalytic.AppendLine($"{data.Point.X } ;{data.Point.Y}; {data.ShellAnalyticalVerticalDisp}");
 
             }
 
             // Write the data to the CSV file
             using (StreamWriter writer = new StreamWriter(lattice_fp))
             {
-                writer.Write(sb_Lattice.ToString());
+                writer.Write(sbLattice.ToString());
             }
             using (StreamWriter writer = new StreamWriter(shell_fp))
             {
-                writer.Write(sb.ToString());
+                writer.Write(sbShell.ToString());
             }
+
+            using (StreamWriter writer = new StreamWriter(shellAnalytic_fp))
+            {
+                writer.Write(sbShellAnalytic.ToString());
+            }
+
+            var process = new Process();
+            //process.StartInfo = new ProcessStartInfo(desktop + "\\RunResults\\gnuplot\\gnuplot 5.2 patchlevel 8 - console version", desktop + "\\RunResults\\GnuplotCommands.gp");
+            //process.StartInfo = new ProcessStartInfo( desktop + "\\RunResults\\GnuplotCommands.gp");
+            process.StartInfo = new ProcessStartInfo( desktop + "\\RunResults\\GnuplotCommandsAnalytic.gp");
+            process.Start();
+            process.WaitForExit();
 
         }
 
@@ -220,21 +288,23 @@ namespace Data
 
 
 
-        private double _ShellThickness;
         private eSupportType _BorderSupportType;
         private eModelGeometryType _GeometryType;
         private double _ShelllUnitWeigth;
+        private bool _IsShellOnlyPlate;
+        private eLoadingType _LoadingType;
 
 
         #endregion
 
 
         #region Public Properties
-        public double ShellThickness { get => _ShellThickness; set => _ShellThickness = value; }
 
         public eModelGeometryType GeometryType { get => _GeometryType; set => _GeometryType = value; }
         public eSupportType BorderSupportType { get => _BorderSupportType; set => _BorderSupportType = value; }
         public double ShelllUnitWeigth { get => _ShelllUnitWeigth; set => _ShelllUnitWeigth = value; }
+        public bool IsShellOnlyPlate { get => _IsShellOnlyPlate; set => _IsShellOnlyPlate = value; }
+        public eLoadingType LoadingType { get => _LoadingType; set => _LoadingType = value; }
 
         public object Clone()
         {
@@ -278,6 +348,7 @@ namespace Data
 
 
         private double _ShellVerticalDisp;
+        private double _ShellAnalyticalVerticalDisp;
         private double _LatticeVerticalDisp;
         private double _PercentDiff;
 
@@ -290,6 +361,7 @@ namespace Data
         #region Public Properties
         public int NodeID { get => _NodeID; set => _NodeID = value; }
         public double ShellVerticalDisp { get => _ShellVerticalDisp; set => _ShellVerticalDisp = value; }
+        public double ShellAnalyticalVerticalDisp { get => _ShellAnalyticalVerticalDisp; set => _ShellAnalyticalVerticalDisp = value; }
         public double LatticeVerticalDisp { get => _LatticeVerticalDisp; set => _LatticeVerticalDisp = value; }
         public double PercentDiff { get => _PercentDiff; set => _PercentDiff = value; }
         public Point Point { get => _Point; set => _Point = value; }

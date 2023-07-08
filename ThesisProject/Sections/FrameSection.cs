@@ -115,7 +115,7 @@ namespace ThesisProject.Sections
 
         public void SetDefaultMaterial()
         {
-            this.Material = new Material(1, 0.3);
+            this.Material = new Material(25*Math.Pow(10,9), 0.3);
             
         }
         
